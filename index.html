@@ -6,7 +6,8 @@
 <title>PostKit, AI Instagram posts for your business</title>
 <meta name="description" content="Generate ready-to-post Instagram designs and captions with AI. For businesses in Lebanon who don't have time to design.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#F7F6F2; --card:#FFFFFF; --border:#E9E7E0; --line:#DBD9D1;
@@ -16,6 +17,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html{scroll-behavior:smooth}
+  html,body{overflow-x:hidden;max-width:100%}
   body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;line-height:1.5}
   ::-webkit-scrollbar{width:6px;height:6px}
   ::-webkit-scrollbar-thumb{background:#CFCEC7;border-radius:3px}
@@ -88,14 +90,16 @@
   input:hover,select:hover,textarea:hover{border-color:#C8C6BE}
   input,select,textarea{transition:border-color .15s ease}
   details.acc{border:1px solid var(--border);border-radius:12px;margin-top:16px;background:var(--bg);overflow:hidden}
-  details.acc summary{list-style:none;cursor:pointer;padding:13px 14px;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;user-select:none}
-  details.acc summary::-webkit-details-marker{display:none}
-  details.acc summary::after{content:"+";color:var(--lime);font-size:17px;font-weight:700;transition:transform .15s ease}
-  details.acc[open] summary::after{transform:rotate(45deg)}
+  details.acc>summary{list-style:none;cursor:pointer;padding:13px 14px;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;user-select:none}
+  details.acc>summary::-webkit-details-marker{display:none}
+  details.acc>summary::after{content:"+";color:var(--lime);font-size:17px;font-weight:700;transition:transform .15s ease}
+  details.acc[open]>summary::after{transform:rotate(45deg)}
   details.acc .acc-body{padding:2px 14px 14px}
   details.acc .acc-body>label:first-child{margin-top:6px}
   .chip{background:var(--card);border:1px solid var(--line);color:#55564F;border-radius:999px;padding:8px 14px;font-size:13px}
   .chip.active{border-color:var(--lime);color:var(--lime);background:var(--lime-bg);font-weight:600}
+  .miniai{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px;font-size:13px;font-weight:600}
+  .miniai:hover{border-color:var(--lime);color:var(--lime)}
   .swatch{width:44px;height:44px;border-radius:12px;border:2px solid #DBD9D1;display:flex;align-items:center;justify-content:center;background:var(--card)}
   .swatch.active{border-color:var(--lime)}
   .swatch span{width:16px;height:16px;border-radius:50%}
@@ -144,6 +148,48 @@
 
   footer{text-align:center;color:var(--dim);font-size:12px;padding:30px 0 90px}
   footer a{color:var(--muted)}
+
+  /* ===== premium polish ===== */
+  @media (prefers-reduced-motion: no-preference){
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
+    .reveal.in{opacity:1;transform:none}
+    .card{transition:box-shadow .25s ease, transform .25s ease}
+    .btn-primary,.gen-btn,.plan a,.copy-btn,.dl-btn{transition:transform .18s cubic-bezier(.2,.7,.2,1), filter .18s ease, box-shadow .25s ease}
+    .btn-primary:hover,.gen-btn:hover{transform:translateY(-2px)}
+    .canvas-wrap{animation:riseIn .55s cubic-bezier(.2,.7,.2,1)}
+    @keyframes riseIn{from{opacity:0;transform:translateY(22px) scale(.98)}to{opacity:1;transform:none}}
+    .chip{transition:border-color .15s ease,color .15s ease,background .15s ease,transform .12s ease}
+    .chip:active{transform:scale(.95)}
+  }
+  header{background:transparent;padding:20px 0 8px}
+  .hero{position:relative}
+  .card{padding:22px}
+  .section-title{margin-top:34px}
+  .skeleton{background:linear-gradient(100deg,#EDEBE4 30%,#F5F3EE 50%,#EDEBE4 70%);background-size:200% 100%;animation:shimmer 1.3s linear infinite}
+  @keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+
+
+  /* ===== refined button hierarchy ===== */
+  #ideaBtn,#planBtn,#monthBtn,#offersBtn,#campaignBtn,#voiceBtn,#luckyBtn,#recapBtn,#bgBtn{
+    border:1px solid var(--border)!important;background:var(--card)!important;color:var(--text)!important;
+    font-weight:600;box-shadow:0 1px 2px rgba(25,26,23,.04);
+  }
+  #ideaBtn:hover,#planBtn:hover,#monthBtn:hover,#offersBtn:hover,#campaignBtn:hover,#voiceBtn:hover,#luckyBtn:hover,#recapBtn:hover,#bgBtn:hover{
+    border-color:var(--lime)!important;color:var(--lime)!important;
+  }
+  #luckyBtn{background:var(--lime-bg)!important;border-color:var(--lime-dark)!important;color:var(--lime)!important;font-weight:700}
+  /* refined labels */
+  label{font-size:11px;letter-spacing:.09em;color:var(--muted);font-weight:600}
+  .section-sub{line-height:1.5}
+  /* refined empty preview */
+  #emptyPreview{border:1.5px dashed var(--line);border-radius:16px;padding:44px 20px;text-align:center;color:var(--dim);margin-bottom:18px;background:
+    repeating-linear-gradient(45deg,transparent,transparent 12px,rgba(43,68,222,.02) 12px,rgba(43,68,222,.02) 24px)}
+  #emptyPreview .ep-mark{width:54px;height:54px;border-radius:14px;background:var(--lime-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px}
+  #emptyPreview b{color:var(--text);display:block;font-size:15px;margin-bottom:4px;letter-spacing:normal}
+  #emptyPreview span{font-size:13px}
+
+  #customizeAcc{border-color:var(--lime-dark);background:var(--lime-bg)}
+  #customizeAcc>summary{color:var(--lime);font-weight:700}
 </style>
 </head>
 <body>
@@ -165,7 +211,7 @@
   </section>
 
   <!-- HOW -->
-  <section id="how" class="steps">
+  <section id="how" class="steps reveal">
     <div class="step"><b>1</b><div><strong>Describe your post</strong>"30% off summer dresses this weekend" is all you type.</div></div>
     <div class="step"><b>2</b><div><strong>Pick a template &amp; colors</strong>4 professional layouts, 6 color moods. Switch instantly.</div></div>
     <div class="step"><b>3</b><div><strong>Download &amp; post</strong>1080×1080 design + caption + hashtags, ready for Instagram.</div></div>
@@ -175,7 +221,7 @@
   <h2 class="section-title" id="app">Create your post</h2>
   <p class="section-sub">Try 3 posts free. No signup needed.</p>
 
-  <div class="card">
+  <div class="card reveal">
     <label for="quickDesc">✨ Just describe it <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(AI fills the form for you)</span></label>
     <div style="display:flex;gap:8px;margin-bottom:4px">
       <input id="quickDesc" placeholder='e.g. "luxury post for my coffee shop about iced drinks"' style="flex:1">
@@ -207,6 +253,7 @@
 
     <label for="topic">What's the post about?</label>
     <textarea id="topic" placeholder="e.g. 30% off all summer dresses this weekend"></textarea>
+    <button id="voiceBtn" type="button" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎤 Speak your idea</button>
     <button id="ideaBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">✦ Need an idea?</button>
     <details class="acc">
       <summary>💡 Idea tools, planning &amp; occasions</summary>
@@ -215,6 +262,25 @@
     <button id="monthBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🗓 Plan my month: 30 AI ideas (1 credit)</button>
     <button id="offersBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">💡 Offer &amp; campaign ideas (1 credit)</button>
     <button id="campaignBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎯 Full campaign from this topic (1 credit)</button>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="miniai" data-ai="cta">✅ CTA ideas</button>
+      <button class="miniai" data-ai="poll">💬 Poll ideas</button>
+      <button class="miniai" data-ai="keywords">🔑 Keywords</button>
+      <button class="miniai" data-ai="seo">🔎 SEO caption</button>
+      <button class="miniai" data-ai="productdesc">🛍️ Product text</button>
+      <button class="miniai" data-ai="quotegen">❝ Quote ideas</button>
+      <button class="miniai" data-ai="polish">✨ Fix grammar</button>
+      <button class="miniai" data-ai="blog">📝 Blog → posts</button>
+    </div>
+    <div style="margin-top:8px">
+      <label style="margin-top:6px">📄 Long text → carousel or posts <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(paste a blog or PDF text)</span></label>
+      <textarea id="longText" style="min-height:70px" placeholder="Paste your blog post or document text here…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="miniai" style="flex:1" data-ai="pdfcarousel">→ 5-slide carousel</button>
+        <button class="miniai" style="flex:1" data-ai="blogLong">→ 3 posts</button>
+      </div>
+    </div>
+    <p class="error" id="aiToolError"></p>
     <div id="planCard" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px">
       <span style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">Tap an idea to use it:</span>
       <div class="chip-row" id="planRow"></div>
@@ -296,6 +362,9 @@
       </div>
     </details>
 
+    <details class="acc" id="customizeAcc">
+      <summary>🎛️ Customize design <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">(templates, colors, fonts, effects)</span></summary>
+      <div class="acc-body">
     <label>Format</label>
     <div class="chip-row" id="fmtRow">
       <button class="chip active" data-fmt="post">Post 1:1</button>
@@ -308,7 +377,8 @@
 
     <label>Template</label>
     <div class="chip-row" id="tplRow">
-      <button class="chip active" data-tpl="bold">Bold Statement</button>
+      <button class="chip active" data-tpl="freestyle">✨ AI Freestyle</button>
+      <button class="chip" data-tpl="bold">Bold Statement</button>
       <button class="chip" data-tpl="editorial">Editorial</button>
       <button class="chip" data-tpl="arc">Arc Modern</button>
       <button class="chip" data-tpl="frame">Framed</button>
@@ -318,6 +388,9 @@
       <button class="chip" data-tpl="dots">Dotted</button>
       <button class="chip" data-tpl="banner">Banner</button>
       <button class="chip" data-tpl="review">Review ★</button>
+      <button class="chip" data-tpl="quote">Quote ❝</button>
+      <button class="chip" data-tpl="beforeafter">Before / After</button>
+      <button class="chip" data-tpl="giveaway">Giveaway 🎁</button>
     </div>
 
     <label>Color mood</label>
@@ -341,13 +414,62 @@
       <div class="swatch-grid" id="primarySwatches"></div>
     </div>
 
+    <label>Typography</label>
+    <div class="chip-row" id="fontRow">
+      <button class="chip active" data-font="default">Modern</button>
+      <button class="chip" data-font="elegant" style="font-family:'Playfair Display',serif">Elegant</button>
+      <button class="chip" data-font="editorial" style="font-family:'Fraunces',serif">Editorial</button>
+      <button class="chip" data-font="bold" style="font-family:'Bebas Neue',sans-serif;letter-spacing:1px">Bold</button>
+      <button class="chip" data-font="clean" style="font-family:'Poppins',sans-serif">Clean</button>
+      <button class="chip" data-font="strong" style="font-family:'Oswald',sans-serif">Strong</button>
+      <button class="chip" data-font="luxe" style="font-family:'Cormorant Garamond',serif">Luxe</button>
+      <button class="chip" data-font="fashion" style="font-family:'DM Serif Display',serif">Fashion</button>
+      <button class="chip" data-font="impact" style="font-family:'Anton',sans-serif">Impact</button>
+      <button class="chip" data-font="vogue" style="font-family:'Abril Fatface',serif">Vogue</button>
+      <button class="chip" data-font="tech" style="font-family:'Space Mono',monospace">Tech</button>
+      <button class="chip" data-font="handwritten" style="font-family:'Caveat',cursive;font-size:16px">Handwritten</button>
+      <button class="chip" data-font="heavy" style="font-family:'Archivo Black',sans-serif">Heavy</button>
+      <button class="chip" data-font="classic" style="font-family:'Libre Baskerville',serif">Classic</button>
+      <button class="chip" data-font="playful" style="font-family:'Righteous',sans-serif">Playful</button>
+    </div>
+
+    <details class="acc">
+      <summary>🎨 Visual effects</summary>
+      <div class="acc-body">
+        <label>Finish</label>
+        <div class="chip-row" id="fxModeRow">
+          <button class="chip active" data-fx="none">None</button>
+          <button class="chip" data-fx="neon">Neon</button>
+          <button class="chip" data-fx="glass">Glass</button>
+          <button class="chip" data-fx="vintage">Vintage</button>
+          <button class="chip" data-fx="luxury">Luxury</button>
+        </div>
+        <label>Extras</label>
+        <div class="chip-row" id="fxToggleRow">
+          <button class="chip" data-fxt="border">Border</button>
+          <button class="chip" data-fxt="shadow">Text shadow</button>
+          <button class="chip" data-fxt="stroke">Text stroke</button>
+          <button class="chip" data-fxt="corners">Rounded frame</button>
+        </div>
+        <label>📱 QR code <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(link or WhatsApp, shows bottom-left)</span></label>
+        <div style="display:flex;gap:8px">
+          <input id="qrInput" placeholder="https://your-link.com or your number" style="flex:1">
+          <button id="qrClear" type="button" style="background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:0 14px;font-size:13px">Clear</button>
+        </div>
+      </div>
+    </details>
+
     <label>Logo <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional, shows top right)</span></label>
     <div style="display:flex;gap:8px;align-items:center">
       <input type="file" id="logoInput" accept="image/*" style="flex:1;padding:9px 10px;font-size:13px">
       <button id="logoClear" style="display:none;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:10px 14px;font-size:13px">Remove</button>
     </div>
 
+      </div>
+    </details>
+
     <button class="gen-btn" id="genBtn">Generate post</button>
+    <button id="luckyBtn" type="button" style="width:100%;margin-top:10px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:12px;padding:12px;font-size:14px;font-weight:600">🍀 I'm Feeling Lucky (random everything)</button>
     <p class="error" id="errorMsg"></p>
     <p class="usage" id="usageMsg"></p>
   </div>
@@ -375,13 +497,31 @@
     </div>
   </div>
 
+  <div id="emptyPreview">
+    <div class="ep-mark">✨</div>
+    <b>Your post will appear here</b>
+    <span>Describe it above and tap Generate</span>
+  </div>
   <div id="slideBar" style="display:none;margin-bottom:10px" class="chip-row"></div>
   <div class="canvas-wrap" id="canvasWrap"><canvas id="canvas" width="1080" height="1080"></canvas></div>
   <div class="action-row" id="actionRow">
     <button class="dl-btn" id="dlBtn">PNG</button>
     <button class="dl-btn" id="dlJpgBtn" style="background:transparent;color:var(--lime);border:1px solid var(--lime-dark)">JPG</button>
     <button class="dl-btn" id="dlAllBtn" style="display:none">All slides</button>
+    <button class="re-btn" id="shuffleBtn" style="display:none">🎲 Shuffle</button>
     <button class="re-btn" id="reBtn">Regenerate</button>
+  </div>
+
+  <div class="card" id="boostCard" style="display:none">
+    <label>✨ Creative Boost <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(rewrites caption, 1 credit each)</span></label>
+    <div class="chip-row" id="boostRow">
+      <button class="chip" data-boost="luxury">💎 More Premium</button>
+      <button class="chip" data-boost="eye">🔥 More Eye-Catching</button>
+      <button class="chip" data-boost="funny">😂 More Funny</button>
+      <button class="chip" data-boost="emotional">❤️ More Emotional</button>
+      <button class="chip" data-boost="sales">📢 More Sales-Focused</button>
+      <button class="chip" data-boost="genz">🧢 For Gen Z</button>
+    </div>
   </div>
 
   <div class="card" id="captionCard">
@@ -389,6 +529,12 @@
     <div class="chip-row" id="versionRow" style="margin-bottom:8px;display:none"></div>
     <p class="caption-text" id="captionText"></p>
     <p class="hashtags" id="hashtagsText"></p>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="miniai" data-len="short">Short</button>
+      <button class="miniai" data-len="medium">Medium</button>
+      <button class="miniai" data-len="long">Long</button>
+      <span id="charCount" style="align-self:center;font-size:12px;color:var(--dim)"></span>
+    </div>
     <div id="tipsBox" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)"></div>
     <div class="chip-row" id="platRow" style="margin-top:10px">
       <span style="font-size:12px;color:var(--muted);align-self:center">Adapt for:</span>
@@ -419,6 +565,9 @@
     <p class="error" id="bgError"></p>
     <label style="margin-top:12px">Or upload your own photo <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(free)</span></label>
     <input type="file" id="bgUpload" accept="image/*" style="padding:9px 10px;font-size:13px">
+    <label style="margin-top:12px">📷 Product photo → ad <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(removes background, 1 credit)</span></label>
+    <input type="file" id="productUpload" accept="image/*" style="padding:9px 10px;font-size:13px">
+    <p class="error" id="productError"></p>
   </div>
 
   <div class="card" id="historyCard" style="display:none">
@@ -454,7 +603,7 @@
   <!-- PRICING -->
   <h2 class="section-title" id="pricing">Pricing</h2>
   <p class="section-sub">Pay via Whish or OMT. Message us on WhatsApp and get your code in minutes.</p>
-  <div class="plans">
+  <div class="plans reveal">
     <div class="plan free">
       <h3>Free</h3>
       <div class="price">$0</div>
@@ -465,21 +614,21 @@
       <span class="tag">MOST POPULAR</span>
       <h3>Starter</h3>
       <div class="price">$15<small>/month</small></div>
-      <ul><li>30 posts per month</li><li>All templates &amp; colors</li><li>English + Arabic</li><li>WhatsApp support</li></ul>
+      <ul><li>15 posts per month</li><li>All templates &amp; colors</li><li>All languages</li><li>No watermark</li></ul>
       <a id="waStarter" href="#" target="_blank" rel="noopener">Get Starter →</a>
     </div>
     <div class="plan">
       <h3>Pro</h3>
       <div class="price">$29<small>/month</small></div>
-      <ul><li>Unlimited posts</li><li>Everything in Starter</li><li>Priority requests for new templates</li></ul>
+      <ul><li>100 posts per month</li><li>Everything in Starter</li><li>Batch generate: a month of posts in one tap</li></ul>
       <a id="waPro" href="#" target="_blank" rel="noopener">Get Pro →</a>
     </div>
     <div class="plan">
-      <span class="tag">DONE FOR YOU</span>
-      <h3>Managed</h3>
+      <span class="tag">FOR AGENCIES</span>
+      <h3>Agency</h3>
       <div class="price">$79<small>/month</small></div>
-      <ul><li>We create 12 posts/month for you</li><li>Delivered ready to publish</li><li>Your brand colors &amp; style</li><li>Zero effort on your side</li></ul>
-      <a id="waDfy" href="#" target="_blank" rel="noopener">Get Managed →</a>
+      <ul><li>Truly unlimited posts</li><li>Manage multiple brands with Brand Kits</li><li>Everything in Pro</li><li>Perfect for freelancers &amp; agencies with clients</li></ul>
+      <a id="waDfy" href="#" target="_blank" rel="noopener">Get Agency →</a>
     </div>
   </div>
 
@@ -498,6 +647,25 @@ const WORKER_URL = "https://postkit-api.georgescharbel6.workers.dev"; // your Cl
 const WHATSAPP  = "96179106883"; // your WhatsApp number
 /* ======================================================= */
 
+const FONT_PAIRS = [
+  { id:"default", name:"Modern", display:"'Archivo', sans-serif", displayW:800, body:"'Space Grotesk', sans-serif", serif:false },
+  { id:"elegant", name:"Elegant", display:"'Playfair Display', serif", displayW:700, body:"'Lora', serif", serif:true },
+  { id:"editorial", name:"Editorial", display:"'Fraunces', serif", displayW:600, body:"'Space Grotesk', sans-serif", serif:true },
+  { id:"bold", name:"Bold", display:"'Bebas Neue', sans-serif", displayW:400, body:"'Montserrat', sans-serif", serif:false },
+  { id:"clean", name:"Clean", display:"'Poppins', sans-serif", displayW:800, body:"'Poppins', sans-serif", serif:false },
+  { id:"strong", name:"Strong", display:"'Oswald', sans-serif", displayW:600, body:"'Montserrat', sans-serif", serif:false },
+  { id:"luxe", name:"Luxe", display:"'Cormorant Garamond', serif", displayW:600, body:"'Montserrat', sans-serif", serif:true },
+  { id:"fashion", name:"Fashion", display:"'DM Serif Display', serif", displayW:400, body:"'Montserrat', sans-serif", serif:true },
+  { id:"impact", name:"Impact", display:"'Anton', sans-serif", displayW:400, body:"'Space Grotesk', sans-serif", serif:false },
+  { id:"vogue", name:"Vogue", display:"'Abril Fatface', serif", displayW:400, body:"'Poppins', sans-serif", serif:true },
+  { id:"tech", name:"Tech", display:"'Space Mono', monospace", displayW:700, body:"'Space Grotesk', sans-serif", serif:false },
+  { id:"handwritten", name:"Handwritten", display:"'Caveat', cursive", displayW:700, body:"'Poppins', sans-serif", serif:false },
+  { id:"heavy", name:"Heavy", display:"'Archivo Black', sans-serif", displayW:400, body:"'Space Grotesk', sans-serif", serif:false },
+  { id:"classic", name:"Classic", display:"'Libre Baskerville', serif", displayW:700, body:"'Lora', serif", serif:true },
+  { id:"playful", name:"Playful", display:"'Righteous', sans-serif", displayW:400, body:"'Poppins', sans-serif", serif:false },
+];
+function getFont() { return FONT_PAIRS.find(f => f.id === state.fontId) || FONT_PAIRS[0]; }
+
 const PALETTES = [
   { id:"amber", name:"Amber Heat", bg:"#1A1208", primary:"#F5A623", accent:"#FFE8C2", text:"#FFF7EA" },
   { id:"ocean", name:"Deep Ocean", bg:"#06202E", primary:"#2EC4B6", accent:"#CBF3F0", text:"#EAFBFA" },
@@ -514,14 +682,16 @@ const PALETTES = [
 ];
 
 let state = {
-  template: "bold",
+  template: "freestyle",
   paletteId: "amber",
   lang: "en",
   tone: "friendly",
   emoji: "yes",
   style: "creative",
+  fontId: "default",
   plan: "trial",
   format: "post",
+  fx: { mode: "none", border: false, shadow: false, stroke: false, corners: false },
   slides: null,
   slideIndex: 0,
   captions: [],
@@ -545,6 +715,26 @@ function getPalette() {
   }
   return PALETTES.find(p => p.id === state.paletteId);
 }
+
+/* ---------- premium motion: scroll reveal + sticky header ---------- */
+(function () {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll(".reveal").forEach(el => el.classList.add("in"));
+  } else if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll(".reveal").forEach(el => el.classList.add("in"));
+  }
+  const hdr = document.querySelector("header");
+  if (hdr) {
+    const onScroll = () => hdr.classList.toggle("scrolled", window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+})();
 
 /* ---------- hero typewriter ---------- */
 (function () {
@@ -580,7 +770,7 @@ function getPalette() {
 const waMsg = (plan) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I want the PostKit ${plan} plan 🙌`)}`;
 document.getElementById("waStarter").href = waMsg("Starter ($15/mo)");
 document.getElementById("waPro").href = waMsg("Pro ($29/mo)");
-document.getElementById("waDfy").href = waMsg("Managed ($79/mo, done for you)");
+document.getElementById("waDfy").href = waMsg("Agency ($79/mo)");
 document.getElementById("waFloat").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi! I have a question about PostKit")}`;
 
 /* ---------- palette chips ---------- */
@@ -748,6 +938,7 @@ document.getElementById("tplRow").addEventListener("click", e => {
   state.template = btn.dataset.tpl;
   [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.remove("active"));
   btn.classList.add("active");
+  if (state.result) document.getElementById("shuffleBtn").style.display = state.template === "freestyle" ? "block" : "none";
   rerender();
 });
 document.getElementById("langRow").addEventListener("click", e => {
@@ -767,6 +958,13 @@ document.getElementById("emojiRow").addEventListener("click", e => {
   state.emoji = btn.dataset.emoji;
   [...document.querySelectorAll("#emojiRow .chip")].forEach(c => c.classList.remove("active"));
   btn.classList.add("active");
+});
+document.getElementById("fontRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-font]"); if (!btn) return;
+  state.fontId = btn.dataset.font;
+  [...document.querySelectorAll("#fontRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+  rerender();
 });
 document.getElementById("styleRow").addEventListener("click", e => {
   const btn = e.target.closest("[data-style]"); if (!btn) return;
@@ -837,23 +1035,7 @@ document.getElementById("occasionBtn").onclick = () => {
   refresh();
 })();
 
-/* ---------- industry auto-template suggestion ---------- */
-const BIZ_TEMPLATE = {
-  "Restaurant / Café": "bold", "Bakery / Pastry": "dots", "Salon / Beauty": "editorial",
-  "Barber Shop": "poster", "Gym / Fitness": "split", "Retail / Store": "promo",
-  "Fashion / Boutique": "editorial", "Jewelry": "frame", "Real Estate": "poster",
-  "Clinic / Dental": "arc", "Pharmacy": "arc", "Hotel / Guesthouse": "editorial",
-  "Travel Agency": "banner", "Photography / Video": "frame", "Events / Wedding": "editorial",
-  "Auto / Car Services": "split", "Electronics / Tech": "promo", "Home / Furniture": "dots",
-  "Education / Tutoring": "arc", "Services / Agency": "poster", "Other": "bold",
-};
-document.getElementById("bizType").addEventListener("change", () => {
-  const t = BIZ_TEMPLATE[document.getElementById("bizType").value];
-  if (!t) return;
-  state.template = t;
-  [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tpl === t));
-  rerender();
-});
+/* AI Freestyle is the default: the AI art-directs each post itself */
 
 /* ---------- quick describe (natural language) ---------- */
 document.getElementById("quickBtn").onclick = async () => {
@@ -1028,6 +1210,198 @@ async function batchRun(count) {
 document.getElementById("batch6Btn").onclick = () => batchRun(6);
 document.getElementById("batch12Btn").onclick = () => batchRun(12);
 
+/* ---------- AI writing tools (CTA, poll, keywords, seo, product, quote, polish, blog, carousel) ---------- */
+function showIdeaChips(ideas, labelPrefix) {
+  const row = document.getElementById("planRow");
+  row.innerHTML = "";
+  ideas.forEach((idea) => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.style.textAlign = "left";
+    b.textContent = idea;
+    b.onclick = () => {
+      const ta = document.getElementById("topic");
+      ta.value = idea;
+      ta.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+    row.appendChild(b);
+  });
+  document.getElementById("planCard").style.display = "block";
+}
+function applyCaption(cap, tags) {
+  document.getElementById("topic").value = cap;
+  // if a result exists, also update its caption panel
+  if (state.result) {
+    state.result.caption = cap;
+    if (Array.isArray(tags) && tags.length) state.result.hashtags = tags;
+    document.getElementById("captionText").textContent = state.result.caption;
+    document.getElementById("hashtagsText").textContent = (state.result.hashtags || []).map(h => "#" + h).join(" ");
+  }
+}
+async function runAiTool(mode, inputOverride) {
+  const err = document.getElementById("aiToolError");
+  err.textContent = "";
+  const topicVal = inputOverride !== undefined ? inputOverride
+    : (mode === "polish" || mode === "seo" || mode === "productdesc") ? document.getElementById("topic").value.trim()
+    : document.getElementById("topic").value.trim();
+  if (!topicVal && mode !== "quotegen") { err.textContent = "Type or paste something first."; return; }
+  err.textContent = "Working…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: state.code, mode,
+        brand: document.getElementById("brand").value.trim(),
+        bizType: document.getElementById("bizType").value,
+        topic: topicVal, lang: state.lang, tone: state.tone, emoji: state.emoji,
+      }),
+    });
+    const data = await res.json();
+    if (!data.ok || !data.result) { err.textContent = data.message || "Failed. Try again."; return; }
+    const r = data.result;
+    err.textContent = "";
+    if (Array.isArray(r.ideas)) { showIdeaChips(r.ideas); }
+    else if (Array.isArray(r.slides) && r.slides.length) {
+      state.slides = r.slides; state.slideIndex = 0;
+      state.result = { headline: r.slides[0].headline, subline: r.slides[0].subline, caption: r.caption || "", hashtags: r.hashtags || [] };
+      state.captions = [{ caption: state.result.caption, hashtags: state.result.hashtags }];
+      state.captionIndex = 0;
+      if (state.template === "freestyle") state.template = "dots";
+      showResult();
+    }
+    else if (Array.isArray(r.posts) && r.posts.length) {
+      state.slides = r.posts; state.slideIndex = 0;
+      state.result = { headline: r.posts[0].headline, subline: r.posts[0].subline, caption: r.caption || "", hashtags: r.hashtags || [] };
+      state.captions = [{ caption: state.result.caption, hashtags: state.result.hashtags }];
+      state.captionIndex = 0;
+      showResult();
+    }
+    else if (r.caption !== undefined) { applyCaption(r.caption, r.hashtags); err.textContent = "Done ✓ Added to your topic/caption."; }
+    if (data.usage) {
+      usageMsg.textContent = data.usage.plan === "trial"
+        ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+        : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+    }
+  } catch { err.textContent = "Connection failed. Try again."; }
+}
+document.querySelectorAll(".miniai").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const mode = btn.dataset.ai;
+    if (mode === "pdfcarousel") return runAiTool("pdfcarousel", document.getElementById("longText").value.trim());
+    if (mode === "blogLong") return runAiTool("blog", document.getElementById("longText").value.trim());
+    runAiTool(mode);
+  });
+});
+
+/* ---------- visual effects ---------- */
+document.getElementById("fxModeRow").addEventListener("click", e => {
+  const b = e.target.closest("[data-fx]"); if (!b) return;
+  state.fx.mode = b.dataset.fx;
+  [...document.querySelectorAll("#fxModeRow .chip")].forEach(c => c.classList.remove("active"));
+  b.classList.add("active");
+  rerender();
+});
+document.getElementById("fxToggleRow").addEventListener("click", e => {
+  const b = e.target.closest("[data-fxt]"); if (!b) return;
+  const k = b.dataset.fxt;
+  state.fx[k] = !state.fx[k];
+  b.classList.toggle("active", state.fx[k]);
+  rerender();
+});
+
+/* ---------- QR code ---------- */
+function buildQR() {
+  const val = document.getElementById("qrInput").value.trim();
+  if (!val) { qrImg = null; rerender(); return; }
+  try {
+    const holder = document.createElement("div");
+    new QRCode(holder, { text: val, width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M });
+    setTimeout(() => {
+      const c = holder.querySelector("canvas");
+      const img = holder.querySelector("img");
+      const src = c ? c.toDataURL("image/png") : (img ? img.src : null);
+      if (src) { const i = new Image(); i.onload = () => { qrImg = i; rerender(); }; i.src = src; }
+    }, 60);
+  } catch (e) {}
+}
+let qrTimer;
+document.getElementById("qrInput").addEventListener("input", () => { clearTimeout(qrTimer); qrTimer = setTimeout(buildQR, 500); });
+document.getElementById("qrClear").onclick = () => { document.getElementById("qrInput").value = ""; qrImg = null; rerender(); };
+
+/* ---------- I'm Feeling Lucky ---------- */
+document.getElementById("luckyBtn").onclick = () => {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  state.template = "freestyle";
+  [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tpl === "freestyle"));
+  const pals = PALETTES.map(p => p.id);
+  state.paletteId = pick(pals); state.customActive = false;
+  [...palRow.children].forEach((c, i) => c.classList.toggle("active", PALETTES[i] && PALETTES[i].id === state.paletteId));
+  state.tone = pick(["friendly", "professional", "luxury", "funny"]);
+  state.style = pick(["creative", "luxury", "minimal", "viral", "corporate"]);
+  state.fx.mode = pick(["none", "neon", "glass", "vintage", "luxury"]);
+  [...document.querySelectorAll("#toneRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tone === state.tone));
+  [...document.querySelectorAll("#styleRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.style === state.style));
+  [...document.querySelectorAll("#fxModeRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.fx === state.fx.mode));
+  if (!document.getElementById("topic").value.trim()) {
+    const list = IDEAS[document.getElementById("bizType").value] || IDEAS["Other"];
+    document.getElementById("topic").value = pick(list);
+  }
+  generate();
+};
+
+/* ---------- creative boost ---------- */
+document.getElementById("boostRow").addEventListener("click", async e => {
+  const b = e.target.closest("[data-boost]"); if (!b || !state.result) return;
+  b.disabled = true; const old = b.textContent; b.textContent = "…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, mode: "boost", boost: b.dataset.boost, topic: state.result.caption, emoji: state.emoji }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result && data.result.caption) {
+      state.captions.push({ caption: data.result.caption, hashtags: data.result.hashtags || state.result.hashtags });
+      state.captionIndex = state.captions.length - 1;
+      state.result.caption = data.result.caption;
+      if (data.result.hashtags) state.result.hashtags = data.result.hashtags;
+      document.getElementById("captionText").textContent = state.result.caption;
+      document.getElementById("hashtagsText").textContent = state.result.hashtags.map(h => "#" + h).join(" ");
+      renderVersions(); updateCharCount();
+    }
+  } catch {}
+  b.disabled = false; b.textContent = old;
+});
+
+/* ---------- caption length ---------- */
+document.querySelectorAll("[data-len]").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    if (!state.result) return;
+    btn.disabled = true; const old = btn.textContent; btn.textContent = "…";
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: state.code, mode: "length", length: btn.dataset.len, topic: state.result.caption, emoji: state.emoji }),
+      });
+      const data = await res.json();
+      if (data.ok && data.result && data.result.caption) {
+        state.result.caption = data.result.caption;
+        if (data.result.hashtags) state.result.hashtags = data.result.hashtags;
+        document.getElementById("captionText").textContent = state.result.caption;
+        document.getElementById("hashtagsText").textContent = state.result.hashtags.map(h => "#" + h).join(" ");
+        updateCharCount();
+      }
+    } catch {}
+    btn.disabled = false; btn.textContent = old;
+  });
+});
+function updateCharCount() {
+  if (!state.result) return;
+  const c = state.result.caption.length;
+  const words = state.result.caption.trim().split(/\s+/).length;
+  document.getElementById("charCount").textContent = c + " chars · ~" + Math.max(1, Math.round(words / 200)) + " min read";
+}
+
 /* ---------- marketing coach ---------- */document.getElementById("coachBtn").onclick = async () => {
   const q = document.getElementById("coachQ").value.trim();
   const err = document.getElementById("coachError");
@@ -1168,6 +1542,7 @@ async function generate() {
         bizType: document.getElementById("bizType").value,
         topic, lang: state.lang, tone: state.tone, emoji: state.emoji, style: state.style,
         audience: document.getElementById("audience").value.trim(),
+        freestyle: state.template === "freestyle",
       }),
     });
     const data = await res.json();
@@ -1226,10 +1601,32 @@ function showResult() {
   renderSlideBar();
   renderVersions();
   renderTips();
+  document.getElementById("boostCard").style.display = "block";
+  var _ep = document.getElementById("emptyPreview"); if (_ep) _ep.style.display = "none";
+  updateCharCount();
   document.getElementById("dlAllBtn").style.display = state.slides ? "block" : "none";
+  document.getElementById("shuffleBtn").style.display = state.template === "freestyle" ? "block" : "none";
   rerender();
   document.getElementById("canvasWrap").scrollIntoView({ behavior: "smooth", block: "center" });
 }
+
+function randomSpec() {
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  return {
+    bg: pick(["solid", "gradient", "duotone-split", "big-circle", "corner-arc", "stripes", "dot-texture", "wave"]),
+    align: pick(["left", "center"]),
+    vpos: pick(["upper", "middle", "lower"]),
+    deco: pick(["bar", "double-bar", "dots-row", "ring", "ticks", "underline", "frame-line", "none"]),
+    caseStyle: pick(["upper", "normal", "normal"]),
+    serif: Math.random() < 0.4,
+    brandPos: pick(["top-left", "top-center", "bottom-left"]),
+  };
+}
+document.getElementById("shuffleBtn").onclick = () => {
+  if (!state.result) return;
+  state.result.design = randomSpec();
+  rerender();
+};
 
 function renderTips() {
   const box = document.getElementById("tipsBox");
@@ -1291,6 +1688,8 @@ function renderVersions() {
 
 /* ---------- AI background ---------- */
 let bgImg = null;
+let productImg = null;
+let qrImg = null;
 const bgBtn = document.getElementById("bgBtn");
 const bgClear = document.getElementById("bgClear");
 const bgError = document.getElementById("bgError");
@@ -1537,6 +1936,63 @@ document.getElementById("bgUpload").addEventListener("change", () => {
   reader.readAsDataURL(f);
 });
 
+/* ---------- voice input ---------- */
+(function () {
+  const btn = document.getElementById("voiceBtn");
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { btn.style.display = "none"; return; }
+  const rec = new SR();
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  let listening = false;
+  function setLang() {
+    rec.lang = state.lang === "ar" ? "ar-LB" : state.lang === "fr" ? "fr-FR" : state.lang === "es" ? "es-ES" : state.lang === "de" ? "de-DE" : "en-US";
+  }
+  btn.onclick = () => {
+    if (listening) { rec.stop(); return; }
+    setLang();
+    try { rec.start(); } catch (e) { return; }
+  };
+  rec.onstart = () => { listening = true; btn.textContent = "🎤 Listening… tap to stop"; };
+  rec.onend = () => { listening = false; btn.textContent = "🎤 Speak your idea"; };
+  rec.onerror = () => { listening = false; btn.textContent = "🎤 Speak your idea"; };
+  rec.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    const ta = document.getElementById("topic");
+    ta.value = ta.value ? ta.value + " " + text : text;
+  };
+})();
+
+/* ---------- product photo -> cutout on background ---------- */
+document.getElementById("productUpload").addEventListener("change", async () => {
+  const f = document.getElementById("productUpload").files[0];
+  const err = document.getElementById("productError");
+  err.textContent = "";
+  if (!f) return;
+  if (f.size > 5 * 1024 * 1024) { err.textContent = "Image too large (max 5MB)."; return; }
+  const dataUrl = await new Promise((res) => {
+    const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f);
+  });
+  err.textContent = "Removing background… (~8s)";
+  try {
+    const resp = await fetch(WORKER_URL + "/cutout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, image: dataUrl }),
+    });
+    const data = await resp.json();
+    if (!data.ok || !data.image) { err.textContent = data.message || "Background removal failed."; return; }
+    const img = new Image();
+    img.onload = () => { productImg = img; err.textContent = "Product added ✓ It sits on your design; generate or shuffle to arrange."; rerender(); };
+    img.src = data.image;
+    if (data.usage) {
+      usageMsg.textContent = data.usage.plan === "trial"
+        ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+        : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+    }
+  } catch { err.textContent = "Connection failed. Try again."; }
+});
+
 /* ---------- brand kits ---------- */
 function loadKits() {
   let kits = {};
@@ -1641,10 +2097,26 @@ function rerender() {
       document.fonts.load("600 96px 'Fraunces'"),
       document.fonts.load("italic 400 38px 'Fraunces'"),
       document.fonts.load("600 32px 'Space Grotesk'"),
+      document.fonts.load("700 90px 'Playfair Display'"),
+      document.fonts.load("800 90px 'Poppins'"),
+      document.fonts.load("400 90px 'Bebas Neue'"),
+      document.fonts.load("800 90px 'Montserrat'"),
+      document.fonts.load("600 90px 'Oswald'"),
+      document.fonts.load("600 40px 'Lora'"),
+      document.fonts.load("600 90px 'Cormorant Garamond'"),
+      document.fonts.load("400 90px 'DM Serif Display'"),
+      document.fonts.load("400 90px 'Anton'"),
+      document.fonts.load("400 90px 'Abril Fatface'"),
+      document.fonts.load("700 90px 'Space Mono'"),
+      document.fonts.load("700 90px 'Caveat'"),
+      document.fonts.load("400 90px 'Archivo Black'"),
+      document.fonts.load("700 90px 'Libre Baskerville'"),
+      document.fonts.load("400 90px 'Righteous'"),
     ]).finally(() =>
       drawPost(canvas, {
         template: state.template, palette: pal, H,
         headline: state.result.headline, subline: state.result.subline, brand,
+        design: state.result.design,
       })
     )
   );
@@ -1716,9 +2188,16 @@ function paintBG(ctx, p, x, y, w, h) {
   }
 }
 
-function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 1080 }) {
+function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 1080, design }) {
   const S = canvas.width || 1080, ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, S, H);
+  const _fx = (typeof state !== "undefined" && state.fx) ? state.fx : { mode:"none" };
+  const _origFill = ctx.fillText.bind(ctx);
+  ctx.fillText = function(t, x, y) {
+    if (_fx.shadow) { ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.45)"; ctx.shadowBlur = 14; ctx.shadowOffsetY = 6; _origFill(t, x, y); ctx.restore(); }
+    if (_fx.stroke) { ctx.save(); ctx.lineWidth = Math.max(3, (parseInt(ctx.font)||40)*0.06); ctx.strokeStyle = "rgba(0,0,0,0.55)"; ctx.strokeText(t, x, y); ctx.restore(); }
+    _origFill(t, x, y);
+  };
 
   const drawHeadline = (x, y, size, color, maxW, weight = 800, font = "'Archivo', sans-serif") => {
     ctx.fillStyle = color; ctx.textAlign = "left";
@@ -1969,6 +2448,257 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ctx.textAlign = "left";
   }
 
+  if (template === "freestyle") {
+    const d = Object.assign({ bg: "solid", align: "left", vpos: "middle", deco: "bar", caseStyle: "normal", serif: false, brandPos: "top-left" }, design || (typeof randomSpec === "function" ? randomSpec() : {}));
+    // background
+    if (d.bg === "gradient" && !(typeof bgImg !== "undefined" && bgImg)) {
+      const g = ctx.createLinearGradient(0, 0, S, H);
+      g.addColorStop(0, p.bg); g.addColorStop(1, shade(p.bg, 26));
+      ctx.fillStyle = g; ctx.fillRect(0, 0, S, H);
+    } else {
+      paintBG(ctx, p, 0, 0, S, H);
+    }
+    if (d.bg === "duotone-split") {
+      ctx.fillStyle = p.primary;
+      ctx.globalAlpha = 0.14;
+      ctx.fillRect(0, 0, S, H * 0.5);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = p.primary; ctx.fillRect(0, H * 0.5 - 3, S, 6);
+    }
+    if (d.bg === "big-circle") {
+      ctx.fillStyle = p.primary; ctx.globalAlpha = 0.16;
+      ctx.beginPath(); ctx.arc(S * 0.85, H * 0.2, Math.min(S, H) * 0.45, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = p.primary; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.arc(S * 0.85, H * 0.2, Math.min(S, H) * 0.45, 0, Math.PI * 2); ctx.stroke();
+    }
+    if (d.bg === "corner-arc") {
+      ctx.fillStyle = p.primary;
+      ctx.beginPath(); ctx.moveTo(0, H); ctx.quadraticCurveTo(0, H - 340, 380, H); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(S, 0); ctx.quadraticCurveTo(S, 300, S - 340, 0); ctx.closePath(); ctx.fill();
+    }
+    if (d.bg === "stripes") {
+      ctx.strokeStyle = p.primary; ctx.globalAlpha = 0.10; ctx.lineWidth = 26;
+      for (let x = -H; x < S + H; x += 90) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H, H); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if (d.bg === "dot-texture") {
+      ctx.fillStyle = p.primary; ctx.globalAlpha = 0.14;
+      for (let x = 44; x < S; x += 68) for (let y = 44; y < H; y += 68) {
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    if (d.bg === "wave") {
+      ctx.fillStyle = p.primary; ctx.globalAlpha = 0.16;
+      ctx.beginPath();
+      ctx.moveTo(0, H);
+      ctx.quadraticCurveTo(S * 0.25, H - 340, S * 0.5, H - 200);
+      ctx.quadraticCurveTo(S * 0.75, H - 60, S, H - 240);
+      ctx.lineTo(S, H); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = p.primary; ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(0, H - 6);
+      ctx.quadraticCurveTo(S * 0.25, H - 346, S * 0.5, H - 206);
+      ctx.quadraticCurveTo(S * 0.75, H - 66, S, H - 246);
+      ctx.stroke();
+    }
+    const centered = d.align === "center";
+    const tx = centered ? S / 2 : 90;
+    ctx.textAlign = centered ? "center" : "left";
+    // brand
+    ctx.fillStyle = p.primary;
+    ctx.font = "700 32px 'Space Grotesk', sans-serif";
+    const bx = d.brandPos.includes("center") ? S / 2 : 90;
+    const by = d.brandPos.includes("bottom") ? H - 80 : 120;
+    ctx.textAlign = d.brandPos.includes("center") ? "center" : "left";
+    ctx.fillText(brand.toUpperCase(), bx, by);
+    ctx.textAlign = centered ? "center" : "left";
+    // headline block position
+    const anchor = d.vpos === "upper" ? H * 0.34 : d.vpos === "lower" ? H * 0.62 : H * 0.48;
+    const _fp = (typeof getFont === "function") ? getFont() : null;
+    const font = _fp ? _fp.display : (d.serif ? "'Fraunces', serif" : "'Archivo', sans-serif");
+    const weight = _fp ? _fp.displayW : (d.serif ? 600 : 800);
+    const text = d.caseStyle === "upper" ? headline.toUpperCase() : headline;
+    let fs = d.serif ? 92 : 100;
+    ctx.font = `${weight} ${fs}px ${font}`;
+    let lines = wrapText(ctx, text, S - 200);
+    while (lines.length > 4 && fs > 44) { fs -= 6; ctx.font = `${weight} ${fs}px ${font}`; lines = wrapText(ctx, text, S - 200); }
+    const blockH = lines.length * fs * 1.12;
+    let hy = anchor - blockH / 2 + fs * 0.4;
+    hy = Math.max(200, Math.min(hy, H - 260 - blockH));
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, tx, hy + i * fs * 1.12));
+    const endY = hy + blockH;
+    // decoration
+    ctx.fillStyle = p.primary;
+    const decoX = centered ? S / 2 : 90;
+    if (d.deco === "bar") ctx.fillRect(centered ? S / 2 - 60 : 90, hy - fs - 34, 120, 9);
+    if (d.deco === "double-bar") { ctx.fillRect(centered ? S / 2 - 80 : 90, hy - fs - 44, 160, 8); ctx.fillRect(centered ? S / 2 - 50 : 90, hy - fs - 26, 100, 8); }
+    if (d.deco === "frame-line") { ctx.strokeStyle = p.primary; ctx.lineWidth = 4; ctx.strokeRect(52, 52, S - 104, H - 104); }
+    if (d.deco === "underline") ctx.fillRect(centered ? S / 2 - 90 : 90, endY + 18, 180, 8);
+    if (d.deco === "dots-row") { for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.arc((centered ? S / 2 - 80 : 96) + i * 40, hy - fs - 28, 7, 0, Math.PI * 2); ctx.fill(); } }
+    if (d.deco === "ring") { ctx.strokeStyle = p.primary; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(decoX + (centered ? 0 : 18), hy - fs - 30, 22, 0, Math.PI * 2); ctx.stroke(); }
+    if (d.deco === "ticks") {
+      ctx.lineWidth = 6; ctx.strokeStyle = p.primary;
+      const m = 70, t = 46;
+      [[m, m, 1, 1], [S - m, m, -1, 1], [m, H - m, 1, -1], [S - m, H - m, -1, -1]].forEach(([x, y, dx, dy]) => {
+        ctx.beginPath(); ctx.moveTo(x + dx * t, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * t); ctx.stroke();
+      });
+    }
+    // subline
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    const _bodyFont = _fp ? _fp.body : "'Space Grotesk', sans-serif";
+    ctx.font = "400 40px " + _bodyFont;
+    const subY = Math.min(endY + 72, H - 140);
+    wrapText(ctx, subline, S - 240).slice(0, 2).forEach((l, i) => ctx.fillText(l, tx, subY + i * 52));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "quote") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.textAlign = "center";
+    // big quotation mark
+    ctx.fillStyle = p.primary;
+    ctx.font = "800 220px 'Fraunces', serif";
+    ctx.fillText("\u201C", S / 2, H * 0.26);
+    // quote text
+    let fs = 76; ctx.font = `italic 500 ${fs}px 'Fraunces', serif`;
+    let lines = wrapText(ctx, headline, S - 260);
+    while (lines.length > 6 && fs > 40) { fs -= 5; ctx.font = `italic 500 ${fs}px 'Fraunces', serif`; lines = wrapText(ctx, headline, S - 260); }
+    const qy = H / 2 - (lines.length * fs * 1.2) / 2 + fs * 0.4;
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, qy + i * fs * 1.2));
+    // divider + attribution
+    const endY = qy + lines.length * fs * 1.2;
+    ctx.fillStyle = p.primary;
+    ctx.fillRect(S / 2 - 40, endY + 30, 80, 5);
+    ctx.font = "600 34px 'Space Grotesk', sans-serif";
+    ctx.fillText(subline || brand, S / 2, endY + 100);
+    // brand bottom
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "500 28px 'Space Grotesk', sans-serif";
+    ctx.fillText(brand.toUpperCase(), S / 2, H - 70);
+    ctx.textAlign = "left";
+  }
+
+  if (template === "beforeafter") {
+    ctx.fillStyle = p.bg; ctx.fillRect(0, 0, S, H);
+    const midX = S / 2;
+    ctx.fillStyle = shade(p.bg, 18); ctx.fillRect(0, 0, midX, H);
+    ctx.fillStyle = p.primary; ctx.globalAlpha = 0.12; ctx.fillRect(midX, 0, midX, H); ctx.globalAlpha = 1;
+    ctx.fillStyle = p.primary; ctx.fillRect(midX - 3, 0, 6, H);
+    ctx.textAlign = "center";
+    ctx.fillStyle = p.text; ctx.font = "800 46px 'Archivo', sans-serif";
+    ctx.fillText("BEFORE", midX / 2, H * 0.12);
+    ctx.fillStyle = p.primary;
+    ctx.fillText("AFTER", midX + midX / 2, H * 0.12);
+    // headline bottom band
+    ctx.fillStyle = p.primary; ctx.fillRect(0, H - 220, S, 220);
+    let fs = 64; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, S - 160);
+    while (lines.length > 2 && fs > 34) { fs -= 6; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, S - 160); }
+    ctx.fillStyle = textOn(p.primary);
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, H - 150 + i * fs * 1.05));
+    ctx.font = "500 30px 'Space Grotesk', sans-serif";
+    ctx.fillText(brand.toUpperCase(), S / 2, H - 40);
+    ctx.textAlign = "left";
+  }
+
+  if (template === "giveaway") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.textAlign = "center";
+    ctx.font = "80px 'Space Grotesk', sans-serif";
+    ctx.fillText("🎁", S / 2, H * 0.2);
+    ctx.fillStyle = p.primary; ctx.font = "800 54px 'Archivo', sans-serif";
+    ctx.fillText("GIVEAWAY", S / 2, H * 0.3);
+    let fs = 84; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, S - 200);
+    while (lines.length > 3 && fs > 40) { fs -= 8; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, S - 200); }
+    const hy = H * 0.5 - (lines.length * fs * 1.1) / 2 + fs * 0.4;
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, hy + i * fs * 1.1));
+    // "how to enter" chips
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "500 40px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, S - 220).slice(0, 3).forEach((l, i) => ctx.fillText(l, S / 2, H * 0.72 + i * 52));
+    ctx.fillStyle = p.primary; ctx.font = "700 30px 'Space Grotesk', sans-serif";
+    ctx.fillText(brand.toUpperCase(), S / 2, H - 60);
+    ctx.textAlign = "left";
+  }
+
+  // ---------- visual effects overlay ----------
+  if (typeof state !== "undefined" && state.fx) {
+    const fx = state.fx;
+    if (fx.mode === "vintage") {
+      ctx.save();
+      ctx.globalAlpha = 0.16; ctx.fillStyle = "#7A5A2E"; ctx.fillRect(0, 0, S, H);
+      ctx.globalAlpha = 0.10; ctx.fillStyle = "#000";
+      // vignette
+      const g = ctx.createRadialGradient(S/2, H/2, Math.min(S,H)*0.3, S/2, H/2, Math.max(S,H)*0.75);
+      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,0.5)");
+      ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.fillRect(0, 0, S, H);
+      ctx.restore();
+    }
+    if (fx.mode === "luxury") {
+      ctx.save();
+      const g = ctx.createLinearGradient(0, 0, S, H);
+      g.addColorStop(0, "rgba(212,175,55,0.10)"); g.addColorStop(0.5, "rgba(212,175,55,0)"); g.addColorStop(1, "rgba(212,175,55,0.14)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, S, H);
+      ctx.strokeStyle = "rgba(212,175,55,0.85)"; ctx.lineWidth = 4;
+      ctx.strokeRect(46, 46, S - 92, H - 92);
+      ctx.restore();
+    }
+    if (fx.mode === "neon") {
+      ctx.save();
+      const g = ctx.createRadialGradient(S/2, H*0.4, 60, S/2, H*0.4, Math.max(S,H)*0.7);
+      g.addColorStop(0, "rgba(124,92,255,0.20)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, S, H);
+      ctx.restore();
+    }
+    if (fx.mode === "glass") {
+      ctx.save();
+      const bw = S - 140, bh = H * 0.42, bx = 70, by = (H - bh) / 2;
+      ctx.fillStyle = "rgba(255,255,255,0.10)";
+      roundRect(ctx, bx, by, bw, bh, 30); ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 2;
+      roundRect(ctx, bx, by, bw, bh, 30); ctx.stroke();
+      ctx.restore();
+    }
+    if (fx.border) { ctx.save(); ctx.strokeStyle = p.primary; ctx.lineWidth = 18; ctx.strokeRect(9, 9, S - 18, H - 18); ctx.restore(); }
+    if (fx.corners) { ctx.save(); ctx.strokeStyle = p.primary; ctx.lineWidth = 6; roundRect(ctx, 40, 40, S - 80, H - 80, 48); ctx.stroke(); ctx.restore(); }
+  }
+
+  // ---------- product cutout image (on top of design, above logo) ----------
+  if (typeof productImg !== "undefined" && productImg) {
+    const maxW = S * 0.62, maxH = H * 0.5;
+    const r = productImg.width / productImg.height;
+    let pw = maxW, ph = pw / r;
+    if (ph > maxH) { ph = maxH; pw = ph * r; }
+    // soft shadow
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.28)";
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 18;
+    ctx.drawImage(productImg, (S - pw) / 2, H - ph - H * 0.06, pw, ph);
+    ctx.restore();
+  }
+
+  // ---------- QR code (bottom-left) ----------
+  if (typeof qrImg !== "undefined" && qrImg) {
+    const qs = Math.round(S * 0.16);
+    const pad = 18;
+    ctx.save();
+    ctx.fillStyle = "#FFFFFF";
+    roundRect(ctx, 70 - pad, H - qs - 70 - pad, qs + pad * 2, qs + pad * 2, 16);
+    ctx.fill();
+    ctx.drawImage(qrImg, 70, H - qs - 70, qs, qs);
+    ctx.restore();
+  }
+
   // ---------- logo overlay (all templates) ----------
   if (typeof logoImg !== "undefined" && logoImg) {
     const maxH = 100;
@@ -1977,6 +2707,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ctx.drawImage(logoImg, S - 80 - lw, 64, lw, lh);
   }
 
+  ctx.fillText = _origFill; // restore native before overlays
   // ---------- watermark on free tier ----------
   if (typeof state !== "undefined" && state.plan === "trial") {
     ctx.save();

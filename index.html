@@ -71,6 +71,7 @@
   input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit}
   textarea{min-height:76px;resize:vertical}
   .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+  #palRow{gap:10px}
   .picker-btn{width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
   .picker-btn span.arrow{color:var(--muted);font-size:12px;transition:transform .15s}
   .picker-btn.open span.arrow{transform:rotate(180deg)}
@@ -452,6 +453,8 @@
           <button class="chip" data-fxt="stroke">Text stroke</button>
           <button class="chip" data-fxt="corners">Rounded frame</button>
         </div>
+        <label>Photo tint <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(lower = clearer photo)</span></label>
+        <input type="range" id="tintRange" min="0" max="85" value="45" style="width:100%;accent-color:var(--lime)">
         <label>📱 QR code <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(link or WhatsApp, shows bottom-left)</span></label>
         <div style="display:flex;gap:8px">
           <input id="qrInput" placeholder="https://your-link.com or your number" style="flex:1">
@@ -693,6 +696,7 @@ let state = {
   plan: "trial",
   format: "post",
   fx: { mode: "none", border: false, shadow: false, stroke: false, corners: false },
+  tint: 0.45,
   slides: null,
   slideIndex: 0,
   captions: [],
@@ -777,12 +781,18 @@ document.getElementById("waFloat").href = `https://wa.me/${WHATSAPP}?text=${enco
 /* ---------- palette chips ---------- */
 const palRow = document.getElementById("palRow");
 PALETTES.forEach(p => {
+  const wrap = document.createElement("div");
+  wrap.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px;width:56px";
   const b = document.createElement("button");
   b.className = "swatch" + (p.id === state.paletteId ? " active" : "");
   b.title = p.name;
   b.style.background = `linear-gradient(135deg, ${p.bg} 50%, ${p.primary} 50%)`;
-  b.onclick = () => { state.paletteId = p.id; state.customActive = false; document.getElementById("customPanel").style.display = "none"; [...palRow.children].forEach(c => c.classList.remove("active")); b.classList.add("active"); rerender(); };
-  palRow.appendChild(b);
+  b.onclick = () => { state.paletteId = p.id; state.customActive = false; document.getElementById("customPanel").style.display = "none"; [...palRow.querySelectorAll(".swatch")].forEach(c => c.classList.remove("active")); b.classList.add("active"); rerender(); };
+  const lbl = document.createElement("span");
+  lbl.textContent = (p.name.split(" · ")[0] || p.name);
+  lbl.style.cssText = "font-size:10px;color:var(--muted);text-align:center;line-height:1.1";
+  wrap.appendChild(b); wrap.appendChild(lbl);
+  palRow.appendChild(wrap);
 });
 // custom color swatch
 const customSwatch = document.createElement("button");
@@ -797,7 +807,7 @@ customSwatch.onclick = () => {
   customSwatch.classList.add("active");
   rerender();
 };
-palRow.appendChild(customSwatch);
+(function(){ const w=document.createElement("div"); w.style.cssText="display:flex;flex-direction:column;align-items:center;gap:4px;width:56px"; const l=document.createElement("span"); l.textContent="Custom"; l.style.cssText="font-size:10px;color:var(--muted)"; w.appendChild(customSwatch); w.appendChild(l); palRow.appendChild(w); })();
 document.getElementById("customBg").oninput = rerender;
 document.getElementById("customPrimary").oninput = rerender;
 
@@ -1331,6 +1341,12 @@ function buildQR() {
 let qrTimer;
 document.getElementById("qrInput").addEventListener("input", () => { clearTimeout(qrTimer); qrTimer = setTimeout(buildQR, 500); });
 document.getElementById("qrClear").onclick = () => { document.getElementById("qrInput").value = ""; qrImg = null; rerender(); };
+
+/* ---------- photo tint ---------- */
+document.getElementById("tintRange").addEventListener("input", (e) => {
+  state.tint = parseInt(e.target.value, 10) / 100;
+  rerender();
+});
 
 /* ---------- I'm Feeling Lucky ---------- */
 document.getElementById("luckyBtn").onclick = () => {
@@ -2183,7 +2199,8 @@ function paintBG(ctx, p, x, y, w, h) {
     if (ir > r) { sh = bgImg.height; sw = sh * r; sx = (bgImg.width - sw) / 2; sy = 0; }
     else { sw = bgImg.width; sh = sw / r; sx = 0; sy = (bgImg.height - sh) / 2; }
     ctx.drawImage(bgImg, sx, sy, sw, sh, x, y, w, h);
-    ctx.fillStyle = hexToRgba(p.bg, 0.66); // tint keeps text readable + brand colors alive
+    var _ts = (typeof state !== "undefined" && typeof state.tint === "number") ? state.tint : 0.5;
+    ctx.fillStyle = hexToRgba(p.bg, _ts); // lighter tint keeps photos crisp
     ctx.fillRect(x, y, w, h);
   } else {
     ctx.fillStyle = p.bg;

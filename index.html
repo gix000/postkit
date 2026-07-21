@@ -375,23 +375,24 @@
       <button class="chip" data-fmt="carousel">Carousel ×3</button>
     </div>
 
-    <label>Template</label>
+    <label>Template <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">— ✨ AI Freestyle picks the best design for you</span></label>
     <div class="chip-row" id="tplRow">
-      <button class="chip active" data-tpl="freestyle">✨ AI Freestyle</button>
-      <button class="chip" data-tpl="bold">Bold Statement</button>
-      <button class="chip" data-tpl="editorial">Editorial</button>
-      <button class="chip" data-tpl="arc">Arc Modern</button>
-      <button class="chip" data-tpl="frame">Framed</button>
-      <button class="chip" data-tpl="split">Split</button>
-      <button class="chip" data-tpl="promo">Promo Badge</button>
-      <button class="chip" data-tpl="poster">Poster Type</button>
-      <button class="chip" data-tpl="dots">Dotted</button>
-      <button class="chip" data-tpl="banner">Banner</button>
-      <button class="chip" data-tpl="review">Review ★</button>
-      <button class="chip" data-tpl="quote">Quote ❝</button>
-      <button class="chip" data-tpl="beforeafter">Before / After</button>
-      <button class="chip" data-tpl="giveaway">Giveaway 🎁</button>
+      <button class="chip active" data-tpl="freestyle" title="AI chooses the best layout for your content">✨ AI Freestyle</button>
+      <button class="chip" data-tpl="bold" title="Large headline with minimal design">Bold Statement</button>
+      <button class="chip" data-tpl="editorial" title="Magazine-inspired centered layout">Editorial</button>
+      <button class="chip" data-tpl="arc" title="Modern curved elements">Arc Modern</button>
+      <button class="chip" data-tpl="frame" title="Content inside stylish borders">Framed</button>
+      <button class="chip" data-tpl="split" title="Color block and text stacked">Split</button>
+      <button class="chip" data-tpl="promo" title="Highlights discounts and offers">Promo Badge</button>
+      <button class="chip" data-tpl="poster" title="Huge editorial type">Poster Type</button>
+      <button class="chip" data-tpl="dots" title="Panel on a dotted texture">Dotted</button>
+      <button class="chip" data-tpl="banner" title="Bold ribbon across the middle">Banner</button>
+      <button class="chip" data-tpl="review" title="Customer testimonial design">Review ★</button>
+      <button class="chip" data-tpl="quote" title="Inspirational or business quote">Quote ❝</button>
+      <button class="chip" data-tpl="beforeafter" title="Transformation comparison">Before / After</button>
+      <button class="chip" data-tpl="giveaway" title="Contest and giveaway post">Giveaway 🎁</button>
     </div>
+    <p id="tplDesc" style="font-size:12px;color:var(--muted);margin-top:6px">AI chooses the best layout for your content</p>
 
     <label>Color mood</label>
     <div class="chip-row" id="palRow"></div>
@@ -652,7 +653,7 @@ const FONT_PAIRS = [
   { id:"elegant", name:"Elegant", display:"'Playfair Display', serif", displayW:700, body:"'Lora', serif", serif:true },
   { id:"editorial", name:"Editorial", display:"'Fraunces', serif", displayW:600, body:"'Space Grotesk', sans-serif", serif:true },
   { id:"bold", name:"Bold", display:"'Bebas Neue', sans-serif", displayW:400, body:"'Montserrat', sans-serif", serif:false },
-  { id:"clean", name:"Clean", display:"'Poppins', sans-serif", displayW:800, body:"'Poppins', sans-serif", serif:false },
+  { id:"clean", name:"Minimal · Clean", display:"'Poppins', sans-serif", displayW:800, body:"'Poppins', sans-serif", serif:false },
   { id:"strong", name:"Strong", display:"'Oswald', sans-serif", displayW:600, body:"'Montserrat', sans-serif", serif:false },
   { id:"luxe", name:"Luxe", display:"'Cormorant Garamond', serif", displayW:600, body:"'Montserrat', sans-serif", serif:true },
   { id:"fashion", name:"Fashion", display:"'DM Serif Display', serif", displayW:400, body:"'Montserrat', sans-serif", serif:true },
@@ -667,18 +668,18 @@ const FONT_PAIRS = [
 function getFont() { return FONT_PAIRS.find(f => f.id === state.fontId) || FONT_PAIRS[0]; }
 
 const PALETTES = [
-  { id:"amber", name:"Amber Heat", bg:"#1A1208", primary:"#F5A623", accent:"#FFE8C2", text:"#FFF7EA" },
-  { id:"ocean", name:"Deep Ocean", bg:"#06202E", primary:"#2EC4B6", accent:"#CBF3F0", text:"#EAFBFA" },
-  { id:"rose", name:"Rosewood", bg:"#2A0E14", primary:"#E85D75", accent:"#FFD6DE", text:"#FFF0F3" },
-  { id:"lime", name:"Electric Lime", bg:"#101408", primary:"#B4E33D", accent:"#EAF7C8", text:"#F7FBEC" },
-  { id:"royal", name:"Royal", bg:"#120E2A", primary:"#7C5CFF", accent:"#D9CFFF", text:"#F2EFFF" },
-  { id:"gold", name:"Gold Luxury", bg:"#14100A", primary:"#D4AF37", accent:"#F3E5B8", text:"#FBF6E8" },
-  { id:"forest", name:"Fresh Forest", bg:"#0E2318", primary:"#3FA46A", accent:"#CDEBD8", text:"#EFF9F2" },
-  { id:"coffee", name:"Coffee House", bg:"#241812", primary:"#C08552", accent:"#EAD7C3", text:"#F8F1E9" },
-  { id:"slate", name:"Slate Blue", bg:"#1B2430", primary:"#8ECAE6", accent:"#D9EEF8", text:"#F0F6FA" },
-  { id:"clean", name:"Clean Light", bg:"#F7F5F0", primary:"#1C1C1C", accent:"#C9553E", text:"#1C1C1C" },
-  { id:"coral", name:"Warm Coral", bg:"#FDF1EC", primary:"#E76F51", accent:"#7A3B2E", text:"#2A1A14" },
-  { id:"blush", name:"Soft Blush", bg:"#FBEFF2", primary:"#C9506E", accent:"#7E2E44", text:"#2B1A1F" },
+  { id:"amber", name:"Warm · Amber Heat", bg:"#1A1208", primary:"#F5A623", accent:"#FFE8C2", text:"#FFF7EA" },
+  { id:"ocean", name:"Fresh · Deep Ocean", bg:"#06202E", primary:"#2EC4B6", accent:"#CBF3F0", text:"#EAFBFA" },
+  { id:"rose", name:"Vibrant · Rosewood", bg:"#2A0E14", primary:"#E85D75", accent:"#FFD6DE", text:"#FFF0F3" },
+  { id:"lime", name:"Bold · Electric Lime", bg:"#101408", primary:"#B4E33D", accent:"#EAF7C8", text:"#F7FBEC" },
+  { id:"royal", name:"Modern · Royal", bg:"#120E2A", primary:"#7C5CFF", accent:"#D9CFFF", text:"#F2EFFF" },
+  { id:"gold", name:"Luxury · Gold Luxury", bg:"#14100A", primary:"#D4AF37", accent:"#F3E5B8", text:"#FBF6E8" },
+  { id:"forest", name:"Earthy · Fresh Forest", bg:"#0E2318", primary:"#3FA46A", accent:"#CDEBD8", text:"#EFF9F2" },
+  { id:"coffee", name:"Cozy · Coffee House", bg:"#241812", primary:"#C08552", accent:"#EAD7C3", text:"#F8F1E9" },
+  { id:"slate", name:"Corporate · Slate Blue", bg:"#1B2430", primary:"#8ECAE6", accent:"#D9EEF8", text:"#F0F6FA" },
+  { id:"clean", name:"Minimal · Clean Light", bg:"#F7F5F0", primary:"#1C1C1C", accent:"#C9553E", text:"#1C1C1C" },
+  { id:"coral", name:"Soft · Warm Coral", bg:"#FDF1EC", primary:"#E76F51", accent:"#7A3B2E", text:"#2A1A14" },
+  { id:"blush", name:"Pastel · Soft Blush", bg:"#FBEFF2", primary:"#C9506E", accent:"#7E2E44", text:"#2B1A1F" },
 ];
 
 let state = {
@@ -938,6 +939,8 @@ document.getElementById("tplRow").addEventListener("click", e => {
   state.template = btn.dataset.tpl;
   [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.remove("active"));
   btn.classList.add("active");
+  const dEl = document.getElementById("tplDesc");
+  if (dEl) dEl.textContent = btn.getAttribute("title") || "";
   if (state.result) document.getElementById("shuffleBtn").style.display = state.template === "freestyle" ? "block" : "none";
   rerender();
 });

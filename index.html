@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostKit, AI Instagram posts for your business</title>
+<meta name="description" content="Generate ready-to-post Instagram designs and captions with AI. For businesses in Lebanon who don't have time to design.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F6F2; --card:#FFFFFF; --border:#E9E7E0; --line:#DBD9D1;
+    --text:#191A17; --muted:#73746D; --dim:#A6A79F;
+    --lime:#2B44DE; --lime-dark:#C7CEF6; --lime-bg:#EEF0FD;
+    --red:#C0483C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;line-height:1.5}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:#CFCEC7;border-radius:3px}
+  input:focus,textarea:focus,select:focus{outline:none}
+  input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+  button:focus{outline:none}
+  button:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+  summary:focus{outline:none}
+  summary:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+  button{cursor:pointer;font-family:inherit;transition:transform .12s ease,opacity .12s ease}
+  button:active{transform:scale(.97)}
+  @media (prefers-reduced-motion:reduce){button{transition:none}.pulse{animation:none!important}}
+
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-mark{width:22px;height:22px;background:var(--lime);border-radius:6px;transform:rotate(45deg)}
+  .logo-text{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px;letter-spacing:.12em}
+  .nav-cta{background:transparent;border:1px solid var(--lime-dark);color:var(--lime);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none}
+
+  /* ---------- hero ---------- */
+  .hero{padding:44px 0 36px;text-align:left}
+  .hero h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(34px,9vw,52px);line-height:1.05;letter-spacing:-.01em}
+  .hero h1 em{font-family:'Fraunces',serif;font-style:italic;font-weight:400;color:var(--lime)}
+  #heroCursor{color:var(--lime);font-weight:400;animation:blink 1s step-end infinite;margin-left:2px}
+  @keyframes blink{50%{opacity:0}}
+  .hero h1{min-height:2.2em}
+  .hero p{color:var(--muted);font-size:16px;margin:18px 0 26px;max-width:42ch}
+  .hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-primary{background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:14px 24px;font-size:16px;font-weight:700;text-decoration:none;display:inline-block}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px 24px;font-size:16px;font-weight:600;text-decoration:none;display:inline-block;transition:border-color .15s}
+  .btn-ghost:hover{border-color:var(--lime);color:var(--lime)}
+  .btn-primary{box-shadow:0 6px 18px rgba(43,68,222,.25);transition:filter .15s}
+  .btn-primary:hover{filter:brightness(1.07)}
+
+  /* ---------- how ---------- */
+  .steps{display:grid;gap:12px;padding:10px 0 34px}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start}
+  .step b{background:var(--lime-bg);color:var(--lime);font-family:'Archivo',sans-serif;font-size:16px;min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .step div{font-size:14px;color:var(--muted)}
+  .step div strong{color:var(--text);display:block;margin-bottom:2px;font-size:15px}
+
+  /* ---------- app ---------- */
+  .section-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:24px;margin:26px 0 4px}
+  .section-sub{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 1px 2px rgba(25,26,23,.04),0 6px 20px rgba(25,26,23,.05)}
+  label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 7px}
+  label:first-child{margin-top:0}
+  input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit}
+  textarea{min-height:76px;resize:vertical}
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+  .picker-btn{width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px 14px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+  .picker-btn span.arrow{color:var(--muted);font-size:12px;transition:transform .15s}
+  .picker-btn.open span.arrow{transform:rotate(180deg)}
+  .picker-panel{display:none;margin-top:8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;max-height:260px;overflow-y:auto}
+  .picker-panel.open{display:flex;flex-wrap:wrap;gap:8px}
+  .color-preview{width:100%;height:42px;border-radius:8px;border:1px solid var(--line);cursor:pointer}
+  .swatch-grid{display:none;margin-top:8px}
+  .swatch-grid.open{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  .sw{width:100%;aspect-ratio:1;border-radius:6px;border:1px solid rgba(0,0,0,.12);cursor:pointer}
+  .sw:hover{transform:scale(1.1)}
+  .swatch-grid input[type=range]{width:100%;margin:5px 0;accent-color:var(--lime)}
+  .swatch-grid input[type=range].hue{appearance:none;-webkit-appearance:none;height:14px;border-radius:7px;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+  .swatch-grid input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid #888;cursor:pointer}
+  .swatch-grid input[type=range].hue::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid #888;cursor:pointer}
+  .tune-label{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .chip:hover{border-color:var(--lime);color:var(--lime)}
+  input:hover,select:hover,textarea:hover{border-color:#C8C6BE}
+  input,select,textarea{transition:border-color .15s ease}
+  details.acc{border:1px solid var(--border);border-radius:12px;margin-top:16px;background:var(--bg);overflow:hidden}
+  details.acc summary{list-style:none;cursor:pointer;padding:13px 14px;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;user-select:none}
+  details.acc summary::-webkit-details-marker{display:none}
+  details.acc summary::after{content:"+";color:var(--lime);font-size:17px;font-weight:700;transition:transform .15s ease}
+  details.acc[open] summary::after{transform:rotate(45deg)}
+  details.acc .acc-body{padding:2px 14px 14px}
+  details.acc .acc-body>label:first-child{margin-top:6px}
+  .chip{background:var(--card);border:1px solid var(--line);color:#55564F;border-radius:999px;padding:8px 14px;font-size:13px}
+  .chip.active{border-color:var(--lime);color:var(--lime);background:var(--lime-bg);font-weight:600}
+  .swatch{width:44px;height:44px;border-radius:12px;border:2px solid #DBD9D1;display:flex;align-items:center;justify-content:center;background:var(--card)}
+  .swatch.active{border-color:var(--lime)}
+  .swatch span{width:16px;height:16px;border-radius:50%}
+  .gen-btn{width:100%;margin-top:22px;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;box-shadow:0 6px 18px rgba(43,68,222,.28)}
+  .gen-btn:hover{filter:brightness(1.07)}
+  .error{color:var(--red);font-size:13px;margin-top:10px}
+  .usage{font-size:12px;color:var(--dim);margin-top:10px;text-align:center}
+  .canvas-wrap{border-radius:16px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;display:none}
+  canvas{width:100%;display:block}
+  .action-row{display:none;gap:10px;margin-bottom:18px}
+  .action-row button{flex:1;border-radius:12px;padding:13px;font-size:15px;font-weight:700;border:none}
+  .dl-btn{background:var(--lime);color:#FFFFFF}
+  .re-btn{background:transparent;color:var(--text);border:1px solid var(--line)!important;font-weight:600!important}
+  #captionCard{display:none}
+  .caption-text{font-size:15px;line-height:1.55;margin:4px 0 10px}
+  .hashtags{font-size:13px;color:var(--lime);line-height:1.6}
+  .copy-btn{width:100%;margin-top:14px;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700}
+  .skeleton{height:120px;border-radius:12px;background:#22261F;display:none}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+  .pulse{animation:pulse 1.2s ease infinite}
+
+  /* ---------- pricing ---------- */
+  .plans{display:grid;gap:12px;margin-bottom:30px}
+  .plan{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:0 1px 2px rgba(25,26,23,.04);transition:box-shadow .15s ease}
+  .plan:hover{box-shadow:0 8px 24px rgba(25,26,23,.08)}
+  .plan.featured{border-color:var(--lime)}
+  .plan h3{font-family:'Archivo',sans-serif;font-size:17px;margin-bottom:2px}
+  .plan .price{font-family:'Archivo',sans-serif;font-weight:800;font-size:32px;margin:6px 0}
+  .plan .price small{font-size:14px;color:var(--muted);font-weight:500}
+  .plan ul{list-style:none;margin:10px 0 16px}
+  .plan li{font-size:14px;color:var(--muted);padding:3px 0}
+  .plan li::before{content:"- ";color:var(--lime)}
+  .plan a{display:block;text-align:center;background:var(--lime);color:#FFFFFF;border-radius:10px;padding:12px;font-weight:700;font-size:15px;text-decoration:none}
+  .plan.free a{background:transparent;color:var(--lime);border:1px solid var(--lime-dark)}
+  .tag{display:inline-block;font-size:11px;color:var(--lime);border:1px solid var(--lime-dark);padding:3px 10px;border-radius:999px;letter-spacing:.08em;margin-bottom:8px}
+
+  /* ---------- code entry ---------- */
+  .code-row{display:flex;gap:8px}
+  .code-row input{flex:1}
+  .code-row button{background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 18px;font-weight:700;font-size:14px}
+  .code-status{font-size:13px;margin-top:8px}
+
+  /* ---------- whatsapp float ---------- */
+  .wa-float{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:var(--lime);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(43,68,222,.35);z-index:50;text-decoration:none}
+  .wa-float svg{width:30px;height:30px;fill:#fff}
+
+  footer{text-align:center;color:var(--dim);font-size:12px;padding:30px 0 90px}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="logo"><div class="logo-mark"></div><span class="logo-text">POSTKIT</span></div>
+    <a href="#pricing" class="nav-cta">Pricing</a>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1 id="heroTitle" aria-label="Your AI social media manager."><span id="ht1"></span><em id="ht2"></em><span id="ht3"></span><span id="heroCursor">|</span></h1>
+    <p>Posts, captions, hashtags, and weekly content plans, ready in seconds. No designer, no design skills, no wasted hours.</p>
+    <div class="hero-btns">
+      <a href="#app" class="btn-primary">Try it free</a>
+      <a href="#how" class="btn-ghost">How it works</a>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section id="how" class="steps">
+    <div class="step"><b>1</b><div><strong>Describe your post</strong>"30% off summer dresses this weekend" is all you type.</div></div>
+    <div class="step"><b>2</b><div><strong>Pick a template &amp; colors</strong>4 professional layouts, 6 color moods. Switch instantly.</div></div>
+    <div class="step"><b>3</b><div><strong>Download &amp; post</strong>1080×1080 design + caption + hashtags, ready for Instagram.</div></div>
+  </section>
+
+  <!-- APP -->
+  <h2 class="section-title" id="app">Create your post</h2>
+  <p class="section-sub">Try 3 posts free. No signup needed.</p>
+
+  <div class="card">
+    <label for="quickDesc">✨ Just describe it <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(AI fills the form for you)</span></label>
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <input id="quickDesc" placeholder='e.g. "luxury post for my coffee shop about iced drinks"' style="flex:1">
+      <button id="quickBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Go</button>
+    </div>
+
+    <label for="brand">Business name</label>
+    <input id="brand" placeholder="e.g. Elegance Store">
+
+    <label for="bizType">Business type</label>
+    <button type="button" class="picker-btn" id="bizBtn"><span id="bizBtnLabel">Restaurant / Café</span><span class="arrow">▾</span></button>
+    <div class="picker-panel" id="bizPanel"></div>
+    <select id="bizType" style="display:none">
+      <option>Restaurant / Café</option><option>Bakery / Pastry</option>
+      <option>Salon / Beauty</option><option>Barber Shop</option>
+      <option>Gym / Fitness</option><option>Retail / Store</option>
+      <option>Fashion / Boutique</option><option>Jewelry</option>
+      <option>Real Estate</option><option>Clinic / Dental</option>
+      <option>Pharmacy</option><option>Hotel / Guesthouse</option>
+      <option>Travel Agency</option><option>Photography / Video</option>
+      <option>Events / Wedding</option><option>Auto / Car Services</option>
+      <option>Electronics / Tech</option><option>Home / Furniture</option>
+      <option>Education / Tutoring</option><option>Services / Agency</option>
+      <option>Other</option>
+    </select>
+
+    <label for="audience">Target audience <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional)</span></label>
+    <input id="audience" placeholder="e.g. young mothers in Jounieh, mid budget">
+
+    <label for="topic">What's the post about?</label>
+    <textarea id="topic" placeholder="e.g. 30% off all summer dresses this weekend"></textarea>
+    <button id="ideaBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">✦ Need an idea?</button>
+    <details class="acc">
+      <summary>💡 Idea tools, planning &amp; occasions</summary>
+      <div class="acc-body">
+    <button id="planBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">📅 Plan my week: 7 AI ideas (1 credit)</button>
+    <button id="monthBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🗓 Plan my month: 30 AI ideas (1 credit)</button>
+    <button id="offersBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">💡 Offer &amp; campaign ideas (1 credit)</button>
+    <button id="campaignBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎯 Full campaign from this topic (1 credit)</button>
+    <div id="planCard" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px">
+      <span style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">Tap an idea to use it:</span>
+      <div class="chip-row" id="planRow"></div>
+    </div>
+    <p class="error" id="planError"></p>
+
+    <label>Trending now</label>
+    <div class="chip-row" id="trendRow">
+      <button class="chip">Summer sale</button>
+      <button class="chip">Back to school</button>
+      <button class="chip">Weekend offer</button>
+      <button class="chip">New arrivals</button>
+      <button class="chip">Customer appreciation</button>
+      <button class="chip">Behind the scenes</button>
+    </div>
+
+    <label>Upcoming occasions</label>
+    <div class="chip-row" id="holidayRow">
+      <button class="chip">Eid al-Adha offer</button>
+      <button class="chip">Independence Day (Nov 22)</button>
+      <button class="chip">Black Friday</button>
+      <button class="chip">Christmas collection</button>
+      <button class="chip">New Year offer</button>
+      <button class="chip">Valentine's Day</button>
+      <button class="chip">Ramadan nights</button>
+      <button class="chip">Mother's Day (Mar 21)</button>
+      <button class="chip">Father's Day</button>
+      <button class="chip">Thanksgiving</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input id="customOccasion" placeholder="Add your own occasion, e.g. Store anniversary" style="flex:1">
+      <button id="occasionBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Add</button>
+    </div>
+
+    <label>Or generate from your website</label>
+    <div style="display:flex;gap:8px">
+      <input id="siteUrl" placeholder="https://yourwebsite.com" style="flex:1">
+      <button id="siteBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Scan</button>
+    </div>
+    <p class="error" id="siteError"></p>
+      </div>
+    </details>
+
+
+    <details class="acc">
+      <summary>🗣 Language, tone &amp; style</summary>
+      <div class="acc-body">
+    <label>Language</label>
+    <div class="chip-row" id="langRow">
+      <button class="chip active" data-lang="en">English</button>
+      <button class="chip" data-lang="ar">العربية</button>
+      <button class="chip" data-lang="fr">Français</button>
+      <button class="chip" data-lang="es">Español</button>
+      <button class="chip" data-lang="de">Deutsch</button>
+    </div>
+
+    <label>Caption tone</label>
+    <div class="chip-row" id="toneRow">
+      <button class="chip active" data-tone="friendly">Friendly</button>
+      <button class="chip" data-tone="professional">Professional</button>
+      <button class="chip" data-tone="luxury">Luxury</button>
+      <button class="chip" data-tone="funny">Funny</button>
+    </div>
+
+    <label>Style</label>
+    <div class="chip-row" id="styleRow">
+      <button class="chip active" data-style="creative">Creative</button>
+      <button class="chip" data-style="luxury">Luxury</button>
+      <button class="chip" data-style="minimal">Minimal</button>
+      <button class="chip" data-style="viral">Viral</button>
+      <button class="chip" data-style="corporate">Corporate</button>
+    </div>
+
+    <label>Emojis in caption</label>
+    <div class="chip-row" id="emojiRow">
+      <button class="chip active" data-emoji="yes">With emojis</button>
+      <button class="chip" data-emoji="no">No emojis</button>
+    </div>
+      </div>
+    </details>
+
+    <label>Format</label>
+    <div class="chip-row" id="fmtRow">
+      <button class="chip active" data-fmt="post">Post 1:1</button>
+      <button class="chip" data-fmt="portrait">Portrait 4:5</button>
+      <button class="chip" data-fmt="story">Story 9:16</button>
+      <button class="chip" data-fmt="landscape">Landscape 16:9</button>
+      <button class="chip" data-fmt="pin">Pinterest 2:3</button>
+      <button class="chip" data-fmt="carousel">Carousel ×3</button>
+    </div>
+
+    <label>Template</label>
+    <div class="chip-row" id="tplRow">
+      <button class="chip active" data-tpl="bold">Bold Statement</button>
+      <button class="chip" data-tpl="editorial">Editorial</button>
+      <button class="chip" data-tpl="arc">Arc Modern</button>
+      <button class="chip" data-tpl="frame">Framed</button>
+      <button class="chip" data-tpl="split">Split</button>
+      <button class="chip" data-tpl="promo">Promo Badge</button>
+      <button class="chip" data-tpl="poster">Poster Type</button>
+      <button class="chip" data-tpl="dots">Dotted</button>
+      <button class="chip" data-tpl="banner">Banner</button>
+      <button class="chip" data-tpl="review">Review ★</button>
+    </div>
+
+    <label>Color mood</label>
+    <div class="chip-row" id="palRow"></div>
+    <div id="customPanel" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px">
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="flex:1">
+          <span style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Background</span>
+          <input type="color" id="customBg" value="#1A1208" style="display:none">
+          <button type="button" class="color-preview" id="customBgPrev" aria-label="Pick background color"></button>
+          <input type="text" id="customBgHex" value="#1A1208" maxlength="7" placeholder="#000000" style="margin-top:6px;padding:8px 10px;font-size:13px;text-transform:uppercase">
+        </div>
+        <div style="flex:1">
+          <span style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">Brand color</span>
+          <input type="color" id="customPrimary" value="#F5A623" style="display:none">
+          <button type="button" class="color-preview" id="customPrimaryPrev" aria-label="Pick brand color"></button>
+          <input type="text" id="customPrimaryHex" value="#F5A623" maxlength="7" placeholder="#FFCC00" style="margin-top:6px;padding:8px 10px;font-size:13px;text-transform:uppercase">
+        </div>
+      </div>
+      <div class="swatch-grid" id="bgSwatches"></div>
+      <div class="swatch-grid" id="primarySwatches"></div>
+    </div>
+
+    <label>Logo <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional, shows top right)</span></label>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="file" id="logoInput" accept="image/*" style="flex:1;padding:9px 10px;font-size:13px">
+      <button id="logoClear" style="display:none;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:10px 14px;font-size:13px">Remove</button>
+    </div>
+
+    <button class="gen-btn" id="genBtn">Generate post</button>
+    <p class="error" id="errorMsg"></p>
+    <p class="usage" id="usageMsg"></p>
+  </div>
+
+  <div class="card" style="display:none"><div class="skeleton pulse" id="skel"></div></div>
+
+  <div class="card">
+    <label>Brand kits <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(save your setup, reload in one tap)</span></label>
+    <div class="chip-row" id="kitRow"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input id="kitName" placeholder="Kit name, e.g. Elegance" style="flex:1">
+      <button id="kitSave" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 18px;font-weight:700;font-size:14px">Save kit</button>
+    </div>
+  </div>
+
+  <div id="slideBar" style="display:none;margin-bottom:10px" class="chip-row"></div>
+  <div class="canvas-wrap" id="canvasWrap"><canvas id="canvas" width="1080" height="1080"></canvas></div>
+  <div class="action-row" id="actionRow">
+    <button class="dl-btn" id="dlBtn">PNG</button>
+    <button class="dl-btn" id="dlJpgBtn" style="background:transparent;color:var(--lime);border:1px solid var(--lime-dark)">JPG</button>
+    <button class="dl-btn" id="dlAllBtn" style="display:none">All slides</button>
+    <button class="re-btn" id="reBtn">Regenerate</button>
+  </div>
+
+  <div class="card" id="captionCard">
+    <label>Caption</label>
+    <div class="chip-row" id="versionRow" style="margin-bottom:8px;display:none"></div>
+    <p class="caption-text" id="captionText"></p>
+    <p class="hashtags" id="hashtagsText"></p>
+    <div id="tipsBox" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)"></div>
+    <div class="chip-row" id="platRow" style="margin-top:10px">
+      <span style="font-size:12px;color:var(--muted);align-self:center">Adapt for:</span>
+      <button class="chip" data-plat="fb">Facebook</button>
+      <button class="chip" data-plat="li">LinkedIn</button>
+      <button class="chip" data-plat="x">X</button>
+      <button class="chip" data-plat="th">Threads</button>
+    </div>
+    <div class="chip-row" id="transRow" style="margin-top:10px">
+      <span style="font-size:12px;color:var(--muted);align-self:center">Translate:</span>
+      <button class="chip" data-trans="en">EN</button>
+      <button class="chip" data-trans="ar">عربي</button>
+      <button class="chip" data-trans="fr">FR</button>
+      <button class="chip" data-trans="es">ES</button>
+      <button class="chip" data-trans="de">DE</button>
+    </div>
+    <button class="copy-btn" id="copyBtn">Copy caption + hashtags</button>
+    <button id="recapBtn" style="width:100%;margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:12px;padding:11px;font-size:14px">↻ Rewrite caption (1 credit)</button>
+  </div>
+
+  <div class="card" id="bgCard" style="display:none">
+    <label>AI photo background <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(uses 1 credit)</span></label>
+    <textarea id="bgPrompt" style="min-height:56px" placeholder="e.g. cozy café interior with warm light"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button id="bgBtn" style="flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700">✦ Generate background</button>
+      <button id="bgClear" style="display:none;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:12px 16px;font-size:14px">Remove</button>
+    </div>
+    <p class="error" id="bgError"></p>
+    <label style="margin-top:12px">Or upload your own photo <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(free)</span></label>
+    <input type="file" id="bgUpload" accept="image/*" style="padding:9px 10px;font-size:13px">
+  </div>
+
+  <div class="card" id="historyCard" style="display:none">
+    <label>Recent posts <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(saved on this device)</span></label>
+    <div class="chip-row" id="historyRow"></div>
+  </div>
+
+  <div class="card" id="campaignCard" style="display:none">
+    <label>Campaign</label>
+    <div id="campaignBody" style="font-size:14px;line-height:1.6"></div>
+  </div>
+
+  <div class="card">
+    <label for="coachQ">🧠 Ask the marketing coach <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(1 credit)</span></label>
+    <div style="display:flex;gap:8px">
+      <input id="coachQ" placeholder='e.g. "How can I get more customers this month?"' style="flex:1">
+      <button id="coachBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Ask</button>
+    </div>
+    <div id="coachBody" style="display:none;margin-top:12px;font-size:14px;line-height:1.7"></div>
+    <p class="error" id="coachError"></p>
+  </div>
+
+  <!-- ACCESS CODE -->
+  <div class="card">
+    <label for="codeInput">Have an access code?</label>
+    <div class="code-row">
+      <input id="codeInput" placeholder="e.g. PK-XXXX-XXXX" autocapitalize="characters">
+      <button id="codeBtn">Apply</button>
+    </div>
+    <p class="code-status" id="codeStatus"></p>
+  </div>
+
+  <!-- PRICING -->
+  <h2 class="section-title" id="pricing">Pricing</h2>
+  <p class="section-sub">Pay via Whish or OMT. Message us on WhatsApp and get your code in minutes.</p>
+  <div class="plans">
+    <div class="plan free">
+      <h3>Free</h3>
+      <div class="price">$0</div>
+      <ul><li>3 free posts to try it</li><li>All templates</li><li>Caption + hashtags</li></ul>
+      <a href="#app">Start now</a>
+    </div>
+    <div class="plan featured">
+      <span class="tag">MOST POPULAR</span>
+      <h3>Starter</h3>
+      <div class="price">$15<small>/month</small></div>
+      <ul><li>30 posts per month</li><li>All templates &amp; colors</li><li>English + Arabic</li><li>WhatsApp support</li></ul>
+      <a id="waStarter" href="#" target="_blank" rel="noopener">Get Starter →</a>
+    </div>
+    <div class="plan">
+      <h3>Pro</h3>
+      <div class="price">$29<small>/month</small></div>
+      <ul><li>Unlimited posts</li><li>Everything in Starter</li><li>Priority requests for new templates</li></ul>
+      <a id="waPro" href="#" target="_blank" rel="noopener">Get Pro →</a>
+    </div>
+    <div class="plan">
+      <span class="tag">DONE FOR YOU</span>
+      <h3>Managed</h3>
+      <div class="price">$79<small>/month</small></div>
+      <ul><li>We create 12 posts/month for you</li><li>Delivered ready to publish</li><li>Your brand colors &amp; style</li><li>Zero effort on your side</li></ul>
+      <a id="waDfy" href="#" target="_blank" rel="noopener">Get Managed →</a>
+    </div>
+  </div>
+
+  <footer>
+    PostKit · Built in Lebanon 🇱🇧 · A <a href="https://gbuildstudio.com" target="_blank" rel="noopener">GBuild Studio</a> product
+  </footer>
+</div>
+
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.03c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.26 8.26 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24s-3.7 8.24-8.24 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.29z"/></svg>
+</a>
+
+<script>
+/* ================= CONFIG, EDIT THESE ================= */
+const WORKER_URL = "https://postkit-api.YOURNAME.workers.dev"; // your Cloudflare Worker URL
+const WHATSAPP  = "96179106883"; // your WhatsApp number
+/* ======================================================= */
+
+const PALETTES = [
+  { id:"amber", name:"Amber Heat", bg:"#1A1208", primary:"#F5A623", accent:"#FFE8C2", text:"#FFF7EA" },
+  { id:"ocean", name:"Deep Ocean", bg:"#06202E", primary:"#2EC4B6", accent:"#CBF3F0", text:"#EAFBFA" },
+  { id:"rose", name:"Rosewood", bg:"#2A0E14", primary:"#E85D75", accent:"#FFD6DE", text:"#FFF0F3" },
+  { id:"lime", name:"Electric Lime", bg:"#101408", primary:"#B4E33D", accent:"#EAF7C8", text:"#F7FBEC" },
+  { id:"royal", name:"Royal", bg:"#120E2A", primary:"#7C5CFF", accent:"#D9CFFF", text:"#F2EFFF" },
+  { id:"gold", name:"Gold Luxury", bg:"#14100A", primary:"#D4AF37", accent:"#F3E5B8", text:"#FBF6E8" },
+  { id:"forest", name:"Fresh Forest", bg:"#0E2318", primary:"#3FA46A", accent:"#CDEBD8", text:"#EFF9F2" },
+  { id:"coffee", name:"Coffee House", bg:"#241812", primary:"#C08552", accent:"#EAD7C3", text:"#F8F1E9" },
+  { id:"slate", name:"Slate Blue", bg:"#1B2430", primary:"#8ECAE6", accent:"#D9EEF8", text:"#F0F6FA" },
+  { id:"clean", name:"Clean Light", bg:"#F7F5F0", primary:"#1C1C1C", accent:"#C9553E", text:"#1C1C1C" },
+  { id:"coral", name:"Warm Coral", bg:"#FDF1EC", primary:"#E76F51", accent:"#7A3B2E", text:"#2A1A14" },
+  { id:"blush", name:"Soft Blush", bg:"#FBEFF2", primary:"#C9506E", accent:"#7E2E44", text:"#2B1A1F" },
+];
+
+let state = {
+  template: "bold",
+  paletteId: "amber",
+  lang: "en",
+  tone: "friendly",
+  emoji: "yes",
+  style: "creative",
+  plan: "trial",
+  format: "post",
+  slides: null,
+  slideIndex: 0,
+  captions: [],
+  captionIndex: 0,
+  customActive: false,
+  result: null,
+  code: localStorage.getItem("pk_code") || "",
+};
+
+function textOn(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? "#1C1C1C" : "#FFF9F0";
+}
+function getPalette() {
+  if (state.customActive) {
+    const bg = document.getElementById("customBg").value;
+    const primary = document.getElementById("customPrimary").value;
+    const text = textOn(bg);
+    return { id: "custom", name: "Custom", bg, primary, accent: shade(primary, 70), text };
+  }
+  return PALETTES.find(p => p.id === state.paletteId);
+}
+
+/* ---------- hero typewriter ---------- */
+(function () {
+  const parts = [
+    { el: document.getElementById("ht1"), text: "Your AI " },
+    { el: document.getElementById("ht2"), text: "social media manager." },
+    { el: document.getElementById("ht3"), text: "" },
+  ];
+  const cursor = document.getElementById("heroCursor");
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    parts.forEach(p => p.el.textContent = p.text);
+    cursor.style.display = "none";
+    return;
+  }
+  let pi = 0, ci = 0;
+  function type() {
+    if (pi >= parts.length) {
+      setTimeout(() => { cursor.style.display = "none"; }, 2200);
+      return;
+    }
+    const part = parts[pi];
+    part.el.textContent = part.text.slice(0, ++ci);
+    if (ci >= part.text.length) { pi++; ci = 0; }
+    // slight pause after each sentence-ish break, faster inside words
+    const ch = part.el.textContent.slice(-1);
+    const delay = ch === "." || ch === "," ? 260 : 34 + Math.random() * 40;
+    setTimeout(type, delay);
+  }
+  setTimeout(type, 350);
+})();
+
+/* ---------- WhatsApp links ---------- */
+const waMsg = (plan) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I want the PostKit ${plan} plan 🙌`)}`;
+document.getElementById("waStarter").href = waMsg("Starter ($15/mo)");
+document.getElementById("waPro").href = waMsg("Pro ($29/mo)");
+document.getElementById("waDfy").href = waMsg("Managed ($79/mo, done for you)");
+document.getElementById("waFloat").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi! I have a question about PostKit")}`;
+
+/* ---------- palette chips ---------- */
+const palRow = document.getElementById("palRow");
+PALETTES.forEach(p => {
+  const b = document.createElement("button");
+  b.className = "swatch" + (p.id === state.paletteId ? " active" : "");
+  b.title = p.name;
+  b.style.background = `linear-gradient(135deg, ${p.bg} 50%, ${p.primary} 50%)`;
+  b.onclick = () => { state.paletteId = p.id; state.customActive = false; document.getElementById("customPanel").style.display = "none"; [...palRow.children].forEach(c => c.classList.remove("active")); b.classList.add("active"); rerender(); };
+  palRow.appendChild(b);
+});
+// custom color swatch
+const customSwatch = document.createElement("button");
+customSwatch.className = "swatch";
+customSwatch.title = "Custom colors";
+customSwatch.style.background = "conic-gradient(#F5A623,#E85D75,#7C5CFF,#2EC4B6,#B4E33D,#F5A623)";
+customSwatch.innerHTML = `<span style="background:#111;color:#fff;font-size:16px;line-height:16px;text-align:center">+</span>`;
+customSwatch.onclick = () => {
+  state.customActive = true;
+  document.getElementById("customPanel").style.display = "block";
+  [...palRow.children].forEach(c => c.classList.remove("active"));
+  customSwatch.classList.add("active");
+  rerender();
+};
+palRow.appendChild(customSwatch);
+document.getElementById("customBg").oninput = rerender;
+document.getElementById("customPrimary").oninput = rerender;
+
+/* ---------- hex <-> picker sync ---------- */
+function bindHex(pickerId, hexId) {
+  const picker = document.getElementById(pickerId), hex = document.getElementById(hexId);
+  picker.addEventListener("input", () => { hex.value = picker.value.toUpperCase(); });
+  hex.addEventListener("input", () => {
+    let v = hex.value.trim();
+    if (v && v[0] !== "#") v = "#" + v;
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) { picker.value = v; picker.dispatchEvent(new Event("input")); }
+  });
+}
+bindHex("customBg", "customBgHex");
+bindHex("customPrimary", "customPrimaryHex");
+
+/* ---------- in-page color swatches (replaces native color dialog) ---------- */
+const SWATCHES = [
+  // neutrals
+  "#000000","#1C1C1C","#3A3A3A","#6B6B6B","#9E9E9E","#D5D2CA","#F7F6F2","#FFFFFF",
+  // deep backgrounds
+  "#06202E","#0E3A5C","#101408","#1A1208","#2A0E14","#120E2A","#2C1E12","#14281E",
+  // blues & teals
+  "#2B44DE","#1B6FD8","#3498DB","#7FB3FF","#2EC4B6","#1ABC9C","#0F766E","#A5E8E0",
+  // greens & yellows
+  "#27AE60","#2ECC71","#7FB800","#B4E33D","#DCE775","#F1C40F","#FFD166","#FFF3B0",
+  // oranges, reds & pinks
+  "#F5A623","#E67E22","#D35400","#C0392B","#E74C3C","#E85D75","#FFB3C1","#C71585",
+  // purples, golds & earth
+  "#9B59B6","#7C5CFF","#4B0082","#D4AF37","#B8860B","#8B5A2B","#5C4033","#EFE6D8",
+];
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  const to = x => Math.round(255 * x).toString(16).padStart(2, "0");
+  return "#" + to(f(0)) + to(f(8)) + to(f(4));
+}
+function hexToHsl(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, sa = 0, l = (max + min) / 2;
+  const d = max - min;
+  if (d) {
+    sa = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  return [Math.round(h), Math.round(sa * 100), Math.round(l * 100)];
+}
+function buildSwatchPicker(inputId, prevId, gridId) {
+  const input = document.getElementById(inputId);
+  const prev = document.getElementById(prevId);
+  const grid = document.getElementById(gridId);
+  SWATCHES.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "sw";
+    b.style.background = c;
+    b.title = c;
+    b.onclick = () => {
+      input.value = c;
+      input.dispatchEvent(new Event("input"));
+      prev.style.background = c;
+      grid.classList.remove("open");
+    };
+    grid.appendChild(b);
+  });
+  // fine-tune sliders (custom color without the system dialog)
+  const tune = document.createElement("div");
+  tune.style.gridColumn = "1 / -1";
+  tune.style.marginTop = "4px";
+  tune.innerHTML = '<span class="tune-label">Or make your own</span>' +
+    '<input type="range" class="hue" min="0" max="360" value="30" aria-label="Hue">' +
+    '<input type="range" class="sat" min="0" max="100" value="90" aria-label="Saturation">' +
+    '<input type="range" class="lit" min="0" max="100" value="55" aria-label="Brightness">';
+  grid.appendChild(tune);
+  const sliders = tune.querySelectorAll("input");
+  const hu = sliders[0], sa = sliders[1], li = sliders[2];
+  let applying = false;
+  function applyHSL() {
+    applying = true;
+    const hex = hslToHex(+hu.value, +sa.value, +li.value);
+    input.value = hex;
+    input.dispatchEvent(new Event("input"));
+    applying = false;
+  }
+  [hu, sa, li].forEach(r => r.addEventListener("input", applyHSL));
+  function syncFromHex() {
+    if (applying) return;
+    const [h, s2, l2] = hexToHsl(input.value);
+    hu.value = h; sa.value = s2; li.value = l2;
+  }
+  syncFromHex();
+
+  prev.style.background = input.value;
+  prev.onclick = () => {
+    document.querySelectorAll(".swatch-grid").forEach(g => { if (g !== grid) g.classList.remove("open"); });
+    grid.classList.toggle("open");
+  };
+  input.addEventListener("input", () => { prev.style.background = input.value; syncFromHex(); });
+}
+buildSwatchPicker("customBg", "customBgPrev", "bgSwatches");
+buildSwatchPicker("customPrimary", "customPrimaryPrev", "primarySwatches");
+
+/* ---------- logo upload ---------- */
+let logoImg = null;
+const logoInput = document.getElementById("logoInput");
+const logoClear = document.getElementById("logoClear");
+logoInput.addEventListener("change", () => {
+  const f = logoInput.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => { logoImg = img; logoClear.style.display = "block"; rerender(); };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(f);
+});
+logoClear.onclick = () => { logoImg = null; logoInput.value = ""; logoClear.style.display = "none"; rerender(); };
+
+/* ---------- format chips ---------- */
+document.getElementById("fmtRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-fmt]"); if (!btn) return;
+  state.format = btn.dataset.fmt;
+  [...document.querySelectorAll("#fmtRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+  rerender();
+});
+
+/* ---------- chip rows ---------- */
+document.getElementById("tplRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-tpl]"); if (!btn) return;
+  state.template = btn.dataset.tpl;
+  [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+  rerender();
+});
+document.getElementById("langRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-lang]"); if (!btn) return;
+  state.lang = btn.dataset.lang;
+  [...document.querySelectorAll("#langRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+});
+document.getElementById("toneRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-tone]"); if (!btn) return;
+  state.tone = btn.dataset.tone;
+  [...document.querySelectorAll("#toneRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+});
+document.getElementById("emojiRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-emoji]"); if (!btn) return;
+  state.emoji = btn.dataset.emoji;
+  [...document.querySelectorAll("#emojiRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+});
+document.getElementById("styleRow").addEventListener("click", e => {
+  const btn = e.target.closest("[data-style]"); if (!btn) return;
+  state.style = btn.dataset.style;
+  [...document.querySelectorAll("#styleRow .chip")].forEach(c => c.classList.remove("active"));
+  btn.classList.add("active");
+});
+document.getElementById("trendRow").addEventListener("click", e => {
+  const btn = e.target.closest("button"); if (!btn) return;
+  document.getElementById("topic").value = btn.textContent;
+});
+document.getElementById("holidayRow").addEventListener("click", e => {
+  const btn = e.target.closest("button"); if (!btn) return;
+  document.getElementById("topic").value = btn.textContent + " for our customers";
+});
+/* custom occasions, saved on this device */
+function addOccasionChip(name) {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = name;
+  document.getElementById("holidayRow").appendChild(b);
+}
+let customOccasions = [];
+try { customOccasions = JSON.parse(localStorage.getItem("pk_occasions") || "[]"); } catch {}
+customOccasions.forEach(addOccasionChip);
+document.getElementById("occasionBtn").onclick = () => {
+  const v = document.getElementById("customOccasion").value.trim();
+  if (!v) return;
+  addOccasionChip(v);
+  customOccasions.push(v);
+  try { localStorage.setItem("pk_occasions", JSON.stringify(customOccasions.slice(-20))); } catch {}
+  document.getElementById("customOccasion").value = "";
+  document.getElementById("topic").value = v + " for our customers";
+};
+
+/* ---------- custom business type picker ---------- */
+(function () {
+  const sel = document.getElementById("bizType");
+  const btn = document.getElementById("bizBtn");
+  const lbl = document.getElementById("bizBtnLabel");
+  const panel = document.getElementById("bizPanel");
+  [...sel.options].forEach(o => {
+    const c = document.createElement("button");
+    c.type = "button";
+    c.className = "chip" + (o.value === sel.value ? " active" : "");
+    c.textContent = o.value;
+    c.onclick = () => {
+      sel.value = o.value;
+      sel.dispatchEvent(new Event("change"));
+      close();
+    };
+    panel.appendChild(c);
+  });
+  function refresh() {
+    lbl.textContent = sel.value;
+    [...panel.children].forEach(c => c.classList.toggle("active", c.textContent === sel.value));
+  }
+  function close() { panel.classList.remove("open"); btn.classList.remove("open"); }
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    panel.classList.toggle("open");
+    btn.classList.toggle("open");
+  };
+  document.addEventListener("click", (e) => {
+    if (!panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) close();
+  });
+  sel.addEventListener("change", refresh);
+  refresh();
+})();
+
+/* ---------- industry auto-template suggestion ---------- */
+const BIZ_TEMPLATE = {
+  "Restaurant / Café": "bold", "Bakery / Pastry": "dots", "Salon / Beauty": "editorial",
+  "Barber Shop": "poster", "Gym / Fitness": "split", "Retail / Store": "promo",
+  "Fashion / Boutique": "editorial", "Jewelry": "frame", "Real Estate": "poster",
+  "Clinic / Dental": "arc", "Pharmacy": "arc", "Hotel / Guesthouse": "editorial",
+  "Travel Agency": "banner", "Photography / Video": "frame", "Events / Wedding": "editorial",
+  "Auto / Car Services": "split", "Electronics / Tech": "promo", "Home / Furniture": "dots",
+  "Education / Tutoring": "arc", "Services / Agency": "poster", "Other": "bold",
+};
+document.getElementById("bizType").addEventListener("change", () => {
+  const t = BIZ_TEMPLATE[document.getElementById("bizType").value];
+  if (!t) return;
+  state.template = t;
+  [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tpl === t));
+  rerender();
+});
+
+/* ---------- quick describe (natural language) ---------- */
+document.getElementById("quickBtn").onclick = async () => {
+  const q = document.getElementById("quickDesc").value.trim();
+  if (!q) return;
+  const btn = document.getElementById("quickBtn");
+  btn.disabled = true; btn.textContent = "…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, mode: "chat", topic: q }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result) {
+      const r = data.result;
+      if (r.brand) document.getElementById("brand").value = r.brand;
+      if (r.bizType) {
+        const sel = document.getElementById("bizType");
+        if ([...sel.options].some(o => o.value === r.bizType)) { sel.value = r.bizType; sel.dispatchEvent(new Event("change")); }
+      }
+      if (r.tone) { state.tone = r.tone; [...document.querySelectorAll("#toneRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tone === r.tone)); }
+      if (r.style) { state.style = r.style; [...document.querySelectorAll("#styleRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.style === r.style)); }
+      if (r.lang) { state.lang = r.lang; [...document.querySelectorAll("#langRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.lang === r.lang)); }
+      if (r.topic) document.getElementById("topic").value = r.topic;
+      generate();
+    }
+  } catch {}
+  btn.disabled = false; btn.textContent = "Go";
+};
+
+/* ---------- full campaign ---------- */
+document.getElementById("campaignBtn").onclick = async () => {
+  const topic = document.getElementById("topic").value.trim();
+  const btn = document.getElementById("campaignBtn");
+  planError.textContent = "";
+  if (!topic) { planError.textContent = "Type the campaign topic first, e.g. Black Friday."; return; }
+  btn.disabled = true; btn.textContent = "Building campaign… (~20s)";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: state.code, mode: "campaign", topic,
+        brand: document.getElementById("brand").value.trim(),
+        bizType: document.getElementById("bizType").value,
+        lang: state.lang, tone: state.tone,
+        audience: document.getElementById("audience").value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!data.ok || !data.result) { planError.textContent = data.message || "Campaign failed. Try again."; return; }
+    const r = data.result;
+    const esc = t => String(t).replace(/[<>]/g, "");
+    let htmlOut = "";
+    if (Array.isArray(r.posts)) htmlOut += "<strong>Posts</strong><br>" + r.posts.map((p,i)=> (i+1)+". "+esc(p)).join("<br>") + "<br><br>";
+    if (Array.isArray(r.stories)) htmlOut += "<strong>Stories</strong><br>" + r.stories.map((p,i)=> (i+1)+". "+esc(p)).join("<br>") + "<br><br>";
+    if (Array.isArray(r.email_subjects)) htmlOut += "<strong>Email subjects</strong><br>" + r.email_subjects.map(esc).join("<br>") + "<br><br>";
+    if (r.sms) htmlOut += "<strong>SMS</strong><br>" + esc(r.sms) + "<br><br>";
+    if (r.ad_copy) htmlOut += "<strong>Ad copy</strong><br>" + esc(r.ad_copy);
+    document.getElementById("campaignBody").innerHTML = htmlOut;
+    document.getElementById("campaignCard").style.display = "block";
+    document.getElementById("campaignCard").scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch { planError.textContent = "Connection failed. Try again."; }
+  finally { btn.disabled = false; btn.textContent = "🎯 Full campaign from this topic (1 credit)"; }
+};
+
+/* ---------- marketing coach ---------- */
+document.getElementById("coachBtn").onclick = async () => {
+  const q = document.getElementById("coachQ").value.trim();
+  const err = document.getElementById("coachError");
+  const btn = document.getElementById("coachBtn");
+  err.textContent = "";
+  if (!q) { err.textContent = "Ask a question first."; return; }
+  btn.disabled = true; btn.textContent = "…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: state.code, mode: "coach", topic: q,
+        brand: document.getElementById("brand").value.trim(),
+        bizType: document.getElementById("bizType").value,
+        lang: state.lang,
+      }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result && Array.isArray(data.result.advice)) {
+      const esc = t => String(t).replace(/[<>]/g, "");
+      document.getElementById("coachBody").innerHTML = data.result.advice.map(a => "• " + esc(a)).join("<br>");
+      document.getElementById("coachBody").style.display = "block";
+    } else {
+      err.textContent = data.message || "Coach unavailable. Try again.";
+    }
+  } catch { err.textContent = "Connection failed. Try again."; }
+  finally { btn.disabled = false; btn.textContent = "Ask"; }
+};
+
+/* ---------- idea generator ---------- */
+const IDEAS = {
+  "Restaurant / Café": ["Weekend special: our chef's new dish is here", "Happy hour every day 5-7pm", "Fresh ingredients, made this morning", "Tag someone you'd share this with", "New seasonal menu just dropped", "Behind the scenes in our kitchen"],
+  "Bakery / Pastry": ["Fresh out of the oven every morning at 7am", "New cake collection for this season", "Custom birthday cakes, order 48h ahead", "Weekend special: buy 6 get 2 free", "Behind the scenes: how we make our croissants"],
+  "Salon / Beauty": ["Book this week and get 20% off any treatment", "Transformation Tuesday, before and after", "Self-care isn't a luxury, it's a routine", "New nail collection for this season", "Bridal packages now open for booking"],
+  "Barber Shop": ["Fresh cut, fresh week, book your spot", "Walk-ins welcome this Saturday", "Before and after: this transformation 🔥", "Father & son combo deal this month", "New in: hot towel shave experience"],
+  "Gym / Fitness": ["New member offer: first month half price", "Monday motivation, your only competition is yesterday", "New class added to the schedule this week", "Transformation of the month", "Bring a friend for free this weekend"],
+  "Retail / Store": ["New arrivals just landed", "Weekend flash sale, up to 30% off", "Back in stock: our best seller", "Limited pieces, don't wait", "Free delivery on all orders this week"],
+  "Fashion / Boutique": ["New collection drop, limited pieces only", "Style of the week: how to wear it 3 ways", "Weekend sale: up to 40% off selected items", "Just landed from our latest shipment", "Tag someone who needs this outfit"],
+  "Jewelry": ["A piece for every story, new collection", "Handcrafted, made to last a lifetime", "The perfect gift is waiting here", "Engagement season is here, book a private viewing", "New arrivals in gold and silver"],
+  "Real Estate": ["New listing: modern apartment with a view", "Just sold, thinking of selling yours?", "Open house this weekend", "The market is moving, free property valuation"],
+  "Clinic / Dental": ["Your smile deserves a checkup, book this week", "New patient offer: free first consultation", "Before and after: smile transformation", "5 signs you shouldn't ignore", "Now accepting new appointments"],
+  "Pharmacy": ["Free delivery on all orders this week", "New skincare line now in stock", "Flu season is here, we've got you covered", "Ask our pharmacist: open daily", "Vitamins and supplements, new arrivals"],
+  "Hotel / Guesthouse": ["Weekend getaway offer: 2 nights + breakfast", "Wake up to this view", "Summer bookings now open", "The perfect staycation is closer than you think", "Book direct and save 15%"],
+  "Travel Agency": ["Summer packages just dropped, early bird prices", "Where to next? Tell us in the comments", "Visa + flight + hotel, all handled", "Last-minute deals this weekend", "Honeymoon packages now available"],
+  "Photography / Video": ["Booking now open for summer sessions", "Behind the scenes of yesterday's shoot", "Before and after: the magic of editing", "Mini sessions this weekend, limited spots", "Your brand deserves better photos"],
+  "Events / Wedding": ["2027 wedding dates now booking", "From concept to celebration, recent event", "Behind the scenes of last weekend's setup", "Limited summer dates remaining", "Your dream event, planned to the detail"],
+  "Auto / Car Services": ["Full service special this month", "Summer check-up: AC + tires + oil", "Before and after: this detailing job", "Free inspection with every oil change", "Your car deserves expert hands"],
+  "Electronics / Tech": ["New arrivals: latest phones in stock", "Trade in your old device, get instant discount", "Weekend deal: accessories 25% off", "Repairs done same day", "Best prices in town, compare and see"],
+  "Home / Furniture": ["New collection: modern living room sets", "Transform your space, free consultation", "Weekend showroom sale", "Custom made, delivered to your door", "Before and after: this home makeover"],
+  "Education / Tutoring": ["Registration open for the new semester", "Small groups, big results", "Free trial session this week", "Exam season prep starts now", "Success story: meet our top student"],
+  "Services / Agency": ["We just launched a project we're proud of", "Client results speak louder than promises", "Booking new clients for next month", "The one mistake most businesses make"],
+  "Other": ["Big announcement coming this week", "Thank you for 1000 followers", "New offer for our loyal customers", "Behind the scenes of what we do"],
+};
+document.getElementById("ideaBtn").onclick = () => {
+  const list = IDEAS[document.getElementById("bizType").value] || IDEAS["Other"];
+  document.getElementById("topic").value = list[Math.floor(Math.random() * list.length)];
+};
+
+/* ---------- history ---------- */
+function saveToHistory() {
+  let h = [];
+  try { h = JSON.parse(localStorage.getItem("pk_history") || "[]"); } catch {}
+  h.unshift({
+    result: state.result, template: state.template, paletteId: state.paletteId,
+    customActive: state.customActive, format: state.format,
+    brand: document.getElementById("brand").value.trim(), ts: Date.now(),
+  });
+  h = h.slice(0, 10);
+  localStorage.setItem("pk_history", JSON.stringify(h));
+  renderHistory();
+}
+function renderHistory() {
+  let h = [];
+  try { h = JSON.parse(localStorage.getItem("pk_history") || "[]"); } catch {}
+  const card = document.getElementById("historyCard");
+  const row = document.getElementById("historyRow");
+  if (!h.length) { card.style.display = "none"; return; }
+  card.style.display = "block";
+  row.innerHTML = "";
+  h.forEach((item) => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = (item.result.headline || "post").slice(0, 26);
+    b.onclick = () => {
+      state.result = item.result;
+      state.slides = null;
+      state.slideIndex = 0;
+      state.captions = [{ caption: item.result.caption, hashtags: item.result.hashtags || [] }];
+      state.captionIndex = 0;
+      state.template = item.template;
+      state.paletteId = item.paletteId || state.paletteId;
+      state.customActive = false;
+      state.format = item.format || "post";
+      if (item.brand) document.getElementById("brand").value = item.brand;
+      showResult();
+    };
+    row.appendChild(b);
+  });
+}
+renderHistory();
+
+/* ---------- access code ---------- */
+const codeInput = document.getElementById("codeInput");
+const codeStatus = document.getElementById("codeStatus");
+if (state.code) { codeInput.value = state.code; codeStatus.textContent = "Code saved ✓"; codeStatus.style.color = "var(--lime)"; }
+document.getElementById("codeBtn").onclick = () => {
+  state.code = codeInput.value.trim().toUpperCase();
+  localStorage.setItem("pk_code", state.code);
+  codeStatus.textContent = state.code ? "Code saved ✓ It will be checked on your next generation." : "Code cleared.";
+  codeStatus.style.color = "var(--lime)";
+};
+
+/* ---------- generate ---------- */
+const genBtn = document.getElementById("genBtn");
+const errorMsg = document.getElementById("errorMsg");
+const usageMsg = document.getElementById("usageMsg");
+const skel = document.getElementById("skel");
+
+genBtn.onclick = generate;
+document.getElementById("reBtn").onclick = generate;
+
+async function generate() {
+  const topic = document.getElementById("topic").value.trim();
+  errorMsg.textContent = "";
+  if (!topic) { errorMsg.textContent = "Describe what the post is about first."; return; }
+  genBtn.disabled = true; genBtn.textContent = "Generating…";
+  skel.style.display = "block"; skel.parentElement.style.display = "block";
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: state.code,
+        mode: state.format === "carousel" ? "carousel" : "post",
+        brand: document.getElementById("brand").value.trim(),
+        bizType: document.getElementById("bizType").value,
+        topic, lang: state.lang, tone: state.tone, emoji: state.emoji, style: state.style,
+        audience: document.getElementById("audience").value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      if (data.error === "trial_exhausted") {
+        errorMsg.innerHTML = `Your free posts are used up. <a href="#pricing" style="color:var(--lime)">Get a plan →</a>`;
+      } else if (data.error === "invalid_code") {
+        errorMsg.textContent = "That access code isn't valid. Check it or message us on WhatsApp.";
+      } else if (data.error === "limit_reached") {
+        errorMsg.innerHTML = `Monthly limit reached. <a href="${waMsg('renewal')}" style="color:var(--lime)">Renew via WhatsApp →</a>`;
+      } else {
+        errorMsg.textContent = data.message || "Generation failed. Try again.";
+      }
+      return;
+    }
+    if (Array.isArray(data.result.slides) && data.result.slides.length) {
+      state.slides = data.result.slides.slice(0, 3);
+      state.slideIndex = 0;
+      state.result = {
+        headline: state.slides[0].headline, subline: state.slides[0].subline,
+        caption: data.result.caption, hashtags: data.result.hashtags || [],
+      };
+    } else {
+      state.slides = null;
+      state.result = data.result;
+    }
+    state.captions = [{ caption: state.result.caption, hashtags: state.result.hashtags }];
+    state.captionIndex = 0;
+    if (data.usage) {
+      state.plan = data.usage.plan;
+      usageMsg.textContent = data.usage.plan === "trial"
+        ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+        : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+    }
+    showResult();
+    saveToHistory();
+  } catch (e) {
+    errorMsg.textContent = "Connection failed. Check your internet and try again.";
+  } finally {
+    genBtn.disabled = false; genBtn.textContent = "Generate post";
+    skel.style.display = "none"; skel.parentElement.style.display = "none";
+  }
+}
+
+function showResult() {
+  document.getElementById("canvasWrap").style.display = "block";
+  document.getElementById("actionRow").style.display = "flex";
+  document.getElementById("captionCard").style.display = "block";
+  document.getElementById("bgCard").style.display = "block";
+  const bp = document.getElementById("bgPrompt");
+  if (!bp.value.trim()) {
+    bp.value = document.getElementById("bizType").value.split(" / ")[0].toLowerCase() + " scene, " + (document.getElementById("topic").value.trim().slice(0, 60) || "modern clean setting");
+  }
+  document.getElementById("captionText").textContent = state.result.caption;
+  document.getElementById("hashtagsText").textContent = state.result.hashtags.map(h => "#" + h).join(" ");
+  renderSlideBar();
+  renderVersions();
+  renderTips();
+  document.getElementById("dlAllBtn").style.display = state.slides ? "block" : "none";
+  rerender();
+  document.getElementById("canvasWrap").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function renderTips() {
+  const box = document.getElementById("tipsBox");
+  const tips = [];
+  const cap = state.result.caption || "";
+  const tags = state.result.hashtags || [];
+  const head = state.result.headline || "";
+  if (cap.length > 350) tips.push("Caption is long. Shorter captions usually perform better on Instagram.");
+  if (cap.length < 60) tips.push("Caption is very short. One more sentence could add context.");
+  if (!/[?!]|comment|tag|dm|order|book|visit|link|call|whatsapp|اطلب|احجز|زور|commandez|réservez/i.test(cap)) tips.push("No clear call to action detected. Consider adding one.");
+  if (tags.length < 6) tips.push("Few hashtags. 8 to 12 is a good range.");
+  if (tags.length > 15) tips.push("Too many hashtags can look spammy. Keep 8 to 12.");
+  if (head.split(/\s+/).length > 8) tips.push("Headline is long for the design. Consider regenerating.");
+  if (!tips.length) { box.style.display = "none"; return; }
+  box.style.display = "block";
+  box.innerHTML = "<strong style='color:var(--text)'>Quality check</strong><br>" + tips.map(t => "• " + t).join("<br>");
+}
+
+function renderSlideBar() {
+  const bar = document.getElementById("slideBar");
+  if (!state.slides) { bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  bar.innerHTML = "";
+  state.slides.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (i === state.slideIndex ? " active" : "");
+    b.textContent = "Slide " + (i + 1);
+    b.onclick = () => {
+      state.slideIndex = i;
+      state.result.headline = state.slides[i].headline;
+      state.result.subline = state.slides[i].subline;
+      renderSlideBar();
+      rerender();
+    };
+    bar.appendChild(b);
+  });
+}
+
+function renderVersions() {
+  const row = document.getElementById("versionRow");
+  if (state.captions.length < 2) { row.style.display = "none"; return; }
+  row.style.display = "flex";
+  row.innerHTML = "";
+  state.captions.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (i === state.captionIndex ? " active" : "");
+    b.textContent = "V" + (i + 1);
+    b.onclick = () => {
+      state.captionIndex = i;
+      state.result.caption = c.caption;
+      state.result.hashtags = c.hashtags;
+      document.getElementById("captionText").textContent = c.caption;
+      document.getElementById("hashtagsText").textContent = c.hashtags.map(h => "#" + h).join(" ");
+      renderVersions();
+    };
+    row.appendChild(b);
+  });
+}
+
+/* ---------- AI background ---------- */
+let bgImg = null;
+const bgBtn = document.getElementById("bgBtn");
+const bgClear = document.getElementById("bgClear");
+const bgError = document.getElementById("bgError");
+bgBtn.onclick = async () => {
+  const p = document.getElementById("bgPrompt").value.trim();
+  bgError.textContent = "";
+  if (!p) { bgError.textContent = "Describe the background photo first."; return; }
+  bgBtn.disabled = true; bgBtn.textContent = "Generating… (~10s)";
+  try {
+    const res = await fetch(WORKER_URL + "/background", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, bgPrompt: p, format: state.format }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      bgError.textContent = data.message || "Background generation failed. Try again.";
+      return;
+    }
+    const img = new Image();
+    img.onload = () => { bgImg = img; bgClear.style.display = "block"; rerender(); };
+    img.src = data.image;
+    if (data.usage) {
+      usageMsg.textContent = data.usage.plan === "trial"
+        ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+        : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+    }
+  } catch {
+    bgError.textContent = "Connection failed. Try again.";
+  } finally {
+    bgBtn.disabled = false; bgBtn.textContent = "✦ Generate background";
+  }
+};
+bgClear.onclick = () => { bgImg = null; bgClear.style.display = "none"; rerender(); };
+
+/* ---------- idea engines: week / month / offers ---------- */
+const planError = document.getElementById("planError");
+const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+async function runIdeas(btn, payload, busyLabel, restLabel, maxIdeas) {
+  planError.textContent = "";
+  btn.disabled = true; btn.textContent = busyLabel;
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.assign({
+        code: state.code,
+        brand: document.getElementById("brand").value.trim(),
+        bizType: document.getElementById("bizType").value,
+        lang: state.lang,
+      }, payload)),
+    });
+    const data = await res.json();
+    if (!data.ok || !data.result || !Array.isArray(data.result.ideas)) {
+      planError.textContent = data.message || "Generation failed. Try again.";
+      return;
+    }
+    const row = document.getElementById("planRow");
+    row.innerHTML = "";
+    data.result.ideas.slice(0, maxIdeas).forEach((idea, i) => {
+      const b = document.createElement("button");
+      b.className = "chip";
+      b.textContent = (maxIdeas === 7 ? DAY_LABELS[i] : maxIdeas === 30 ? "D" + (i + 1) : "•") + ": " + idea;
+      b.style.textAlign = "left";
+      b.onclick = () => { document.getElementById("topic").value = idea; document.getElementById("topic").scrollIntoView({ behavior: "smooth", block: "center" }); };
+      row.appendChild(b);
+    });
+    document.getElementById("planCard").style.display = "block";
+    if (data.usage) {
+      usageMsg.textContent = data.usage.plan === "trial"
+        ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+        : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+    }
+  } catch {
+    planError.textContent = "Connection failed. Try again.";
+  } finally {
+    btn.disabled = false; btn.textContent = restLabel;
+  }
+}
+const planBtn = document.getElementById("planBtn");
+planBtn.onclick = () => runIdeas(planBtn, { mode: "plan", days: 7 }, "Planning your week…", "📅 Plan my week: 7 AI ideas (1 credit)", 7);
+const monthBtn = document.getElementById("monthBtn");
+monthBtn.onclick = () => runIdeas(monthBtn, { mode: "plan", days: 30 }, "Planning your month… (~20s)", "🗓 Plan my month: 30 AI ideas (1 credit)", 30);
+const offersBtn = document.getElementById("offersBtn");
+offersBtn.onclick = () => runIdeas(offersBtn, { mode: "offers" }, "Thinking of offers…", "💡 Offer & campaign ideas (1 credit)", 8);
+
+/* ---------- generate from website ---------- */
+document.getElementById("siteBtn").onclick = async () => {
+  const su = document.getElementById("siteUrl").value.trim();
+  const siteError = document.getElementById("siteError");
+  const btn = document.getElementById("siteBtn");
+  siteError.textContent = "";
+  if (!su) { siteError.textContent = "Enter your website URL first."; return; }
+  btn.disabled = true; btn.textContent = "…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, mode: "fromsite", siteUrl: su }),
+    });
+    const data = await res.json();
+    if (!data.ok || !data.result) {
+      siteError.textContent = data.message || "Couldn't read that website.";
+      return;
+    }
+    if (data.result.brand) document.getElementById("brand").value = data.result.brand;
+    if (data.result.bizType) {
+      const sel = document.getElementById("bizType");
+      if ([...sel.options].some(o => o.value === data.result.bizType)) sel.value = data.result.bizType;
+    }
+    if (data.result.topic) document.getElementById("topic").value = data.result.topic;
+    if (data.usage) {
+      usageMsg.textContent = data.usage.plan === "trial"
+        ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+        : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+    }
+  } catch {
+    siteError.textContent = "Connection failed. Try again.";
+  } finally {
+    btn.disabled = false; btn.textContent = "Scan";
+  }
+};
+
+/* ---------- rewrite caption ---------- */
+const recapBtn = document.getElementById("recapBtn");
+recapBtn.onclick = async () => {
+  recapBtn.disabled = true; recapBtn.textContent = "Rewriting…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: state.code, mode: "recaption",
+        brand: document.getElementById("brand").value.trim(),
+        bizType: document.getElementById("bizType").value,
+        topic: document.getElementById("topic").value.trim(),
+        lang: state.lang, tone: state.tone, emoji: state.emoji,
+      }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result && data.result.caption) {
+      state.captions.push({ caption: data.result.caption, hashtags: data.result.hashtags || [] });
+      state.captionIndex = state.captions.length - 1;
+      state.result.caption = data.result.caption;
+      if (Array.isArray(data.result.hashtags)) state.result.hashtags = data.result.hashtags;
+      document.getElementById("captionText").textContent = state.result.caption;
+      document.getElementById("hashtagsText").textContent = state.result.hashtags.map(h => "#" + h).join(" ");
+      renderVersions();
+      if (data.usage) {
+        usageMsg.textContent = data.usage.plan === "trial"
+          ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+          : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+      }
+    }
+  } catch {}
+  recapBtn.disabled = false; recapBtn.textContent = "↻ Rewrite caption (1 credit)";
+};
+
+/* ---------- download all slides ---------- */
+document.getElementById("dlAllBtn").onclick = () => {
+  if (!state.slides) return;
+  const orig = state.slideIndex;
+  const cv = document.getElementById("canvas");
+  cv.width = 1080; cv.height = 1080;
+  state.slides.forEach((s, i) => {
+    state.result.headline = s.headline;
+    state.result.subline = s.subline;
+    const pal = getPalette();
+    const brand = document.getElementById("brand").value.trim() || "Your Brand";
+    drawPost(document.getElementById("canvas"), { template: state.template, palette: pal, H: 1080, headline: s.headline, subline: s.subline, brand });
+    const a = document.createElement("a");
+    a.download = (brand || "post").toLowerCase().replace(/\s+/g, "-") + "-slide" + (i + 1) + ".png";
+    a.href = document.getElementById("canvas").toDataURL("image/png");
+    a.click();
+  });
+  state.slideIndex = orig;
+  state.result.headline = state.slides[orig].headline;
+  state.result.subline = state.slides[orig].subline;
+  rerender();
+};
+
+/* ---------- translate ---------- */
+document.getElementById("transRow").addEventListener("click", async e => {
+  const btn = e.target.closest("[data-trans]"); if (!btn || !state.result) return;
+  const target = btn.dataset.trans;
+  const src = state.result.caption + "\nHashtags: " + state.result.hashtags.join(", ");
+  btn.disabled = true; const old = btn.textContent; btn.textContent = "…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, mode: "translate", topic: src, target }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result && data.result.caption) {
+      state.captions.push({ caption: data.result.caption, hashtags: data.result.hashtags || [] });
+      state.captionIndex = state.captions.length - 1;
+      state.result.caption = data.result.caption;
+      state.result.hashtags = data.result.hashtags || [];
+      document.getElementById("captionText").textContent = state.result.caption;
+      document.getElementById("hashtagsText").textContent = state.result.hashtags.map(h => "#" + h).join(" ");
+      renderVersions();
+    }
+  } catch {}
+  btn.disabled = false; btn.textContent = old;
+});
+
+/* ---------- adapt for platform ---------- */
+document.getElementById("platRow").addEventListener("click", async e => {
+  const btn = e.target.closest("[data-plat]"); if (!btn || !state.result) return;
+  const target = btn.dataset.plat;
+  const src = state.result.caption + "\nHashtags: " + state.result.hashtags.join(", ");
+  btn.disabled = true; const old = btn.textContent; btn.textContent = "…";
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: state.code, mode: "platform", topic: src, target }),
+    });
+    const data = await res.json();
+    if (data.ok && data.result && data.result.caption) {
+      state.captions.push({ caption: data.result.caption, hashtags: data.result.hashtags || [] });
+      state.captionIndex = state.captions.length - 1;
+      state.result.caption = data.result.caption;
+      state.result.hashtags = data.result.hashtags || [];
+      document.getElementById("captionText").textContent = state.result.caption;
+      document.getElementById("hashtagsText").textContent = state.result.hashtags.map(h => "#" + h).join(" ");
+      renderVersions();
+    }
+  } catch {}
+  btn.disabled = false; btn.textContent = old;
+});
+
+/* ---------- upload own background photo ---------- */
+document.getElementById("bgUpload").addEventListener("change", () => {
+  const f = document.getElementById("bgUpload").files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => { bgImg = img; bgClear.style.display = "block"; rerender(); };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(f);
+});
+
+/* ---------- brand kits ---------- */
+function loadKits() {
+  let kits = {};
+  try { kits = JSON.parse(localStorage.getItem("pk_kits") || "{}"); } catch {}
+  return kits;
+}
+function renderKits() {
+  const kits = loadKits();
+  const row = document.getElementById("kitRow");
+  row.innerHTML = "";
+  const names = Object.keys(kits);
+  if (!names.length) {
+    row.innerHTML = '<span style="font-size:13px;color:var(--dim)">No kits saved yet.</span>';
+    return;
+  }
+  names.forEach(name => {
+    const k = kits[name];
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = name;
+    b.onclick = () => {
+      document.getElementById("brand").value = k.brand || "";
+      document.getElementById("bizType").value = k.bizType || "Other";
+      state.lang = k.lang || "en"; state.tone = k.tone || "friendly"; state.emoji = k.emoji || "yes";
+      [...document.querySelectorAll("#langRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.lang === state.lang));
+      [...document.querySelectorAll("#toneRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tone === state.tone));
+      [...document.querySelectorAll("#emojiRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.emoji === state.emoji));
+      if (k.custom) {
+        state.customActive = true;
+        document.getElementById("customBg").value = k.custom.bg;
+        document.getElementById("customBgHex").value = k.custom.bg.toUpperCase();
+        document.getElementById("customPrimary").value = k.custom.primary;
+        document.getElementById("customPrimaryHex").value = k.custom.primary.toUpperCase();
+        document.getElementById("customPanel").style.display = "block";
+        [...palRow.children].forEach(c => c.classList.remove("active"));
+        customSwatch.classList.add("active");
+      } else if (k.paletteId) {
+        state.customActive = false;
+        state.paletteId = k.paletteId;
+        document.getElementById("customPanel").style.display = "none";
+        [...palRow.children].forEach((c, i) => c.classList.toggle("active", PALETTES[i] && PALETTES[i].id === k.paletteId));
+      }
+      if (k.logo) {
+        const img = new Image();
+        img.onload = () => { logoImg = img; logoClear.style.display = "block"; rerender(); };
+        img.src = k.logo;
+      }
+      rerender();
+    };
+    // long-press-free delete: small × via double click? keep simple: right side ✕ button
+    const x = document.createElement("button");
+    x.className = "chip";
+    x.textContent = "✕";
+    x.title = "Delete " + name;
+    x.style.padding = "8px 10px";
+    x.onclick = () => {
+      const kits2 = loadKits();
+      delete kits2[name];
+      localStorage.setItem("pk_kits", JSON.stringify(kits2));
+      renderKits();
+    };
+    const wrap = document.createElement("span");
+    wrap.style.display = "inline-flex"; wrap.style.gap = "4px";
+    wrap.appendChild(b); wrap.appendChild(x);
+    row.appendChild(wrap);
+  });
+}
+document.getElementById("kitSave").onclick = () => {
+  const name = document.getElementById("kitName").value.trim();
+  if (!name) return;
+  const kits = loadKits();
+  kits[name] = {
+    brand: document.getElementById("brand").value.trim(),
+    bizType: document.getElementById("bizType").value,
+    lang: state.lang, tone: state.tone, emoji: state.emoji,
+    paletteId: state.customActive ? null : state.paletteId,
+    custom: state.customActive ? { bg: document.getElementById("customBg").value, primary: document.getElementById("customPrimary").value } : null,
+    logo: logoImg ? logoImg.src : null,
+  };
+  try {
+    localStorage.setItem("pk_kits", JSON.stringify(kits));
+    document.getElementById("kitName").value = "";
+    renderKits();
+  } catch (e) {
+    alert("Couldn't save. The logo image may be too large for storage. Try without a logo.");
+  }
+};
+renderKits();
+
+function rerender() {
+  if (!state.result) return;
+  const pal = getPalette();
+  const brand = document.getElementById("brand").value.trim() || "Your Brand";
+  const canvas = document.getElementById("canvas");
+  const DIMS = { post: [1080, 1080], portrait: [1080, 1350], story: [1080, 1920], carousel: [1080, 1080], landscape: [1920, 1080], pin: [1080, 1620] };
+  const [W, H] = DIMS[state.format] || DIMS.post;
+  if (canvas.width !== W) canvas.width = W;
+  if (canvas.height !== H) canvas.height = H;
+  document.fonts.ready.then(() =>
+    Promise.all([
+      document.fonts.load("800 100px 'Archivo'"),
+      document.fonts.load("600 96px 'Fraunces'"),
+      document.fonts.load("italic 400 38px 'Fraunces'"),
+      document.fonts.load("600 32px 'Space Grotesk'"),
+    ]).finally(() =>
+      drawPost(canvas, {
+        template: state.template, palette: pal, H,
+        headline: state.result.headline, subline: state.result.subline, brand,
+      })
+    )
+  );
+}
+
+/* ---------- download & copy ---------- */
+function downloadCanvas(type) {
+  const a = document.createElement("a");
+  const brand = document.getElementById("brand").value.trim() || "post";
+  const ext = type === "jpg" ? "jpg" : "png";
+  a.download = brand.toLowerCase().replace(/\s+/g, "-") + "-" + state.format + "." + ext;
+  a.href = type === "jpg"
+    ? document.getElementById("canvas").toDataURL("image/jpeg", 0.92)
+    : document.getElementById("canvas").toDataURL("image/png");
+  a.click();
+}
+document.getElementById("dlBtn").onclick = () => downloadCanvas("png");
+document.getElementById("dlJpgBtn").onclick = () => downloadCanvas("jpg");
+document.getElementById("copyBtn").onclick = () => {
+  const full = state.result.caption + "\n\n" + state.result.hashtags.map(h => "#" + h).join(" ");
+  navigator.clipboard.writeText(full);
+  const b = document.getElementById("copyBtn");
+  b.textContent = "Copied ✓";
+  setTimeout(() => (b.textContent = "Copy caption + hashtags"), 1600);
+};
+
+/* ================= CANVAS TEMPLATES ================= */
+function wrapText(ctx, text, maxWidth) {
+  const words = String(text || "").split(" ");
+  const lines = []; let line = "";
+  for (const w of words) {
+    const t = line ? line + " " + w : w;
+    if (ctx.measureText(t).width > maxWidth && line) { lines.push(line); line = w; }
+    else line = t;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.min(255, ((n >> 16) & 255) + amt), g = Math.min(255, ((n >> 8) & 255) + amt), b = Math.min(255, (n & 255) + amt);
+  return "#" + ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
+}
+function hexToRgba(hex, a) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+function paintBG(ctx, p, x, y, w, h) {
+  if (typeof bgImg !== "undefined" && bgImg) {
+    const ir = bgImg.width / bgImg.height, r = w / h;
+    let sw, sh, sx, sy;
+    if (ir > r) { sh = bgImg.height; sw = sh * r; sx = (bgImg.width - sw) / 2; sy = 0; }
+    else { sw = bgImg.width; sh = sw / r; sx = 0; sy = (bgImg.height - sh) / 2; }
+    ctx.drawImage(bgImg, sx, sy, sw, sh, x, y, w, h);
+    ctx.fillStyle = hexToRgba(p.bg, 0.66); // tint keeps text readable + brand colors alive
+    ctx.fillRect(x, y, w, h);
+  } else {
+    ctx.fillStyle = p.bg;
+    ctx.fillRect(x, y, w, h);
+  }
+}
+
+function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 1080 }) {
+  const S = canvas.width || 1080, ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, S, H);
+
+  const drawHeadline = (x, y, size, color, maxW, weight = 800, font = "'Archivo', sans-serif") => {
+    ctx.fillStyle = color; ctx.textAlign = "left";
+    let fs = size;
+    ctx.font = `${weight} ${fs}px ${font}`;
+    let lines = wrapText(ctx, headline, maxW);
+    while (lines.length > 4 && fs > 40) { fs -= 8; ctx.font = `${weight} ${fs}px ${font}`; lines = wrapText(ctx, headline, maxW); }
+    const lh = fs * 1.12;
+    lines.forEach((l, i) => ctx.fillText(l, x, y + i * lh));
+    return y + lines.length * lh;
+  };
+
+  if (template === "bold") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.fillStyle = p.primary; ctx.beginPath(); ctx.arc(S + 100, -100, 460, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = p.bg; ctx.beginPath(); ctx.arc(S + 100, -100, 380, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = p.primary; ctx.font = "700 34px 'Space Grotesk', sans-serif"; ctx.textAlign = "left";
+    ctx.fillText(brand.toUpperCase(), 90, 150);
+    ctx.fillRect(90, 175, 120, 8);
+    const endY = drawHeadline(90, H * 0.44, 108, p.text, S - 240);
+    ctx.fillStyle = p.accent; ctx.font = "400 40px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, S - 260).slice(0, 3).forEach((l, i) => ctx.fillText(l, 90, endY + 60 + i * 54));
+    ctx.fillStyle = p.primary; ctx.fillRect(0, H - 24, S, 24);
+  }
+
+  if (template === "editorial") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.strokeStyle = p.primary; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(90, 120); ctx.lineTo(S - 90, 120); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(90, H - 140); ctx.lineTo(S - 90, H - 140); ctx.stroke();
+    ctx.fillStyle = p.text; ctx.font = "500 30px 'Space Grotesk', sans-serif";
+    ctx.textAlign = "left"; ctx.fillText(brand.toUpperCase(), 90, 100);
+    ctx.textAlign = "right"; ctx.fillText("●", S - 90, 100);
+    ctx.textAlign = "center";
+    let fs = 96; ctx.font = `600 ${fs}px 'Fraunces', serif`;
+    let lines = wrapText(ctx, headline, S - 220);
+    while (lines.length > 4 && fs > 44) { fs -= 6; ctx.font = `600 ${fs}px 'Fraunces', serif`; lines = wrapText(ctx, headline, S - 220); }
+    const startY = H / 2 - (lines.length * fs * 1.15) / 2 + fs * .4;
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, startY + i * fs * 1.15));
+    ctx.fillStyle = p.primary; ctx.font = "italic 400 38px 'Fraunces', serif";
+    const subLines = wrapText(ctx, subline, S - 300).slice(0, 2);
+    subLines.forEach((l, i) => ctx.fillText(l, S / 2, H - 220 + i * 50 - (subLines.length - 1) * 25));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "arc") {
+    if (typeof bgImg !== "undefined" && bgImg) {
+      paintBG(ctx, p, 0, 0, S, H);
+    } else {
+      const g = ctx.createLinearGradient(0, 0, S, H);
+      g.addColorStop(0, p.bg); g.addColorStop(1, shade(p.bg, 28));
+      ctx.fillStyle = g; ctx.fillRect(0, 0, S, H);
+    }
+    ctx.fillStyle = p.primary; ctx.beginPath(); ctx.arc(S / 2, H + 640, 800, 0, Math.PI * 2); ctx.fill();
+    ctx.font = "600 32px 'Space Grotesk', sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.12)";
+    roundRect(ctx, 90, 100, ctx.measureText(brand).width + 80, 70, 35); ctx.fill();
+    ctx.fillStyle = p.text; ctx.textAlign = "left";
+    ctx.fillText(brand, 130, 146);
+    drawHeadline(90, H * 0.37, 100, p.text, S - 200);
+    ctx.fillStyle = textOn(p.primary);
+    ctx.font = "600 40px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    wrapText(ctx, subline, S - 320).slice(0, 2).forEach((l, i) => ctx.fillText(l, S / 2, H - 160 + i * 52));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "frame") {
+    ctx.fillStyle = p.primary; ctx.fillRect(0, 0, S, H);
+    paintBG(ctx, p, 40, 40, S - 80, H - 80);
+    ctx.strokeStyle = p.primary; ctx.lineWidth = 6;
+    const t = 60, m = 90;
+    [[m, m], [S - m, m], [m, H - m], [S - m, H - m]].forEach(([x, y], i) => {
+      ctx.beginPath();
+      ctx.moveTo(x + (i % 2 === 0 ? t : -t), y);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x, y + (i < 2 ? t : -t));
+      ctx.stroke();
+    });
+    ctx.fillStyle = p.primary; ctx.font = "700 30px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(brand.toUpperCase(), S / 2, 170);
+    let fs = 92; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, S - 320);
+    while (lines.length > 4 && fs > 44) { fs -= 6; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, S - 320); }
+    const sy = H / 2 - (lines.length * fs * 1.12) / 2 + fs * .4;
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, sy + i * fs * 1.12));
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "400 36px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, S - 360).slice(0, 2).forEach((l, i) => ctx.fillText(l, S / 2, H - 200 + i * 48));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "split") {
+    const splitY = H * 0.52;
+    ctx.fillStyle = p.primary; ctx.fillRect(0, 0, S, splitY);
+    paintBG(ctx, p, 0, splitY, S, H - splitY);
+    const onPrimary = textOn(p.primary);
+    ctx.fillStyle = onPrimary; ctx.font = "700 32px 'Space Grotesk', sans-serif"; ctx.textAlign = "left";
+    ctx.fillText(brand.toUpperCase(), 90, 130);
+    let fs = 96; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, S - 180);
+    while (lines.length > 3 && fs > 44) { fs -= 8; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, S - 180); }
+    const blockH = lines.length * fs * 1.1;
+    const hy = (splitY - 160) / 2 + 160 - blockH / 2 + fs * 0.8;
+    ctx.fillStyle = onPrimary;
+    lines.forEach((l, i) => ctx.fillText(l, 90, hy + i * fs * 1.1));
+    // notch connecting the halves
+    ctx.fillStyle = p.bg;
+    ctx.beginPath(); ctx.arc(S - 160, splitY, 54, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = p.primary;
+    ctx.font = "700 40px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("→", S - 160, splitY + 14);
+    ctx.textAlign = "left";
+    ctx.fillStyle = p.text; ctx.font = "500 42px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, S - 240).slice(0, 3).forEach((l, i) => ctx.fillText(l, 90, splitY + 110 + i * 56));
+    ctx.fillStyle = p.primary; ctx.fillRect(90, H - 110, 140, 8);
+  }
+
+  if (template === "promo") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.fillStyle = p.text; ctx.font = "700 32px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(brand.toUpperCase(), S / 2, 130);
+    const cx = S / 2, cy = H / 2 - 30, R = 360;
+    // dashed outer ring
+    ctx.strokeStyle = p.primary; ctx.lineWidth = 5; ctx.setLineDash([18, 16]);
+    ctx.beginPath(); ctx.arc(cx, cy, R + 34, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    // badge
+    ctx.fillStyle = p.primary;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+    // headline inside badge
+    const onPrimary = textOn(p.primary);
+    let fs = 84; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, R * 1.5);
+    while (lines.length > 3 && fs > 40) { fs -= 8; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, R * 1.5); }
+    const sy = cy - (lines.length * fs * 1.1) / 2 + fs * 0.4;
+    ctx.fillStyle = onPrimary;
+    lines.forEach((l, i) => ctx.fillText(l, cx, sy + i * fs * 1.1));
+    // subline under badge
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "500 40px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, S - 260).slice(0, 2).forEach((l, i) => ctx.fillText(l, cx, cy + R + 110 + i * 52));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "poster") {
+    paintBG(ctx, p, 0, 0, S, H);
+    // huge type fills the frame
+    let fs = 150; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; ctx.textAlign = "left";
+    let lines = wrapText(ctx, headline.toUpperCase(), S - 160);
+    while (lines.length * fs * 1.02 > H * 0.62 && fs > 60) { fs -= 10; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline.toUpperCase(), S - 160); }
+    const startY = H * 0.18 + fs;
+    lines.forEach((l, i) => {
+      ctx.fillStyle = i === lines.length - 1 ? p.primary : p.text; // last line in brand color
+      ctx.fillText(l, 80, startY + i * fs * 1.02);
+    });
+    ctx.fillStyle = p.text; ctx.font = "500 30px 'Space Grotesk', sans-serif";
+    ctx.fillText(brand.toUpperCase(), 80, 110);
+    ctx.strokeStyle = p.primary; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(80, H - 190); ctx.lineTo(S - 80, H - 190); ctx.stroke();
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "400 38px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, S - 200).slice(0, 2).forEach((l, i) => ctx.fillText(l, 80, H - 120 + i * 50));
+  }
+
+  if (template === "dots") {
+    paintBG(ctx, p, 0, 0, S, H);
+    // dot grid background
+    ctx.fillStyle = shade(p.bg, 22);
+    for (let x = 40; x < S; x += 64) for (let y = 40; y < H; y += 64) {
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    // solid panel
+    const pw = S - 160, ph = H * 0.56, px = 80, py = (H - ph) / 2;
+    ctx.fillStyle = p.primary;
+    roundRect(ctx, px + 16, py + 16, pw, ph, 28); ctx.fill(); // shadow layer
+    ctx.fillStyle = p.bg;
+    roundRect(ctx, px, py, pw, ph, 28); ctx.fill();
+    ctx.strokeStyle = p.primary; ctx.lineWidth = 4;
+    roundRect(ctx, px, py, pw, ph, 28); ctx.stroke();
+    ctx.fillStyle = p.primary; ctx.font = "700 28px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(brand.toUpperCase(), S / 2, py + 70);
+    let fs = 82; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, pw - 120);
+    while (lines.length > 4 && fs > 40) { fs -= 6; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, pw - 120); }
+    const sy = py + ph / 2 - (lines.length * fs * 1.1) / 2 + fs * 0.55;
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, sy + i * fs * 1.1));
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "400 34px 'Space Grotesk', sans-serif";
+    wrapText(ctx, subline, pw - 140).slice(0, 2).forEach((l, i) => ctx.fillText(l, S / 2, py + ph - 90 + i * 44));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "banner") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.fillStyle = p.text; ctx.font = "700 30px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(brand.toUpperCase(), S / 2, 120);
+    // tilted ribbon
+    const ry = H / 2, rh = Math.min(320, H * 0.26);
+    ctx.save();
+    ctx.translate(S / 2, ry);
+    ctx.rotate(-0.045);
+    ctx.fillStyle = p.primary;
+    ctx.fillRect(-S, -rh / 2, S * 2, rh);
+    // ribbon edge stripes
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.fillRect(-S, -rh / 2, S * 2, 12);
+    ctx.fillRect(-S, rh / 2 - 12, S * 2, 12);
+    const onPrimary = textOn(p.primary);
+    let fs = 88; ctx.font = `800 ${fs}px 'Archivo', sans-serif`;
+    let lines = wrapText(ctx, headline, S - 220);
+    while (lines.length > 2 && fs > 44) { fs -= 8; ctx.font = `800 ${fs}px 'Archivo', sans-serif`; lines = wrapText(ctx, headline, S - 220); }
+    const sy = -(lines.length - 1) * fs * 0.55 + fs * 0.35;
+    ctx.fillStyle = onPrimary;
+    lines.forEach((l, i) => ctx.fillText(l, 0, sy + i * fs * 1.1));
+    ctx.restore();
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "500 38px 'Space Grotesk', sans-serif"; ctx.textAlign = "center";
+    wrapText(ctx, subline, S - 240).slice(0, 2).forEach((l, i) => ctx.fillText(l, S / 2, ry + rh / 2 + 120 + i * 50));
+    ctx.textAlign = "left";
+  }
+
+  if (template === "review") {
+    paintBG(ctx, p, 0, 0, S, H);
+    ctx.textAlign = "center";
+    ctx.fillStyle = p.text; ctx.font = "700 30px 'Space Grotesk', sans-serif";
+    ctx.fillText(brand.toUpperCase(), S / 2, 130);
+    // stars
+    ctx.fillStyle = p.primary; ctx.font = "72px 'Space Grotesk', sans-serif";
+    ctx.fillText("★ ★ ★ ★ ★", S / 2, H * 0.28);
+    // quote
+    let fs = 78; ctx.font = `italic 600 ${fs}px 'Fraunces', serif`;
+    const quoted = "\u201C" + headline + "\u201D";
+    let lines = wrapText(ctx, quoted, S - 240);
+    while (lines.length > 5 && fs > 40) { fs -= 6; ctx.font = `italic 600 ${fs}px 'Fraunces', serif`; lines = wrapText(ctx, quoted, S - 240); }
+    const qy = H * 0.52 - (lines.length * fs * 1.18) / 2 + fs * 0.4;
+    ctx.fillStyle = p.text;
+    lines.forEach((l, i) => ctx.fillText(l, S / 2, qy + i * fs * 1.18));
+    // attribution
+    ctx.fillStyle = p.accent === p.text ? p.primary : p.accent;
+    ctx.font = "500 38px 'Space Grotesk', sans-serif";
+    ctx.fillText(subline, S / 2, qy + lines.length * fs * 1.18 + 70);
+    // bottom accent
+    ctx.fillStyle = p.primary;
+    ctx.fillRect(S / 2 - 70, H - 130, 140, 8);
+    ctx.textAlign = "left";
+  }
+
+  // ---------- logo overlay (all templates) ----------
+  if (typeof logoImg !== "undefined" && logoImg) {
+    const maxH = 100;
+    const ratio = logoImg.width / logoImg.height;
+    const lh = Math.min(maxH, logoImg.height), lw = lh * ratio;
+    ctx.drawImage(logoImg, S - 80 - lw, 64, lw, lh);
+  }
+
+  // ---------- watermark on free tier ----------
+  if (typeof state !== "undefined" && state.plan === "trial") {
+    ctx.save();
+    ctx.globalAlpha = 0.75;
+    ctx.font = "600 26px 'Space Grotesk', sans-serif";
+    ctx.textAlign = "right";
+    const wm = "✦ made with PostKit";
+    const tw = ctx.measureText(wm).width;
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    roundRect(ctx, S - tw - 60, H - 74, tw + 36, 46, 23);
+    ctx.fill();
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText(wm, S - 42, H - 42);
+    ctx.restore();
+  }
+}
+
+</script>
+<!-- GoatCounter analytics: create a free account at goatcounter.com,
+     then replace YOURCODE below and remove the comment markers.
+<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+-->
+</body>
+</html>

@@ -352,6 +352,18 @@
     <p class="usage" id="usageMsg"></p>
   </div>
 
+  <div class="card">
+    <label>⚡ Batch generate <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(a month of posts in one tap)</span></label>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Uses your business info, colors and logo above. AI plans the ideas and creates every post automatically.</p>
+    <div style="display:flex;gap:8px">
+      <button id="batch6Btn" style="flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700">6 posts (~7 credits)</button>
+      <button id="batch12Btn" style="flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700">12 posts (~13 credits)</button>
+    </div>
+    <p id="batchStatus" style="font-size:13px;color:var(--muted);margin-top:10px;display:none"></p>
+    <p class="error" id="batchError"></p>
+    <div id="batchGallery" style="display:none;margin-top:14px;grid-template-columns:1fr 1fr;gap:12px"></div>
+  </div>
+
   <div class="card" style="display:none"><div class="skeleton pulse" id="skel"></div></div>
 
   <div class="card">
@@ -909,8 +921,114 @@ document.getElementById("campaignBtn").onclick = async () => {
   finally { btn.disabled = false; btn.textContent = "🎯 Full campaign from this topic (1 credit)"; }
 };
 
-/* ---------- marketing coach ---------- */
-document.getElementById("coachBtn").onclick = async () => {
+/* ---------- batch generate ---------- */
+const BATCH_TEMPLATES = ["bold", "split", "promo", "editorial", "dots", "banner", "arc", "poster", "frame", "review", "bold", "split"];
+async function batchRun(count) {
+  const err = document.getElementById("batchError");
+  const status = document.getElementById("batchStatus");
+  const gallery = document.getElementById("batchGallery");
+  const b6 = document.getElementById("batch6Btn"), b12 = document.getElementById("batch12Btn");
+  err.textContent = "";
+  const brand = document.getElementById("brand").value.trim();
+  if (!brand) { err.textContent = "Enter the business name first."; return; }
+  b6.disabled = true; b12.disabled = true;
+  status.style.display = "block";
+  status.textContent = "Planning ideas…";
+  gallery.style.display = "none";
+  gallery.innerHTML = "";
+  const savedBg = bgImg; bgImg = null; // flat backgrounds for batch speed
+  try {
+    // 1. plan ideas
+    const planRes = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: state.code, mode: "plan", days: count > 7 ? 30 : 7,
+        brand, bizType: document.getElementById("bizType").value, lang: state.lang,
+      }),
+    });
+    const planData = await planRes.json();
+    if (!planData.ok || !Array.isArray(planData.result.ideas)) {
+      err.textContent = planData.message || "Planning failed. Check your credits and try again.";
+      return;
+    }
+    const ideas = planData.result.ideas.slice(0, count);
+    // 2. generate each post
+    const off = document.createElement("canvas");
+    off.width = 1080; off.height = 1080;
+    const pal = getPalette();
+    let done = 0, failed = 0;
+    for (let i = 0; i < ideas.length; i++) {
+      status.textContent = "Creating post " + (i + 1) + " of " + ideas.length + "…";
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: state.code, brand,
+            bizType: document.getElementById("bizType").value,
+            topic: ideas[i], lang: state.lang, tone: state.tone,
+            emoji: state.emoji, style: state.style,
+            audience: document.getElementById("audience").value.trim(),
+          }),
+        });
+        const data = await res.json();
+        if (!data.ok || !data.result) { failed++; continue; }
+        const r = data.result;
+        drawPost(off, {
+          template: BATCH_TEMPLATES[i % BATCH_TEMPLATES.length],
+          palette: pal, H: 1080,
+          headline: r.headline, subline: r.subline, brand,
+        });
+        const imgUrl = off.toDataURL("image/png");
+        const fullCaption = r.caption + "\n\n" + (r.hashtags || []).map(h => "#" + h).join(" ");
+        const cell = document.createElement("div");
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.style.cssText = "width:100%;border-radius:12px;border:1px solid var(--border);display:block";
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;gap:6px;margin-top:6px";
+        const dl = document.createElement("button");
+        dl.textContent = "PNG";
+        dl.style.cssText = "flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700";
+        dl.onclick = () => {
+          const a = document.createElement("a");
+          a.download = brand.toLowerCase().replace(/\s+/g, "-") + "-batch-" + (i + 1) + ".png";
+          a.href = imgUrl; a.click();
+        };
+        const cp = document.createElement("button");
+        cp.textContent = "Caption";
+        cp.style.cssText = "flex:1;background:transparent;color:var(--lime);border:1px solid var(--lime-dark);border-radius:8px;padding:8px;font-size:12px;font-weight:600";
+        cp.onclick = () => {
+          navigator.clipboard.writeText(fullCaption);
+          cp.textContent = "Copied ✓";
+          setTimeout(() => (cp.textContent = "Caption"), 1400);
+        };
+        row.appendChild(dl); row.appendChild(cp);
+        cell.appendChild(img); cell.appendChild(row);
+        gallery.appendChild(cell);
+        gallery.style.display = "grid";
+        done++;
+        if (data.usage) {
+          usageMsg.textContent = data.usage.plan === "trial"
+            ? `Free posts used: ${data.usage.used}/${data.usage.limit}`
+            : `${data.usage.plan}: ${data.usage.used}/${data.usage.limit} this month`;
+        }
+      } catch (e) { failed++; }
+    }
+    status.textContent = "Done: " + done + " posts created" + (failed ? " (" + failed + " failed, credits allowing you can rerun)" : "") + ". Tap PNG to download each, Caption to copy its text.";
+  } catch (e) {
+    err.textContent = "Connection failed. Try again.";
+    status.style.display = "none";
+  } finally {
+    bgImg = savedBg;
+    b6.disabled = false; b12.disabled = false;
+  }
+}
+document.getElementById("batch6Btn").onclick = () => batchRun(6);
+document.getElementById("batch12Btn").onclick = () => batchRun(12);
+
+/* ---------- marketing coach ---------- */document.getElementById("coachBtn").onclick = async () => {
   const q = document.getElementById("coachQ").value.trim();
   const err = document.getElementById("coachError");
   const btn = document.getElementById("coachBtn");

@@ -354,6 +354,16 @@
   .cc-actions button{background:rgba(0,0,0,.62);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700}
   .cc-spin{width:34px;height:34px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
   @keyframes ccspin{to{transform:rotate(360deg)}}
+
+  /* ===== Phase 1: premium concepts-only homepage ===== */
+  #modeToggle,#genBtn,#starterRow,#customizeAcc{display:none!important}
+  .p1-hero{margin:6px 0 2px}
+  .p1-q{font-family:'Archivo',sans-serif;font-weight:800;font-size:19px;color:var(--text);margin:4px 0 10px;letter-spacing:-.01em}
+  .p1-ideas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+  .p1-actions{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .p1-actions .gen-btn{margin:0}
+  .p1-secondary{background:#fff!important;color:var(--lime)!important;border:1.5px solid var(--lime)!important;box-shadow:none!important}
+  .p1-ghost{background:transparent!important;color:var(--muted)!important;border:1px solid #E6E4DD!important;box-shadow:none!important;font-size:15px!important;font-weight:600!important}
 </style>
 </head>
 <body>
@@ -4611,9 +4621,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     }
     slot._busy=false;
   }
-  function renderConcepts(r){
+  function renderConcepts(r, limit){
     lastConcepts=r;
+    limit = limit || 4;
     var grid=$("ccGrid"); grid.innerHTML="";
+    grid.style.gridTemplateColumns = limit===1 ? "1fr" : "1fr 1fr";
     if(r.shared){
       var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
       $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+
@@ -4621,7 +4633,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         '<button class="miniai" id="ccCopy" style="width:100%">Copy caption + hashtags</button>';
       var cc=$("ccCopy"); if(cc) cc.onclick=function(){ if(navigator.clipboard) navigator.clipboard.writeText(full); };
     }
-    (r.concepts||[]).slice(0,4).forEach(function(c,i){
+    (r.concepts||[]).slice(0,limit).forEach(function(c,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||("Concept "+(i+1)))+'</span>'+(i===0?'<div class="cc-spin"></div>':'<div class="cc-hint">Tap to reveal</div>');
       slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,c); };
@@ -4630,7 +4642,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     });
   }
 
-  // build the concepts card (after the main form card) + the button (under Generate)
+  // build the concepts card (after the main form card) + the Phase 1 homepage
   (function(){
     var formCard=document.querySelector(".card.reveal");
     var html='<div class="card" id="conceptsCard">'+
@@ -4643,23 +4655,67 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(formCard){ formCard.insertAdjacentHTML("afterend", html); }
 
     var gen=$("genBtn"); if(!gen) return;
-    var btn=document.createElement("button");
-    btn.type="button"; btn.id="conceptsBtn"; btn.className="gen-btn";
-    btn.textContent="🎨 Generate 4 AI concepts";
-    gen.insertAdjacentElement("beforebegin", btn);   // primary action, above canvas
-    // demote the canvas generator to a small secondary fallback
-    gen.textContent="Or make a quick template post";
-    gen.style.cssText="background:transparent;color:var(--muted);border:1px solid #E6E4DD;box-shadow:none;font-size:14px;font-weight:600;margin-top:10px";
-    btn.onclick=async function(){
-      var topic=($("topic").value||"").trim();
-      if(!topic){ $("topic").focus(); return; }
+
+    // --- Phase 1: "What do you want to post today?" + idea chips, above the topic ---
+    var topic=$("topic");
+    if(topic){
+      var IDEAS14=[
+        ["🏷️ Weekend Sale","Weekend sale, up to 30% off, this weekend only"],
+        ["🆕 New Arrival","New arrival just landed, come see it"],
+        ["⚡ Flash Sale","Flash sale, today only, big discounts for a few hours"],
+        ["🔜 Coming Soon","Coming soon, something exciting is on the way"],
+        ["🎊 Grand Opening","Grand opening, come celebrate with us, offers all day"],
+        ["🚫 Sold Out","Sold out, thank you, restock coming soon"],
+        ["🎁 Giveaway","Giveaway time, follow, like and tag 2 friends to win"],
+        ["📦 Limited Stock","Limited stock alert, once it is gone it is gone"],
+        ["💬 Customer Review","A real customer review we are proud of"],
+        ["🔄 Before & After","Before and after, see the transformation"],
+        ["🎄 Holiday Promotion","Special holiday promotion for our customers"],
+        ["❝ Quote","An inspiring quote our brand stands behind"],
+        ["🌟 New Collection","Our new collection just dropped, explore it now"]
+      ];
+      var hero=document.createElement("div"); hero.className="p1-hero";
+      hero.innerHTML='<div class="p1-q">What do you want to post today?</div><div class="p1-ideas" id="p1Ideas"></div>';
+      topic.insertAdjacentElement("beforebegin", hero);
+      var ir=$("p1Ideas");
+      IDEAS14.forEach(function(x){
+        var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=x[0];
+        b.onclick=function(){ topic.value=x[1]; ir.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active"); topic.focus(); };
+        ir.appendChild(b);
+      });
+      var tl=document.querySelector('label[for="topic"]'); if(tl) tl.textContent="Or describe your own idea";
+    }
+
+    // --- Phase 1: three clear actions replace the old buttons ---
+    var actions=document.createElement("div"); actions.className="p1-actions";
+    actions.innerHTML=
+      '<button type="button" id="act4" class="gen-btn">🎨 Generate 4 Concepts</button>'+
+      '<button type="button" id="act1" class="gen-btn p1-secondary">⚡ Generate 1 Post</button>'+
+      '<button type="button" id="actM" class="gen-btn p1-ghost">📅 Generate Monthly Pack</button>';
+    gen.insertAdjacentElement("beforebegin", actions);
+
+    async function run(limit){
+      var t=($("topic").value||"").trim();
+      if(!t){ $("topic").focus(); return; }
       var card=$("conceptsCard"); card.style.display="block";
+      $("conceptsCard").querySelector(".std-sub").textContent = limit===1
+        ? "One polished design for your post." : "Four unique directions. The first is ready — tap the others to reveal them.";
       $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
-      btn.disabled=true; var old=btn.textContent; btn.textContent="Creating concepts…";
+      var btns=[$("act4"),$("act1"),$("actM")]; btns.forEach(function(b){b.disabled=true;});
+      var a=(limit===1?$("act1"):$("act4")); var old=a.textContent; a.textContent="Creating…";
       card.scrollIntoView({behavior:"smooth",block:"start"});
-      try{ var r=await callConcepts(); renderConcepts(r); }
+      try{ var r=await callConcepts(); renderConcepts(r, limit); }
       catch(e){ $("ccErr").textContent=e.message; }
-      finally{ btn.disabled=false; btn.textContent=old; }
+      finally{ btns.forEach(function(b){b.disabled=false;}); a.textContent=old; }
+    }
+    $("act4").onclick=function(){ run(4); };
+    $("act1").onclick=function(){ run(1); };
+    $("actM").onclick=function(){
+      var card=$("conceptsCard"); card.style.display="block";
+      $("ccGrid").innerHTML=""; $("ccShared").innerHTML="";
+      $("ccErr").textContent="";
+      $("conceptsCard").querySelector(".std-sub").textContent="Monthly Content Packs — a full month of on-brand posts — are coming next. For now, generate concepts one at a time.";
+      card.scrollIntoView({behavior:"smooth",block:"start"});
     };
   })();
 

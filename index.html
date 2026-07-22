@@ -12,7 +12,7 @@
   :root{
     --bg:#F7F6F2; --card:#FFFFFF; --border:#E9E7E0; --line:#DBD9D1;
     --text:#191A17; --muted:#73746D; --dim:#A6A79F;
-    --lime:#2B44DE; --lime-dark:#C7CEF6; --lime-bg:#EEF0FD;
+    --lime:#2B44DE; --lime-dark:#C7CEF6; --lime-bg:#EEF2FF;
     --red:#C0483C;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -191,6 +191,145 @@
 
   #customizeAcc{border-color:var(--lime-dark);background:var(--lime-bg)}
   #customizeAcc>summary{color:var(--lime);font-weight:700}
+
+  /* ===== AI Studio additions ===== */
+  .std-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--text);margin:0 0 2px;text-transform:none}
+  .std-sub{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .std-block{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+  .std-block:first-child{margin-top:0;padding-top:0;border-top:none}
+  .thumb-grid{display:grid;gap:10px;margin-top:10px}
+  .thumb-grid.g2{grid-template-columns:1fr 1fr}
+  .thumb-grid.g3{grid-template-columns:1fr 1fr 1fr}
+  .thumb{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg);cursor:pointer;position:relative;transition:border-color .15s,transform .12s}
+  .thumb:hover{border-color:var(--lime);transform:translateY(-2px)}
+  .thumb img{width:100%;display:block}
+  .thumb .tlabel{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.62);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;letter-spacing:.04em}
+  .thumb .tpick{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;text-align:center;padding:4px;opacity:0;transition:opacity .15s}
+  .thumb:hover .tpick{opacity:1}
+  .score-row{display:flex;align-items:center;gap:10px;margin:7px 0}
+  .score-row .sname{font-size:12px;color:var(--muted);width:120px;flex-shrink:0}
+  .score-bar{flex:1;height:8px;border-radius:6px;background:var(--border);overflow:hidden}
+  .score-bar i{display:block;height:100%;border-radius:6px;background:var(--lime);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .score-row .sval{font-size:12px;font-weight:700;width:38px;text-align:right;color:var(--text)}
+  .score-overall{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+  .score-overall b{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;color:var(--lime)}
+  .score-overall span{font-size:12px;color:var(--muted)}
+  .std-battle{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-top:10px}
+  .std-battle .vs{font-family:'Archivo',sans-serif;font-weight:800;color:var(--dim);font-size:14px}
+  .gallery-cat{display:flex;flex-wrap:wrap;gap:8px}
+  .gallery-ex{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .gallery-card{border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;background:var(--bg);transition:border-color .15s,transform .12s}
+  .gallery-card:hover{border-color:var(--lime);transform:translateY(-2px)}
+  .gallery-card .gc-strip{height:44px;border-radius:8px;margin-bottom:8px}
+  .gallery-card b{font-size:13px;color:var(--text);display:block;letter-spacing:normal}
+  .gallery-card span{font-size:12px;color:var(--muted)}
+  .lock-chip.locked{border-color:var(--lime)!important;background:var(--lime-bg)!important;color:var(--lime)!important;font-weight:700}
+  .creative-wrap input[type=range]{width:100%;accent-color:var(--lime);margin-top:6px}
+  .creative-lbls{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px}
+  #studioCard label{margin-top:0}
+  .dna-slider{margin:10px 0}
+  .dna-slider label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:2px;text-transform:none;letter-spacing:0}
+  .dna-slider label b{color:var(--lime);font-weight:700}
+  .dna-slider input[type=range]{width:100%;accent-color:var(--lime)}
+  .dna-sel{flex:1;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font-size:13px}
+
+  /* ===== kill sticky :hover on touch devices =====
+     On phones a tap triggers :hover and it stays stuck until you tap
+     elsewhere, making deselected chips still look selected. Only allow
+     hover styling where a real hovering pointer exists (desktop). */
+  @media (hover:none){
+    .chip:hover{border-color:var(--line);color:#55564F;background:var(--card)}
+    .chip.active:hover{border-color:var(--lime);color:var(--lime);background:var(--lime-bg)}
+    input:hover,select:hover,textarea:hover{border-color:var(--line)}
+    .btn-ghost:hover{border-color:var(--line);color:var(--text)}
+    .miniai:hover{border-color:var(--line);color:var(--text)}
+    .picker-btn:hover{border-color:var(--line)}
+    #ideaBtn:hover,#planBtn:hover,#monthBtn:hover,#offersBtn:hover,#campaignBtn:hover,#voiceBtn:hover,#recapBtn:hover,#bgBtn:hover{border-color:var(--border)!important;color:var(--text)!important}
+    .gallery-card:hover,.thumb:hover,.plan:hover,.card:hover{transform:none}
+    .sw:hover{transform:none}
+  }
+
+  /* ===================================================================
+     PREMIUM PASS — whitespace over borders, softer cards, bigger type
+     =================================================================== */
+  :root{ --accent:#4F46E5; --accent-soft:#EEF2FF; --label:#4A4B44; }
+  .card{
+    border:1px solid #F0EEE8;
+    border-radius:22px;
+    padding:26px 24px;
+    margin-bottom:22px;
+    box-shadow:0 1px 2px rgba(25,26,23,.03), 0 10px 34px -12px rgba(25,26,23,.10);
+  }
+  label{
+    font-size:13px;
+    letter-spacing:.01em;
+    text-transform:none;
+    color:var(--label);
+    font-weight:600;
+    margin:18px 0 8px;
+  }
+  input,select,textarea,.picker-btn{
+    background:#FBFAF7;
+    border:1px solid #EDEBE4;
+    border-radius:13px;
+    padding:14px 15px;
+  }
+  input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  textarea{min-height:88px}
+  details.acc{
+    border:1px solid transparent;
+    background:#FAF9F5;
+    border-radius:16px;
+    margin-top:14px;
+  }
+  details.acc>summary{padding:15px 16px;font-size:14px}
+  details.acc[open]{background:#FBFAF7;border-color:#F0EEE8}
+  #advancedOpts{background:#FAF9F5;border:1px solid transparent;margin-top:20px}
+  #advancedOpts>summary{color:var(--text);font-weight:600;font-size:14px;padding:15px 16px}
+  #advancedOpts[open]{background:#FBFAF7;border-color:#F0EEE8}
+  #advancedOpts .adv-body{padding:4px 16px 18px}
+  #advancedOpts .adv-body>label:first-child{margin-top:8px}
+  /* make the nested "Customize design" match the other sub-sections (no blue) */
+  #customizeAcc{background:#FAF9F5!important;border-color:transparent!important}
+  #customizeAcc[open]{background:#FBFAF7!important;border-color:#F0EEE8!important}
+  #customizeAcc>summary{color:var(--text)!important;font-weight:600!important}
+  .chip{padding:9px 15px;font-size:13.5px;border-color:#E7E5DE;border-radius:14px}
+  /* selected state uses the light accent — cleaner than solid blue */
+  .chip.active{background:var(--accent-soft);border-color:#D3D8F7;color:var(--accent);font-weight:600}
+  /* secondary helper buttons: quiet neutral so only "Generate" is blue */
+  #ideaBtn,#voiceBtn,#enhanceBtn,#planBtn,#monthBtn,#offersBtn,#campaignBtn,#recapBtn,#bgBtn,#luckyBtn{
+    color:#6B6C64!important;
+    border:1px solid #E6E4DD!important;
+    border-style:solid!important;
+    background:transparent!important;
+    font-weight:600!important;
+  }
+  #ideaBtn:active,#voiceBtn:active,#enhanceBtn:active,#luckyBtn:active{background:#F5F4EF!important}
+  /* soft accent for info/step surfaces */
+  .step b{background:var(--accent-soft);color:var(--accent)}
+  .nav-cta{border-color:#D3D8F7;color:var(--accent)}
+  .section-title{font-size:27px;margin-top:30px}
+  .section-sub{font-size:15px;margin-bottom:20px}
+  button:active{transform:scale(.98)}
+  .gen-btn{border-radius:14px;box-shadow:0 8px 22px -6px rgba(43,68,222,.35)}
+  .step{border-color:#F0EEE8;border-radius:16px;box-shadow:0 8px 24px -14px rgba(25,26,23,.10)}
+  #stageLoad{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(247,246,242,.82);backdrop-filter:blur(3px)}
+  #stageLoad.show{display:flex}
+  #stageLoad .sl-box{background:var(--card);border-radius:22px;padding:30px 34px;box-shadow:0 20px 60px -20px rgba(25,26,23,.3);text-align:center;max-width:300px}
+  #stageLoad .sl-msg{font-family:'Archivo',sans-serif;font-weight:800;font-size:19px;color:var(--text);margin-bottom:6px;min-height:1.3em}
+  #stageLoad .sl-sub{font-size:13px;color:var(--muted)}
+  #stageLoad .sl-dots{margin-top:16px;display:flex;gap:6px;justify-content:center}
+  #stageLoad .sl-dots i{width:9px;height:9px;border-radius:50%;background:var(--lime);animation:sldot 1s infinite ease-in-out}
+  #stageLoad .sl-dots i:nth-child(2){animation-delay:.16s}
+  #stageLoad .sl-dots i:nth-child(3){animation-delay:.32s}
+  @keyframes sldot{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+  /* Basic / Pro mode */
+  #modeToggle{display:flex;gap:4px;background:#EFEDE6;border-radius:14px;padding:4px;margin:0 auto 20px;width:max-content}
+  #modeToggle button{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:14px;padding:9px 22px;border-radius:11px;transition:all .15s}
+  #modeToggle button.active{background:#fff;color:var(--accent);box-shadow:0 2px 8px -2px rgba(25,26,23,.18)}
+  #modeToggle .mode-hint{align-self:center;font-size:12px;color:var(--dim);padding-left:6px;font-weight:400}
+  body.basic-mode .pro-only{display:none!important}
 </style>
 </head>
 <body>
@@ -229,6 +368,11 @@
       <button id="quickBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Go</button>
     </div>
 
+    <label for="topic">What's the post about?</label>
+    <textarea id="topic" placeholder="e.g. 30% off all summer dresses this weekend"></textarea>
+    <button id="voiceBtn" type="button" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎤 Speak your idea</button>
+    <button id="ideaBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">✦ Need an idea?</button>
+
     <label for="brand">Business name</label>
     <input id="brand" placeholder="e.g. Elegance Store">
 
@@ -248,14 +392,11 @@
       <option>Education / Tutoring</option><option>Services / Agency</option>
       <option>Other</option>
     </select>
-
+    <details class="acc" id="advancedOpts">
+      <summary>⚙️ Advanced options <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">— optional, or just hit Generate</span></summary>
+      <div class="adv-body">
     <label for="audience">Target audience <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional)</span></label>
     <input id="audience" placeholder="e.g. young mothers in Jounieh, mid budget">
-
-    <label for="topic">What's the post about?</label>
-    <textarea id="topic" placeholder="e.g. 30% off all summer dresses this weekend"></textarea>
-    <button id="voiceBtn" type="button" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎤 Speak your idea</button>
-    <button id="ideaBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">✦ Need an idea?</button>
     <details class="acc">
       <summary>💡 Idea tools, planning &amp; occasions</summary>
       <div class="acc-body">
@@ -376,7 +517,7 @@
       <button class="chip" data-fmt="carousel">Carousel ×3</button>
     </div>
 
-    <label>Template <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">— ✨ AI Freestyle picks the best design for you</span></label>
+    <label>Template</label>
     <div class="chip-row" id="tplRow">
       <button class="chip active" data-tpl="freestyle" title="AI chooses the best layout for your content">✨ AI Freestyle</button>
       <button class="chip" data-tpl="bold" title="Large headline with minimal design">Bold Statement</button>
@@ -445,6 +586,9 @@
           <button class="chip" data-fx="glass">Glass</button>
           <button class="chip" data-fx="vintage">Vintage</button>
           <button class="chip" data-fx="luxury">Luxury</button>
+          <button class="chip" data-fx="grain">Grain</button>
+          <button class="chip" data-fx="foil">Gold foil</button>
+          <button class="chip" data-fx="mesh">Mesh</button>
         </div>
         <label>Extras</label>
         <div class="chip-row" id="fxToggleRow">
@@ -455,6 +599,15 @@
         </div>
         <label>Photo tint <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(lower = clearer photo)</span></label>
         <input type="range" id="tintRange" min="0" max="85" value="45" style="width:100%;accent-color:var(--lime)">
+        <label>Background blur <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(for photo backgrounds)</span></label>
+        <input type="range" id="blurRange" min="0" max="30" value="0" style="width:100%;accent-color:var(--lime)">
+        <label>Text color</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="button" id="textAutoBtn" class="chip active" data-tc="auto">Auto</button>
+          <input type="color" id="textColorPick" value="#FFFFFF" style="display:none">
+          <button type="button" class="color-preview" id="textColorPrev" style="flex:1" aria-label="Pick text color">Custom text color</button>
+        </div>
+        <div class="swatch-grid" id="textSwatches"></div>
         <label>📱 QR code <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(link or WhatsApp, shows bottom-left)</span></label>
         <div style="display:flex;gap:8px">
           <input id="qrInput" placeholder="https://your-link.com or your number" style="flex:1">
@@ -471,6 +624,8 @@
 
       </div>
     </details>
+    </div>
+    </details>
 
     <button class="gen-btn" id="genBtn">Generate post</button>
     <button id="luckyBtn" type="button" style="width:100%;margin-top:10px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:12px;padding:12px;font-size:14px;font-weight:600">🍀 I'm Feeling Lucky (random everything)</button>
@@ -478,7 +633,7 @@
     <p class="usage" id="usageMsg"></p>
   </div>
 
-  <div class="card">
+  <div class="card" id="batchCard">
     <label>⚡ Batch generate <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(a month of posts in one tap)</span></label>
     <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Uses your business info, colors and logo above. AI plans the ideas and creates every post automatically.</p>
     <div style="display:flex;gap:8px">
@@ -492,7 +647,7 @@
 
   <div class="card" style="display:none"><div class="skeleton pulse" id="skel"></div></div>
 
-  <div class="card">
+  <div class="card" id="kitCard">
     <label>Brand kits <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(save your setup, reload in one tap)</span></label>
     <div class="chip-row" id="kitRow"></div>
     <div style="display:flex;gap:8px;margin-top:10px">
@@ -511,6 +666,7 @@
   <div class="action-row" id="actionRow">
     <button class="dl-btn" id="dlBtn">PNG</button>
     <button class="dl-btn" id="dlJpgBtn" style="background:transparent;color:var(--lime);border:1px solid var(--lime-dark)">JPG</button>
+    <button class="dl-btn" id="dlWebpBtn" style="background:transparent;color:var(--lime);border:1px solid var(--lime-dark)">WEBP</button>
     <button class="dl-btn" id="dlAllBtn" style="display:none">All slides</button>
     <button class="re-btn" id="shuffleBtn" style="display:none">🎲 Shuffle</button>
     <button class="re-btn" id="reBtn">Regenerate</button>
@@ -584,7 +740,7 @@
     <div id="campaignBody" style="font-size:14px;line-height:1.6"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="coachCard">
     <label for="coachQ">🧠 Ask the marketing coach <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(1 credit)</span></label>
     <div style="display:flex;gap:8px">
       <input id="coachQ" placeholder='e.g. "How can I get more customers this month?"' style="flex:1">
@@ -617,20 +773,20 @@
     <div class="plan featured">
       <span class="tag">MOST POPULAR</span>
       <h3>Starter</h3>
-      <div class="price">$15<small>/month</small></div>
+      <div class="price">$19<small>/month</small></div>
       <ul><li>15 posts per month</li><li>All templates &amp; colors</li><li>All languages</li><li>No watermark</li></ul>
       <a id="waStarter" href="#" target="_blank" rel="noopener">Get Starter →</a>
     </div>
     <div class="plan">
       <h3>Pro</h3>
-      <div class="price">$29<small>/month</small></div>
+      <div class="price">$39<small>/month</small></div>
       <ul><li>100 posts per month</li><li>Everything in Starter</li><li>Batch generate: a month of posts in one tap</li></ul>
       <a id="waPro" href="#" target="_blank" rel="noopener">Get Pro →</a>
     </div>
     <div class="plan">
       <span class="tag">FOR AGENCIES</span>
       <h3>Agency</h3>
-      <div class="price">$79<small>/month</small></div>
+      <div class="price">$99<small>/month</small></div>
       <ul><li>Truly unlimited posts</li><li>Manage multiple brands with Brand Kits</li><li>Everything in Pro</li><li>Perfect for freelancers &amp; agencies with clients</li></ul>
       <a id="waDfy" href="#" target="_blank" rel="noopener">Get Agency →</a>
     </div>
@@ -671,18 +827,12 @@ const FONT_PAIRS = [
 function getFont() { return FONT_PAIRS.find(f => f.id === state.fontId) || FONT_PAIRS[0]; }
 
 const PALETTES = [
-  { id:"amber", name:"Warm · Amber Heat", bg:"#1A1208", primary:"#F5A623", accent:"#FFE8C2", text:"#FFF7EA" },
-  { id:"ocean", name:"Fresh · Deep Ocean", bg:"#06202E", primary:"#2EC4B6", accent:"#CBF3F0", text:"#EAFBFA" },
-  { id:"rose", name:"Vibrant · Rosewood", bg:"#2A0E14", primary:"#E85D75", accent:"#FFD6DE", text:"#FFF0F3" },
-  { id:"lime", name:"Bold · Electric Lime", bg:"#101408", primary:"#B4E33D", accent:"#EAF7C8", text:"#F7FBEC" },
-  { id:"royal", name:"Modern · Royal", bg:"#120E2A", primary:"#7C5CFF", accent:"#D9CFFF", text:"#F2EFFF" },
-  { id:"gold", name:"Luxury · Gold Luxury", bg:"#14100A", primary:"#D4AF37", accent:"#F3E5B8", text:"#FBF6E8" },
-  { id:"forest", name:"Earthy · Fresh Forest", bg:"#0E2318", primary:"#3FA46A", accent:"#CDEBD8", text:"#EFF9F2" },
-  { id:"coffee", name:"Cozy · Coffee House", bg:"#241812", primary:"#C08552", accent:"#EAD7C3", text:"#F8F1E9" },
-  { id:"slate", name:"Corporate · Slate Blue", bg:"#1B2430", primary:"#8ECAE6", accent:"#D9EEF8", text:"#F0F6FA" },
-  { id:"clean", name:"Minimal · Clean Light", bg:"#F7F5F0", primary:"#1C1C1C", accent:"#C9553E", text:"#1C1C1C" },
-  { id:"coral", name:"Soft · Warm Coral", bg:"#FDF1EC", primary:"#E76F51", accent:"#7A3B2E", text:"#2A1A14" },
-  { id:"blush", name:"Pastel · Soft Blush", bg:"#FBEFF2", primary:"#C9506E", accent:"#7E2E44", text:"#2B1A1F" },
+  { id:"noir",   name:"Noir",   bg:"#111111", primary:"#FFFFFF", accent:"#CFCFCF", text:"#FFFFFF" },
+  { id:"ivory",  name:"Ivory",  bg:"#F7F4EE", primary:"#1A1A1A", accent:"#B08D57", text:"#1A1A1A" },
+  { id:"gold",   name:"Gold",   bg:"#141210", primary:"#D4AF37", accent:"#EBD9A6", text:"#FBF6E8" },
+  { id:"stone",  name:"Stone",  bg:"#2B2B28", primary:"#E8E4DC", accent:"#B9B3A7", text:"#F4F1EA" },
+  { id:"sand",   name:"Sand",   bg:"#EDE4D6", primary:"#8A5A2B", accent:"#5C4023", text:"#2E2013" },
+  { id:"mint",   name:"Mint",   bg:"#F2F6F3", primary:"#1F6E52", accent:"#3FA46A", text:"#14281E" },
 ];
 
 let state = {
@@ -697,6 +847,7 @@ let state = {
   format: "post",
   fx: { mode: "none", border: false, shadow: false, stroke: false, corners: false },
   tint: 0.45,
+  textColor: null,
   slides: null,
   slideIndex: 0,
   captions: [],
@@ -773,9 +924,9 @@ function getPalette() {
 
 /* ---------- WhatsApp links ---------- */
 const waMsg = (plan) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hi! I want the PostKit ${plan} plan 🙌`)}`;
-document.getElementById("waStarter").href = waMsg("Starter ($15/mo)");
-document.getElementById("waPro").href = waMsg("Pro ($29/mo)");
-document.getElementById("waDfy").href = waMsg("Agency ($79/mo)");
+document.getElementById("waStarter").href = waMsg("Starter ($19/mo)");
+document.getElementById("waPro").href = waMsg("Pro ($39/mo)");
+document.getElementById("waDfy").href = waMsg("Agency ($99/mo)");
 document.getElementById("waFloat").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi! I have a question about PostKit")}`;
 
 /* ---------- palette chips ---------- */
@@ -1148,6 +1299,9 @@ async function batchRun(count) {
       return;
     }
     const ideas = planData.result.ideas.slice(0, count);
+    // one consistent template for the WHOLE batch -> identical logo & brand
+    // name placement/size on every post in the grid.
+    const batchTpl = (state.template && state.template !== "freestyle") ? state.template : "bold";
     // 2. generate each post
     const off = document.createElement("canvas");
     off.width = 1080; off.height = 1080;
@@ -1171,7 +1325,7 @@ async function batchRun(count) {
         if (!data.ok || !data.result) { failed++; continue; }
         const r = data.result;
         drawPost(off, {
-          template: BATCH_TEMPLATES[i % BATCH_TEMPLATES.length],
+          template: batchTpl,
           palette: pal, H: 1080,
           headline: r.headline, subline: r.subline, brand,
         });
@@ -1341,6 +1495,22 @@ function buildQR() {
 let qrTimer;
 document.getElementById("qrInput").addEventListener("input", () => { clearTimeout(qrTimer); qrTimer = setTimeout(buildQR, 500); });
 document.getElementById("qrClear").onclick = () => { document.getElementById("qrInput").value = ""; qrImg = null; rerender(); };
+
+/* ---------- text color ---------- */
+document.getElementById("textAutoBtn").onclick = () => {
+  state.textColor = null;
+  document.getElementById("textAutoBtn").classList.add("active");
+  document.getElementById("textColorPrev").style.borderColor = "var(--line)";
+  rerender();
+};
+document.getElementById("textColorPick").addEventListener("input", (e) => {
+  state.textColor = e.target.value;
+  document.getElementById("textAutoBtn").classList.remove("active");
+  document.getElementById("textColorPrev").style.color = (function(h){const n=parseInt(h.slice(1),16);return (0.299*((n>>16)&255)+0.587*((n>>8)&255)+0.114*(n&255))/255>0.6?'#111':'#fff';})(e.target.value);
+  rerender();
+});
+/* use the in-app swatch picker (no native OS color dialog) */
+buildSwatchPicker("textColorPick", "textColorPrev", "textSwatches");
 
 /* ---------- photo tint ---------- */
 document.getElementById("tintRange").addEventListener("input", (e) => {
@@ -1548,6 +1718,7 @@ async function generate() {
   errorMsg.textContent = "";
   if (!topic) { errorMsg.textContent = "Describe what the post is about first."; return; }
   genBtn.disabled = true; genBtn.textContent = "Generating…";
+  var _ep0 = document.getElementById("emptyPreview"); if (_ep0) _ep0.style.display = "none";
   skel.style.display = "block"; skel.parentElement.style.display = "block";
 
   try {
@@ -1622,6 +1793,7 @@ function showResult() {
   renderTips();
   document.getElementById("boostCard").style.display = "block";
   var _ep = document.getElementById("emptyPreview"); if (_ep) _ep.style.display = "none";
+  var _sk = document.getElementById("skel"); if (_sk && _sk.parentElement) _sk.parentElement.style.display = "none";
   updateCharCount();
   document.getElementById("dlAllBtn").style.display = state.slides ? "block" : "none";
   document.getElementById("shuffleBtn").style.display = state.template === "freestyle" ? "block" : "none";
@@ -2106,7 +2278,7 @@ function rerender() {
   const pal = getPalette();
   const brand = document.getElementById("brand").value.trim() || "Your Brand";
   const canvas = document.getElementById("canvas");
-  const DIMS = { post: [1080, 1080], portrait: [1080, 1350], story: [1080, 1920], carousel: [1080, 1080], landscape: [1920, 1080], pin: [1080, 1620] };
+  const DIMS = { post: [1080, 1080], portrait: [1080, 1350], story: [1080, 1920], carousel: [1080, 1080], landscape: [1920, 1080], pin: [1080, 1620], square: [1080, 1080], facebook: [1200, 630], linkedin: [1200, 627] };
   const [W, H] = DIMS[state.format] || DIMS.post;
   if (canvas.width !== W) canvas.width = W;
   if (canvas.height !== H) canvas.height = H;
@@ -2145,15 +2317,17 @@ function rerender() {
 function downloadCanvas(type) {
   const a = document.createElement("a");
   const brand = document.getElementById("brand").value.trim() || "post";
-  const ext = type === "jpg" ? "jpg" : "png";
+  const ext = type === "jpg" ? "jpg" : (type === "webp" ? "webp" : "png");
   a.download = brand.toLowerCase().replace(/\s+/g, "-") + "-" + state.format + "." + ext;
-  a.href = type === "jpg"
-    ? document.getElementById("canvas").toDataURL("image/jpeg", 0.92)
-    : document.getElementById("canvas").toDataURL("image/png");
+  const cv = document.getElementById("canvas");
+  a.href = type === "jpg" ? cv.toDataURL("image/jpeg", 0.92)
+         : type === "webp" ? cv.toDataURL("image/webp", 0.92)
+         : cv.toDataURL("image/png");
   a.click();
 }
 document.getElementById("dlBtn").onclick = () => downloadCanvas("png");
 document.getElementById("dlJpgBtn").onclick = () => downloadCanvas("jpg");
+document.getElementById("dlWebpBtn").onclick = () => downloadCanvas("webp");
 document.getElementById("copyBtn").onclick = () => {
   const full = state.result.caption + "\n\n" + state.result.hashtags.map(h => "#" + h).join(" ");
   navigator.clipboard.writeText(full);
@@ -2198,9 +2372,22 @@ function paintBG(ctx, p, x, y, w, h) {
     let sw, sh, sx, sy;
     if (ir > r) { sh = bgImg.height; sw = sh * r; sx = (bgImg.width - sw) / 2; sy = 0; }
     else { sw = bgImg.width; sh = sw / r; sx = 0; sy = (bgImg.height - sh) / 2; }
-    ctx.drawImage(bgImg, sx, sy, sw, sh, x, y, w, h);
-    var _ts = (typeof state !== "undefined" && typeof state.tint === "number") ? state.tint : 0.5;
-    ctx.fillStyle = hexToRgba(p.bg, _ts); // lighter tint keeps photos crisp
+    var _blur = (typeof state !== "undefined" && typeof state.blur === "number") ? state.blur : 0;
+    if (_blur > 0) { ctx.save(); ctx.filter = "blur(" + Math.round(_blur * (w/1080)) + "px)"; ctx.drawImage(bgImg, sx, sy, sw, sh, x - _blur, y - _blur, w + _blur*2, h + _blur*2); ctx.restore(); }
+    else { ctx.drawImage(bgImg, sx, sy, sw, sh, x, y, w, h); }
+    var _ts = (typeof state !== "undefined" && typeof state.tint === "number") ? state.tint : 0.45;
+    // light overall tint for brand feel
+    ctx.fillStyle = hexToRgba(p.bg, _ts);
+    ctx.fillRect(x, y, w, h);
+    // readability scrim: darker in the middle band where text sits, feathered to edges
+    var _sg = ctx.createLinearGradient(0, y, 0, y + h);
+    var _dark = hexToRgba(p.bg, Math.min(0.9, _ts + 0.35));
+    var _clear = hexToRgba(p.bg, 0);
+    _sg.addColorStop(0, _clear);
+    _sg.addColorStop(0.28, _dark);
+    _sg.addColorStop(0.72, _dark);
+    _sg.addColorStop(1, _clear);
+    ctx.fillStyle = _sg;
     ctx.fillRect(x, y, w, h);
   } else {
     ctx.fillStyle = p.bg;
@@ -2211,10 +2398,19 @@ function paintBG(ctx, p, x, y, w, h) {
 function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 1080, design }) {
   const S = canvas.width || 1080, ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, S, H);
+  const _hasPhoto = (typeof bgImg !== "undefined" && bgImg) || (typeof productImg !== "undefined" && productImg && false);
+  if (typeof bgImg !== "undefined" && bgImg) {
+    // guarantee readable text over any photo
+    p = Object.assign({}, p, { text: "#FFFFFF", accent: "#FFE8C2" });
+  }
+  if (typeof state !== "undefined" && state.textColor) {
+    p = Object.assign({}, p, { text: state.textColor, accent: state.textColor });
+  }
   const _fx = (typeof state !== "undefined" && state.fx) ? state.fx : { mode:"none" };
+  const _photoShadow = (typeof bgImg !== "undefined" && bgImg) && !(typeof state !== "undefined" && state.textColor);
   const _origFill = ctx.fillText.bind(ctx);
   ctx.fillText = function(t, x, y) {
-    if (_fx.shadow) { ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.45)"; ctx.shadowBlur = 14; ctx.shadowOffsetY = 6; _origFill(t, x, y); ctx.restore(); }
+    if (_fx.shadow || _photoShadow) { ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = _photoShadow ? 20 : 14; ctx.shadowOffsetY = 4; _origFill(t, x, y); ctx.restore(); }
     if (_fx.stroke) { ctx.save(); ctx.lineWidth = Math.max(3, (parseInt(ctx.font)||40)*0.06); ctx.strokeStyle = "rgba(0,0,0,0.55)"; ctx.strokeText(t, x, y); ctx.restore(); }
     _origFill(t, x, y);
   };
@@ -2478,40 +2674,40 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     } else {
       paintBG(ctx, p, 0, 0, S, H);
     }
-    if (d.bg === "duotone-split") {
+    if (!_photoBG && d.bg === "duotone-split") {
       ctx.fillStyle = p.primary;
       ctx.globalAlpha = 0.14;
       ctx.fillRect(0, 0, S, H * 0.5);
       ctx.globalAlpha = 1;
       ctx.fillStyle = p.primary; ctx.fillRect(0, H * 0.5 - 3, S, 6);
     }
-    if (d.bg === "big-circle") {
+    if (!_photoBG && d.bg === "big-circle") {
       ctx.fillStyle = p.primary; ctx.globalAlpha = 0.16;
       ctx.beginPath(); ctx.arc(S * 0.85, H * 0.2, Math.min(S, H) * 0.45, 0, Math.PI * 2); ctx.fill();
       ctx.globalAlpha = 1;
       ctx.strokeStyle = p.primary; ctx.lineWidth = 5;
       ctx.beginPath(); ctx.arc(S * 0.85, H * 0.2, Math.min(S, H) * 0.45, 0, Math.PI * 2); ctx.stroke();
     }
-    if (d.bg === "corner-arc") {
+    if (!_photoBG && d.bg === "corner-arc") {
       ctx.fillStyle = p.primary;
       ctx.beginPath(); ctx.moveTo(0, H); ctx.quadraticCurveTo(0, H - 340, 380, H); ctx.closePath(); ctx.fill();
       ctx.beginPath(); ctx.moveTo(S, 0); ctx.quadraticCurveTo(S, 300, S - 340, 0); ctx.closePath(); ctx.fill();
     }
-    if (d.bg === "stripes") {
+    if (!_photoBG && d.bg === "stripes") {
       ctx.strokeStyle = p.primary; ctx.globalAlpha = 0.10; ctx.lineWidth = 26;
       for (let x = -H; x < S + H; x += 90) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + H, H); ctx.stroke();
       }
       ctx.globalAlpha = 1;
     }
-    if (d.bg === "dot-texture") {
+    if (!_photoBG && d.bg === "dot-texture") {
       ctx.fillStyle = p.primary; ctx.globalAlpha = 0.14;
       for (let x = 44; x < S; x += 68) for (let y = 44; y < H; y += 68) {
         ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = 1;
     }
-    if (d.bg === "wave") {
+    if (!_photoBG && d.bg === "wave") {
       ctx.fillStyle = p.primary; ctx.globalAlpha = 0.16;
       ctx.beginPath();
       ctx.moveTo(0, H);
@@ -2526,7 +2722,16 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       ctx.quadraticCurveTo(S * 0.75, H - 66, S, H - 246);
       ctx.stroke();
     }
+    var _photoBG = (typeof bgImg !== "undefined" && bgImg);
     const centered = d.align === "center";
+    if (_photoBG) {
+      // readable panel behind text on photos
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,0.34)";
+      var _pw = S - 120, _ph = H * 0.46, _px = 60, _py = (H - _ph) / 2;
+      roundRect(ctx, _px, _py, _pw, _ph, 28); ctx.fill();
+      ctx.restore();
+    }
     const tx = centered ? S / 2 : 90;
     ctx.textAlign = centered ? "center" : "left";
     // brand
@@ -2688,8 +2893,78 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       roundRect(ctx, bx, by, bw, bh, 30); ctx.stroke();
       ctx.restore();
     }
+    if (fx.mode === "grain") {
+      ctx.save();
+      // procedural film grain — deterministic-ish speckle
+      ctx.globalAlpha = 0.05;
+      for (var gi = 0; gi < 2600; gi++) {
+        var gx = Math.random() * S, gy = Math.random() * H, gr2 = Math.random() * 1.6 + 0.4;
+        ctx.fillStyle = Math.random() < 0.5 ? "#000" : "#fff";
+        ctx.beginPath(); ctx.arc(gx, gy, gr2, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    if (fx.mode === "foil") {
+      ctx.save();
+      // diagonal gold-foil sheen bands
+      var fg = ctx.createLinearGradient(0, 0, S, H);
+      fg.addColorStop(0.00, "rgba(183,138,54,0.28)");
+      fg.addColorStop(0.28, "rgba(245,225,150,0.42)");
+      fg.addColorStop(0.42, "rgba(120,90,30,0.30)");
+      fg.addColorStop(0.60, "rgba(245,225,150,0.40)");
+      fg.addColorStop(0.78, "rgba(150,110,40,0.28)");
+      fg.addColorStop(1.00, "rgba(230,200,120,0.34)");
+      ctx.globalCompositeOperation = "overlay";
+      ctx.fillStyle = fg; ctx.fillRect(0, 0, S, H);
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = "rgba(212,175,55,0.9)"; ctx.lineWidth = 4;
+      ctx.strokeRect(46, 46, S - 92, H - 92);
+      ctx.restore();
+    }
+    if (fx.mode === "mesh") {
+      ctx.save();
+      // soft multi-point mesh gradient wash
+      var pts = [
+        [S*0.18, H*0.20, p.primary, 0.30],
+        [S*0.82, H*0.30, shade(p.primary, 60), 0.26],
+        [S*0.30, H*0.82, shade(p.bg, 50), 0.30],
+        [S*0.80, H*0.80, p.accent || p.primary, 0.24]
+      ];
+      pts.forEach(function(pt){
+        var rg = ctx.createRadialGradient(pt[0], pt[1], 10, pt[0], pt[1], Math.max(S,H)*0.55);
+        rg.addColorStop(0, hexToRgba(pt[2], pt[3]));
+        rg.addColorStop(1, hexToRgba(pt[2], 0));
+        ctx.fillStyle = rg; ctx.fillRect(0, 0, S, H);
+      });
+      ctx.restore();
+    }
     if (fx.border) { ctx.save(); ctx.strokeStyle = p.primary; ctx.lineWidth = 18; ctx.strokeRect(9, 9, S - 18, H - 18); ctx.restore(); }
     if (fx.corners) { ctx.save(); ctx.strokeStyle = p.primary; ctx.lineWidth = 6; roundRect(ctx, 40, 40, S - 80, H - 80, 48); ctx.stroke(); ctx.restore(); }
+  }
+
+  // ---------- corner badge stamp (top-left) ----------
+  if (typeof state !== "undefined" && state.badge) {
+    const label = String(state.badge).toUpperCase();
+    ctx.save();
+    const cx = 150, cy = 150, rad = 96;
+    ctx.translate(cx, cy); ctx.rotate(-0.20);
+    // stamp disc
+    ctx.fillStyle = p.primary;
+    ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.fill();
+    // inner ring
+    ctx.strokeStyle = hexToRgba(p.bg, 0.85); ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(0, 0, rad - 14, 0, Math.PI * 2); ctx.stroke();
+    // label (auto-fit, wrap up to 2 lines)
+    ctx.fillStyle = p.text || "#FFFFFF";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const words = label.split(" ");
+    let lines = words.length > 1 && label.length > 6 ? [words[0], words.slice(1).join(" ")] : [label];
+    let fs = 40;
+    lines.forEach(l => { while (fs > 16) { ctx.font = "800 " + fs + "px Archivo, sans-serif"; if (ctx.measureText(l).width <= (rad - 22) * 2) break; fs -= 2; } });
+    ctx.font = "800 " + fs + "px Archivo, sans-serif";
+    const lh2 = fs * 1.05, startY = -((lines.length - 1) * lh2) / 2;
+    lines.forEach((l, i) => ctx.fillText(l, 0, startY + i * lh2));
+    ctx.restore();
   }
 
   // ---------- product cutout image (on top of design, above logo) ----------
@@ -2734,7 +3009,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ctx.globalAlpha = 0.75;
     ctx.font = "600 26px 'Space Grotesk', sans-serif";
     ctx.textAlign = "right";
-    const wm = "✦ made with PostKit";
+    const wm = "✦ Made with PostKit";
     const tw = ctx.measureText(wm).width;
     ctx.fillStyle = "rgba(0,0,0,0.45)";
     roundRect(ctx, S - tw - 60, H - 74, tw + 36, 46, 23);
@@ -2746,6 +3021,1540 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 }
 
 </script>
+
+<!-- ============================================================
+     AI STUDIO  —  16 added features (client-side, plugs into
+     existing state / rerender / drawPost pipeline)
+     ============================================================ -->
+<script>
+(function(){
+  "use strict";
+  // Wait until the main app script has defined its globals.
+  function ready(){ return (typeof state!=="undefined" && typeof rerender==="function" && typeof drawPost==="function" && typeof PALETTES!=="undefined"); }
+  if(!ready()){ return setTimeout(arguments.callee, 60); }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var pick = function(a){ return a[Math.floor(Math.random()*a.length)]; };
+
+  /* ---- extend state ---- */
+  state.locks = { color:false, layout:false, font:false, bg:false };
+  state.creative = 0.5;
+  state.difficulty = null;
+  state.goal = null;
+  state.blur = 0;
+  state.badge = null;
+  state.dna = { creativity:0.5, minimalism:0.5, boldness:0.5, luxury:0.4 };
+  state.autoPalette = true;   // let AI pick colors by business type
+  state.autoFont = true;      // let AI pick font by business type
+  var autoPalBtn=null, autoFontBtn=null;
+  function fontForBiz(biz){
+    var m={
+      "Fashion / Boutique":"fashion","Jewelry":"luxe","Hotel / Guesthouse":"luxe",
+      "Salon / Beauty":"elegant","Events / Wedding":"luxe","Photography / Video":"vogue",
+      "Restaurant / Café":"editorial","Bakery / Pastry":"editorial",
+      "Gym / Fitness":"impact","Barber Shop":"strong","Auto / Car Services":"impact",
+      "Retail / Store":"clean","Real Estate":"editorial","Clinic / Dental":"clean",
+      "Pharmacy":"clean","Travel Agency":"clean","Electronics / Tech":"tech",
+      "Home / Furniture":"editorial","Education / Tutoring":"clean",
+      "Services / Agency":"default","Other":"default"
+    };
+    return m[biz]||"default";
+  }
+  var _blurR = $("blurRange");
+  if(_blurR){ _blurR.addEventListener("input", function(e){ state.blur = parseInt(e.target.value,10)||0; if(state.result) rerender(); }); }
+
+  /* =========================================================
+     UI SYNC HELPERS  (reflect programmatic state into chips)
+     ========================================================= */
+  function activate(rowSel, attr, val){
+    document.querySelectorAll(rowSel+" [data-"+attr+"]").forEach(function(c){
+      c.classList.toggle("active", c.getAttribute("data-"+attr)===val);
+    });
+  }
+  function setTemplate(id){
+    if(state.locks.layout) return;
+    state.template=id;
+    activate("#tplRow","tpl",id);
+    var chip=document.querySelector('#tplRow [data-tpl="'+id+'"]');
+    var d=$("tplDesc"); if(d&&chip) d.textContent=chip.getAttribute("title")||"";
+    var sb=$("shuffleBtn"); if(sb&&state.result) sb.style.display = id==="freestyle"?"block":"none";
+  }
+  function setFont(id){
+    if(state.locks.font) return;
+    state.autoFont=false; if(autoFontBtn) autoFontBtn.classList.remove("active");
+    state.fontId=id; activate("#fontRow","font",id);
+  }
+  function setTone(v){ state.tone=v; activate("#toneRow","tone",v); }
+  function setStyle(v){ state.style=v; activate("#styleRow","style",v); }
+  function setFx(mode){ state.fx.mode=mode; activate("#fxModeRow","fx",mode); }
+  function setPalette(id){
+    if(state.locks.color) return;
+    state.autoPalette=false; if(autoPalBtn) autoPalBtn.classList.remove("active");
+    state.customActive=false; state.paletteId=id;
+    var cp=$("customPanel"); if(cp) cp.style.display="none";
+    var idx = PALETTES.findIndex(function(p){return p.id===id;});
+    var sws = $("palRow").querySelectorAll(".swatch");
+    sws.forEach(function(s){ s.classList.remove("active"); });
+    if(idx>=0 && sws[idx]) sws[idx].classList.add("active");
+  }
+  function applyCustomColors(bg, primary){
+    if(state.locks.color) return;
+    state.autoPalette=false; if(autoPalBtn) autoPalBtn.classList.remove("active");
+    state.customActive=true;
+    ["customBg","customBgHex","customPrimary","customPrimaryHex"].forEach(function(id){ if(!$(id)) return; });
+    if($("customBg")) $("customBg").value=bg;
+    if($("customBgHex")) $("customBgHex").value=bg.toUpperCase();
+    if($("customPrimary")) $("customPrimary").value=primary;
+    if($("customPrimaryHex")) $("customPrimaryHex").value=primary.toUpperCase();
+    if($("customBgPrev")) $("customBgPrev").style.background=bg;
+    if($("customPrimaryPrev")) $("customPrimaryPrev").style.background=primary;
+    $("palRow").querySelectorAll(".swatch").forEach(function(s){ s.classList.remove("active"); });
+    var cp=$("customPanel"); if(cp) cp.style.display="block";
+  }
+  function setFormat(fmt){
+    state.format=fmt;
+    document.querySelectorAll("#fmtRow .chip").forEach(function(c){
+      c.classList.toggle("active", c.getAttribute("data-fmt")===fmt);
+    });
+  }
+  function needResult(){
+    if(!state.result){ toast("Generate a post first ↑"); return false; }
+    return true;
+  }
+
+  /* toasts disabled — no popups on selection */
+  function toast(msg){ /* intentionally does nothing */ }
+
+  /* =========================================================
+     OFFSCREEN RENDER (for variation / remix / battle thumbs)
+     ========================================================= */
+  function studioRender(opts){
+    opts=opts||{};
+    var c=document.createElement("canvas");
+    var H=opts.H||1080;
+    c.width=1080; c.height=H;
+    var brand=($("brand").value||"").trim()||"Your Brand";
+    drawPost(c, {
+      template: opts.template||state.template,
+      palette:  opts.palette||getPalette(),
+      H:H,
+      headline: (state.result&&state.result.headline)||"",
+      subline:  (state.result&&state.result.subline)||"",
+      brand:brand,
+      design: (opts.design!==undefined)?opts.design:(state.result&&state.result.design)
+    });
+    return c;
+  }
+  function thumbFrom(canvas){ return canvas.toDataURL("image/png"); }
+  function withFonts(fn){
+    if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(fn); } else { fn(); }
+  }
+
+  /* =========================================================
+     CREATIVE-AWARE RANDOM SPEC  (feature #15)
+     ========================================================= */
+  function randomSpecC(level){
+    level = (typeof level==="number")?level:state.creative;
+    var wild = Math.random() < level;         // higher creativity -> more adventurous
+    var bgSafe = ["solid","gradient","big-circle"];
+    var bgWild = ["duotone-split","corner-arc","stripes","dot-texture","wave","big-circle","gradient"];
+    var decoSafe = ["bar","underline","none","double-bar"];
+    var decoWild = ["dots-row","ring","ticks","frame-line","double-bar","bar"];
+    return {
+      bg: pick(wild?bgWild:bgSafe),
+      align: level>0.66 ? pick(["left","center"]) : (Math.random()<0.5?"left":"center"),
+      vpos: pick(wild?["upper","middle","lower"]:["middle","lower"]),
+      deco: pick(wild?decoWild:decoSafe),
+      caseStyle: (level>0.6 && Math.random()<0.6)?"upper":"normal",
+      serif: Math.random() < (0.25 + level*0.4),
+      brandPos: pick(["top-left","top-center","bottom-left"])
+    };
+  }
+
+  /* =========================================================
+     MAPS: smart colors, moods, goals, difficulty
+     ========================================================= */
+  var SMART_COLORS = {
+    "Restaurant / Café":"sand","Bakery / Pastry":"sand","Salon / Beauty":"ivory",
+    "Barber Shop":"noir","Gym / Fitness":"noir","Retail / Store":"stone",
+    "Fashion / Boutique":"noir","Jewelry":"gold","Real Estate":"stone",
+    "Clinic / Dental":"mint","Pharmacy":"mint","Hotel / Guesthouse":"gold",
+    "Travel Agency":"mint","Photography / Video":"noir","Events / Wedding":"gold",
+    "Auto / Car Services":"noir","Electronics / Tech":"noir","Home / Furniture":"sand",
+    "Education / Tutoring":"mint","Services / Agency":"stone","Other":"ivory"
+  };
+  var MOODS = {
+    Calm:{pal:"mint"}, Luxury:{pal:"gold"}, Corporate:{pal:"stone"},
+    Modern:{pal:"noir"}, Elegant:{pal:"ivory"},
+    Fun:{custom:["#181225","#FF5CA8"]}, Energetic:{custom:["#0E0E0E","#FF3B30"]}
+  };
+  var GOALS = {
+    "More sales":{tone:"professional",style:"viral",tpl:"promo"},
+    "More followers":{tone:"friendly",style:"viral",tpl:"giveaway"},
+    "Brand awareness":{tone:"luxury",style:"luxury",tpl:"editorial"},
+    "Product launch":{tone:"professional",style:"creative",tpl:"bold"},
+    "Event":{tone:"friendly",style:"creative",tpl:"banner"},
+    "Engagement":{tone:"funny",style:"viral",tpl:"quote"}
+  };
+  var DIFFICULTY = {
+    "Simple":  { tpl:"split",     font:"clean",  fx:"none",   pal:"ivory" },
+    "Medium":  { tpl:"dots",      font:"default",fx:"none",   pal:"stone" },
+    "Premium": { tpl:"editorial", font:"luxe",   fx:"luxury", pal:"gold"  },
+    "Luxury":  { tpl:"frame",     font:"fashion",fx:"luxury", pal:"gold", border:true },
+    "Ultra Creative":{ tpl:"freestyle", font:"impact", fx:"neon", pal:"noir", wild:true }
+  };
+  var SUGGESTIONS = {
+    "Make text larger":{ tpl:"poster", font:"impact" },
+    "Improve spacing":{ tpl:"freestyle", design:{bg:"solid",align:"center",vpos:"middle",deco:"none",caseStyle:"normal",serif:false,brandPos:"top-center"} },
+    "More modern":{ tpl:"split", font:"clean", pal:"stone", fx:"none" },
+    "More premium":{ tpl:"frame", font:"luxe", pal:"gold", fx:"luxury", border:true },
+    "More colorful":{ custom:["#101018","#3DDC97"] }
+  };
+
+  /* =========================================================
+     GALLERY DATA  (feature #2)
+     ========================================================= */
+  var GALLERY = {
+    Restaurant:[
+      {biz:"Restaurant / Café",topic:"Weekend brunch special, 2-for-1 on all pancakes",pal:"sand",tpl:"promo",tone:"friendly"},
+      {biz:"Restaurant / Café",topic:"New autumn menu just dropped — cozy comfort food",pal:"stone",tpl:"editorial",tone:"friendly"},
+      {biz:"Restaurant / Café",topic:"Reserve your table for Valentine's dinner",pal:"noir",tpl:"bold",tone:"luxury"},
+      {biz:"Restaurant / Café",topic:'"Best shawarma in town" — thank you for the love',pal:"sand",tpl:"review",tone:"friendly"}
+    ],
+    Coffee:[
+      {biz:"Restaurant / Café",topic:"Iced caramel latte — your summer in a cup",pal:"sand",tpl:"poster",tone:"friendly"},
+      {biz:"Restaurant / Café",topic:"Buy 5 coffees, get the 6th free with our loyalty card",pal:"stone",tpl:"promo",tone:"friendly"},
+      {biz:"Restaurant / Café",topic:"Freshly roasted single-origin beans now in store",pal:"noir",tpl:"editorial",tone:"luxury"},
+      {biz:"Restaurant / Café",topic:"Morning ritual: quiet corner, warm cup, good book",pal:"ivory",tpl:"quote",tone:"friendly"}
+    ],
+    Fashion:[
+      {biz:"Fashion / Boutique",topic:"New arrivals: the autumn collection is here",pal:"noir",tpl:"poster",tone:"luxury"},
+      {biz:"Fashion / Boutique",topic:"Up to 40% off — end of season sale this weekend",pal:"gold",tpl:"promo",tone:"professional"},
+      {biz:"Fashion / Boutique",topic:"Style edit: 3 ways to wear our signature blazer",pal:"stone",tpl:"editorial",tone:"luxury"},
+      {biz:"Fashion / Boutique",topic:"Before / After: styled by our team",pal:"noir",tpl:"beforeafter",tone:"luxury"}
+    ],
+    Gym:[
+      {biz:"Gym / Fitness",topic:"January challenge: 30 days, new you. Sign up now",pal:"noir",tpl:"bold",tone:"professional"},
+      {biz:"Gym / Fitness",topic:"First month free for new members this week only",pal:"noir",tpl:"promo",tone:"friendly"},
+      {biz:"Gym / Fitness",topic:'"Lost 12kg in 3 months" — real member result',pal:"stone",tpl:"beforeafter",tone:"professional"},
+      {biz:"Gym / Fitness",topic:"No excuses. The only bad workout is the one you skipped",pal:"noir",tpl:"quote",tone:"professional"}
+    ],
+    "Real Estate":[
+      {biz:"Real Estate",topic:"Just listed: 3-bedroom sea-view apartment in Jounieh",pal:"stone",tpl:"editorial",tone:"professional"},
+      {biz:"Real Estate",topic:"Open house this Sunday, 11am to 4pm — everyone welcome",pal:"ivory",tpl:"banner",tone:"friendly"},
+      {biz:"Real Estate",topic:"Sold in 9 days — thinking of selling yours?",pal:"gold",tpl:"promo",tone:"professional"},
+      {biz:"Real Estate",topic:"Your dream home is closer than you think",pal:"stone",tpl:"bold",tone:"luxury"}
+    ],
+    Beauty:[
+      {biz:"Salon / Beauty",topic:"Bridal glow package — book before it fills up",pal:"gold",tpl:"editorial",tone:"luxury"},
+      {biz:"Salon / Beauty",topic:"20% off all facials this month for new clients",pal:"ivory",tpl:"promo",tone:"friendly"},
+      {biz:"Salon / Beauty",topic:"Before / After: our signature keratin treatment",pal:"noir",tpl:"beforeafter",tone:"luxury"},
+      {biz:"Salon / Beauty",topic:'"I finally feel like myself again" — thank you',pal:"ivory",tpl:"review",tone:"friendly"}
+    ],
+    Bakery:[
+      {biz:"Bakery / Pastry",topic:"Fresh croissants out of the oven every morning at 7am",pal:"sand",tpl:"editorial",tone:"friendly"},
+      {biz:"Bakery / Pastry",topic:"Order your custom birthday cake, 48 hours ahead",pal:"sand",tpl:"promo",tone:"friendly"},
+      {biz:"Bakery / Pastry",topic:"New: pistachio and rose baklava, limited batch",pal:"gold",tpl:"bold",tone:"luxury"},
+      {biz:"Bakery / Pastry",topic:"Buy a dozen, get 2 free this weekend",pal:"stone",tpl:"promo",tone:"friendly"}
+    ],
+    Jewelry:[
+      {biz:"Jewelry",topic:"The new gold collection has arrived",pal:"gold",tpl:"frame",tone:"luxury"},
+      {biz:"Jewelry",topic:"Find the perfect engagement ring with us",pal:"noir",tpl:"editorial",tone:"luxury"},
+      {biz:"Jewelry",topic:"Handcrafted, one of a kind, just for you",pal:"gold",tpl:"poster",tone:"luxury"},
+      {biz:"Jewelry",topic:"Up to 30% off selected pieces this week",pal:"noir",tpl:"promo",tone:"professional"}
+    ],
+    Hotel:[
+      {biz:"Hotel / Guesthouse",topic:"Escape for the weekend — sea view rooms available",pal:"gold",tpl:"editorial",tone:"luxury"},
+      {biz:"Hotel / Guesthouse",topic:"Book direct and save 15% on your stay",pal:"stone",tpl:"promo",tone:"professional"},
+      {biz:"Hotel / Guesthouse",topic:"Your quiet getaway starts here",pal:"mint",tpl:"poster",tone:"luxury"},
+      {biz:"Hotel / Guesthouse",topic:"Sunday brunch by the pool, every week",pal:"sand",tpl:"banner",tone:"friendly"}
+    ],
+    Events:[
+      {biz:"Events / Wedding",topic:"Now booking weddings for next season",pal:"gold",tpl:"frame",tone:"luxury"},
+      {biz:"Events / Wedding",topic:"Let us plan the day you'll never forget",pal:"ivory",tpl:"poster",tone:"luxury"},
+      {biz:"Events / Wedding",topic:"Real event: behind the scenes of last weekend",pal:"noir",tpl:"editorial",tone:"friendly"},
+      {biz:"Events / Wedding",topic:"Free consultation this month only",pal:"stone",tpl:"promo",tone:"professional"}
+    ],
+    Retail:[
+      {biz:"Retail / Store",topic:"New arrivals just hit the shelves",pal:"stone",tpl:"editorial",tone:"friendly"},
+      {biz:"Retail / Store",topic:"Mega clearance — everything must go",pal:"noir",tpl:"promo",tone:"friendly"},
+      {biz:"Retail / Store",topic:"Shop online, pick up in store today",pal:"mint",tpl:"split",tone:"professional"},
+      {biz:"Retail / Store",topic:"Gift ideas for everyone on your list",pal:"gold",tpl:"bold",tone:"friendly"}
+    ],
+    Clinic:[
+      {biz:"Clinic / Dental",topic:"Book your check-up, new patients welcome",pal:"mint",tpl:"split",tone:"professional"},
+      {biz:"Clinic / Dental",topic:"Your brighter smile starts with one visit",pal:"ivory",tpl:"editorial",tone:"professional"},
+      {biz:"Clinic / Dental",topic:"Free consultation for teeth whitening this month",pal:"mint",tpl:"promo",tone:"friendly"},
+      {biz:"Clinic / Dental",topic:"Did you know? A tip for healthier gums",pal:"stone",tpl:"quote",tone:"professional"}
+    ],
+    Barber:[
+      {biz:"Barber Shop",topic:"Fresh cuts, no appointment needed today",pal:"noir",tpl:"bold",tone:"friendly"},
+      {biz:"Barber Shop",topic:"Book your slot for the weekend rush",pal:"stone",tpl:"promo",tone:"professional"},
+      {biz:"Barber Shop",topic:"Before / After: a clean fade transformation",pal:"noir",tpl:"beforeafter",tone:"friendly"},
+      {biz:"Barber Shop",topic:"Father and son cut, 20% off this week",pal:"stone",tpl:"promo",tone:"friendly"}
+    ],
+    Auto:[
+      {biz:"Auto / Car Services",topic:"Full car service and check, book today",pal:"noir",tpl:"bold",tone:"professional"},
+      {biz:"Auto / Car Services",topic:"Summer AC tune-up, 15% off this month",pal:"stone",tpl:"promo",tone:"professional"},
+      {biz:"Auto / Car Services",topic:"We make your car feel brand new again",pal:"noir",tpl:"poster",tone:"professional"},
+      {biz:"Auto / Car Services",topic:"Free brake inspection with any service",pal:"stone",tpl:"banner",tone:"friendly"}
+    ],
+    Tech:[
+      {biz:"Electronics / Tech",topic:"The latest phones just landed in store",pal:"noir",tpl:"bold",tone:"professional"},
+      {biz:"Electronics / Tech",topic:"Trade in your old device and save",pal:"stone",tpl:"promo",tone:"professional"},
+      {biz:"Electronics / Tech",topic:"Back to school tech deals, this week only",pal:"mint",tpl:"promo",tone:"friendly"},
+      {biz:"Electronics / Tech",topic:"1 year warranty on every purchase",pal:"noir",tpl:"editorial",tone:"professional"}
+    ],
+    Travel:[
+      {biz:"Travel Agency",topic:"Your dream getaway is one message away",pal:"mint",tpl:"poster",tone:"luxury"},
+      {biz:"Travel Agency",topic:"Early bird summer packages now open",pal:"sand",tpl:"promo",tone:"friendly"},
+      {biz:"Travel Agency",topic:"All-inclusive deals starting this month",pal:"gold",tpl:"editorial",tone:"luxury"},
+      {biz:"Travel Agency",topic:"We handle everything, you just pack",pal:"mint",tpl:"quote",tone:"friendly"}
+    ],
+    Home:[
+      {biz:"Home / Furniture",topic:"New living room collection just arrived",pal:"sand",tpl:"editorial",tone:"luxury"},
+      {biz:"Home / Furniture",topic:"End of season sale, up to 40% off",pal:"stone",tpl:"promo",tone:"friendly"},
+      {biz:"Home / Furniture",topic:"Design your dream space with us",pal:"sand",tpl:"poster",tone:"luxury"},
+      {biz:"Home / Furniture",topic:"Free delivery on orders this week",pal:"mint",tpl:"banner",tone:"friendly"}
+    ],
+    Pharmacy:[
+      {biz:"Pharmacy",topic:"Your health essentials, all in one place",pal:"mint",tpl:"split",tone:"professional"},
+      {biz:"Pharmacy",topic:"Free blood pressure check this week",pal:"ivory",tpl:"promo",tone:"friendly"},
+      {biz:"Pharmacy",topic:"Flu season is here, stay protected",pal:"mint",tpl:"editorial",tone:"professional"},
+      {biz:"Pharmacy",topic:"We now deliver to your door",pal:"stone",tpl:"banner",tone:"friendly"}
+    ],
+    Education:[
+      {biz:"Education / Tutoring",topic:"Registration now open for the new term",pal:"stone",tpl:"editorial",tone:"professional"},
+      {biz:"Education / Tutoring",topic:"Boost your grades with one-on-one tutoring",pal:"mint",tpl:"bold",tone:"professional"},
+      {biz:"Education / Tutoring",topic:"Summer crash courses, limited seats",pal:"gold",tpl:"promo",tone:"friendly"},
+      {biz:"Education / Tutoring",topic:"Free trial lesson for new students",pal:"ivory",tpl:"banner",tone:"friendly"}
+    ],
+    Photography:[
+      {biz:"Photography / Video",topic:"Now booking weddings and events",pal:"noir",tpl:"editorial",tone:"luxury"},
+      {biz:"Photography / Video",topic:"Capture your brand with a photoshoot",pal:"stone",tpl:"poster",tone:"professional"},
+      {biz:"Photography / Video",topic:"Mini sessions this weekend, book fast",pal:"sand",tpl:"promo",tone:"friendly"},
+      {biz:"Photography / Video",topic:"Every moment deserves to be remembered",pal:"noir",tpl:"quote",tone:"luxury"}
+    ],
+    Services:[
+      {biz:"Services / Agency",topic:"Let us handle it, so you don't have to",pal:"stone",tpl:"bold",tone:"professional"},
+      {biz:"Services / Agency",topic:"Free quote on your next project",pal:"mint",tpl:"promo",tone:"professional"},
+      {biz:"Services / Agency",topic:"Trusted by businesses across Lebanon",pal:"noir",tpl:"editorial",tone:"professional"},
+      {biz:"Services / Agency",topic:"Here's how we can grow your business",pal:"stone",tpl:"quote",tone:"professional"}
+    ],
+    Florist:[
+      {biz:"Retail / Store",topic:"Fresh bouquets, made to order daily",pal:"sand",tpl:"editorial",tone:"friendly"},
+      {biz:"Retail / Store",topic:"Say it with flowers this Valentine's",pal:"gold",tpl:"promo",tone:"luxury"},
+      {biz:"Retail / Store",topic:"Same-day delivery across the city",pal:"mint",tpl:"banner",tone:"friendly"},
+      {biz:"Retail / Store",topic:"Custom arrangements for every occasion",pal:"ivory",tpl:"poster",tone:"luxury"}
+    ]
+  };
+
+  /* =========================================================
+     BUILD UI  — inject Inspiration Gallery + AI Studio card
+     ========================================================= */
+  function palById(id){ return PALETTES.find(function(p){return p.id===id;})||PALETTES[0]; }
+
+  // --- Inspiration Gallery (before the main form card) ---
+  var appCard = document.querySelector(".card.reveal");
+  var galleryHTML =
+    '<div class="card" id="galleryCard">'+
+      '<div class="std-title">🖼️ Inspiration gallery</div>'+
+      '<div class="std-sub">Tap a category, then a post to load it and customize.</div>'+
+      '<div class="gallery-cat" id="galleryCats"></div>'+
+      '<div class="gallery-ex" id="galleryEx" style="display:none"></div>'+
+    '</div>';
+  if(appCard){ appCard.insertAdjacentHTML("beforebegin", galleryHTML); }
+
+  var cats=Object.keys(GALLERY);
+  var gc=$("galleryCats");
+  cats.forEach(function(cat,i){
+    var b=document.createElement("button");
+    b.className="chip"+(i===0?" active":"");
+    b.textContent=cat;
+    b.onclick=function(){
+      gc.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");});
+      b.classList.add("active");
+      renderGallery(cat);
+    };
+    gc.appendChild(b);
+  });
+  function renderGallery(cat){
+    var wrap=$("galleryEx"); wrap.style.display="grid"; wrap.innerHTML="";
+    GALLERY[cat].forEach(function(ex){
+      var p=palById(ex.pal);
+      var card=document.createElement("div");
+      card.className="gallery-card";
+      card.innerHTML='<div class="gc-strip" style="background:linear-gradient(135deg,'+p.bg+' 55%,'+p.primary+' 55%)"></div>'+
+                     '<b>'+ex.topic.replace(/</g,"")+'</b><span>'+ex.biz+' · '+ex.tpl+'</span>';
+      card.onclick=function(){ loadExample(ex); };
+      wrap.appendChild(card);
+    });
+  }
+  function loadExample(ex){
+    var sel=$("bizType");
+    if([].some.call(sel.options,function(o){return o.value===ex.biz;})){ sel.value=ex.biz; sel.dispatchEvent(new Event("change")); }
+    $("topic").value=ex.topic;
+    setPalette(ex.pal); setTemplate(ex.tpl); setTone(ex.tone);
+    toast("Loaded — generating…");
+    $("app").scrollIntoView({behavior:"smooth",block:"start"});
+    if(typeof generate==="function") generate();
+  }
+  renderGallery(cats[0]);
+
+  // --- Prompt Enhancer button (feature #1), near the topic ---
+  var ideaBtn=$("ideaBtn");
+  if(ideaBtn){
+    var enh=document.createElement("button");
+    enh.type="button"; enh.id="enhanceBtn";
+    enh.style.cssText="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%;font-weight:600";
+    enh.textContent="✨ Enhance my idea into a full prompt";
+    ideaBtn.insertAdjacentElement("afterend", enh);
+    enh.onclick=enhancePrompt;
+  }
+  function enhancePrompt(){
+    var t=$("topic"); var raw=(t.value||"").trim();
+    if(!raw){ toast("Type a short idea first, e.g. \"sale on shoes\""); t.focus(); return; }
+    var biz=$("bizType").value.split(" / ")[0];
+    var aud=($("audience").value||"").trim();
+    var tone=state.tone;
+    var toneWord={friendly:"warm and inviting",professional:"clear and trustworthy",luxury:"premium and elegant",funny:"playful and fun"}[tone]||"engaging";
+    // detect a discount if present
+    var pctMatch=raw.match(/(\d+)\s*%/);
+    var hasOffer=/sale|off|discount|deal|offer|promo|%/.test(raw.toLowerCase());
+    var parts=[];
+    parts.push(raw.charAt(0).toUpperCase()+raw.slice(1));
+    if(hasOffer){ parts.push(pctMatch?("Highlight the "+pctMatch[1]+"% saving prominently"):"Make the offer the hero of the post"); parts.push("add urgency (limited time / while stock lasts)"); }
+    else { parts.push("lead with one clear benefit for the customer"); }
+    parts.push("tone: "+toneWord);
+    if(aud) parts.push("audience: "+aud);
+    parts.push("include a strong call to action (order / DM / visit) and mention "+biz.toLowerCase());
+    t.value=parts.join(". ")+".";
+    t.focus();
+    toast("Idea expanded ✓ Edit if you like, then Generate");
+  }
+
+  // --- Main AI Studio card (after the result action row) ---
+  var actionRow=$("actionRow");
+  var studioHTML =
+  '<div class="card" id="studioCard" style="display:none">'+
+
+    // Magic Improve (flagship one-tap polish)
+    '<div class="std-block">'+
+      '<div class="std-title">🪄 Magic Improve</div>'+
+      '<div class="std-sub">One tap: better contrast, tighter headline, balanced spacing & readability.</div>'+
+      '<button class="gen-btn" id="magicBtn" style="margin-top:0">🪄 Magic Improve this design</button>'+
+    '</div>'+
+
+    // Design DNA (flagship) — sliders that drive the whole look
+    '<div class="std-block">'+
+      '<div class="std-title">🧬 Design DNA</div>'+
+      '<div class="std-sub">Dial the personality of your design, then re-apply. No design skills needed.</div>'+
+      '<div class="dna-slider"><label>Creativity <b id="dnaCreativityV">50%</b></label><input type="range" id="dnaCreativity" min="0" max="100" value="50"></div>'+
+      '<div class="dna-slider"><label>Minimalism <b id="dnaMinimalismV">50%</b></label><input type="range" id="dnaMinimalism" min="0" max="100" value="50"></div>'+
+      '<div class="dna-slider"><label>Boldness <b id="dnaBoldnessV">50%</b></label><input type="range" id="dnaBoldness" min="0" max="100" value="50"></div>'+
+      '<div class="dna-slider"><label>Luxury <b id="dnaLuxuryV">40%</b></label><input type="range" id="dnaLuxury" min="0" max="100" value="40"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:8px">'+
+        '<select id="dnaMood" class="dna-sel"><option value="">Mood: auto</option><option>Elegant</option><option>Energetic</option><option>Calm</option><option>Playful</option><option>Corporate</option><option>Warm</option></select>'+
+        '<select id="dnaTemp" class="dna-sel"><option value="">Temp: auto</option><option value="warm">Warm</option><option value="cool">Cool</option><option value="neutral">Neutral</option></select>'+
+      '</div>'+
+      '<button class="gen-btn" id="dnaApplyBtn" style="margin-top:10px">🧬 Apply DNA</button>'+
+      '<div id="dnaCode" style="margin-top:10px;font-size:12px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;line-height:1.6"></div>'+
+    '</div>'+
+
+    // Corner badge
+    '<div class="std-block">'+
+      '<div class="std-title">🏷️ Corner badge</div>'+
+      '<div class="std-sub">Stamp a badge on the design.</div>'+
+      '<div class="chip-row" id="badgeRow"></div>'+
+    '</div>'+
+
+    // Randomize
+    '<div class="std-block">'+
+      '<div class="std-title">🎲 Randomize</div>'+
+      '<div class="std-sub">Shuffle one part while keeping the rest.</div>'+
+      '<div class="chip-row" id="randomRow">'+
+        '<button class="chip" data-rnd="palette">Palette</button>'+
+        '<button class="chip" data-rnd="font">Font</button>'+
+        '<button class="chip" data-rnd="layout">Layout</button>'+
+        '<button class="chip" data-rnd="all">Everything</button>'+
+      '</div>'+
+    '</div>'+
+
+    // Design Score (#5)
+    '<div class="std-block">'+
+      '<div class="std-title">📊 Design score</div>'+
+      '<div class="std-sub">Live quality read of your current post.</div>'+
+      '<div id="scoreBody"></div>'+
+    '</div>'+
+
+    // Design variations (#3)
+    '<div class="std-block">'+
+      '<div class="std-title">🎛️ Design variations</div>'+
+      '<div class="std-sub">Four fresh layouts of the same content. Tap one to apply.</div>'+
+      '<button class="miniai" id="varBtn" style="width:100%">Generate 4 variations</button>'+
+      '<div class="thumb-grid g2" id="varGrid" style="display:none"></div>'+
+    '</div>'+
+
+    // Template remix (#8)
+    '<div class="std-block">'+
+      '<div class="std-title">🔀 Template remix</div>'+
+      '<div class="std-sub">Same words, three completely different styles.</div>'+
+      '<button class="miniai" id="remixBtn" style="width:100%">Remix into 3 styles</button>'+
+      '<div class="thumb-grid g3" id="remixGrid" style="display:none"></div>'+
+    '</div>'+
+
+    // Design battle (💎)
+    '<div class="std-block">'+
+      '<div class="std-title">⚔️ Design battle</div>'+
+      '<div class="std-sub">Two bold directions head-to-head. Pick a winner or mix them.</div>'+
+      '<button class="miniai" id="battleBtn" style="width:100%">Start a battle</button>'+
+      '<div id="battleWrap" style="display:none">'+
+        '<div class="std-battle">'+
+          '<div class="thumb" id="battleA"><span class="tlabel">A</span></div>'+
+          '<div class="vs">VS</div>'+
+          '<div class="thumb" id="battleB"><span class="tlabel">B</span></div>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;margin-top:10px">'+
+          '<button class="miniai" id="pickA" style="flex:1">Pick A</button>'+
+          '<button class="miniai" id="pickMix" style="flex:1">⚡ Mix</button>'+
+          '<button class="miniai" id="pickB" style="flex:1">Pick B</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+
+    // AI design suggestions (#6)
+    '<div class="std-block">'+
+      '<div class="std-title">🤖 AI design suggestions</div>'+
+      '<div class="std-sub">One-tap improvements.</div>'+
+      '<div class="chip-row" id="suggestRow"></div>'+
+    '</div>'+
+
+    // Difficulty (#10) + Color mood (#11)
+    '<div class="std-block">'+
+      '<div class="std-title">🎚️ Design difficulty</div>'+
+      '<div class="std-sub">From clean and simple to ultra creative.</div>'+
+      '<div class="chip-row" id="difficultyRow"></div>'+
+      '<div class="std-title" style="margin-top:16px">🎨 Color mood</div>'+
+      '<div class="std-sub">Instantly restyle the palette.</div>'+
+      '<div class="chip-row" id="moodRow"></div>'+
+      '<button class="miniai" id="smartColorBtn" style="width:100%;margin-top:10px">✨ Smart colors for my business</button>'+
+    '</div>'+
+
+    // Marketing goal (#9)
+    '<div class="std-block">'+
+      '<div class="std-title">🎯 Marketing goal</div>'+
+      '<div class="std-sub">Steers tone, style and layout toward your objective.</div>'+
+      '<div class="chip-row" id="goalRow"></div>'+
+    '</div>'+
+
+    // Creative slider (#15)
+    '<div class="std-block creative-wrap">'+
+      '<div class="std-title">🎨 Creative level</div>'+
+      '<div class="std-sub">How adventurous variations & shuffle should be.</div>'+
+      '<input type="range" id="creativeRange" min="0" max="100" value="50">'+
+      '<div class="creative-lbls"><span>Safe</span><span id="creativeVal">Balanced</span><span>Creative</span></div>'+
+    '</div>'+
+
+    // Design lock (#12)
+    '<div class="std-block">'+
+      '<div class="std-title">🔒 Design lock</div>'+
+      '<div class="std-sub">Locked parts stay fixed during variations, remix, shuffle & battle.</div>'+
+      '<div class="chip-row" id="lockRow">'+
+        '<button class="chip lock-chip" data-lock="color">Colors</button>'+
+        '<button class="chip lock-chip" data-lock="layout">Layout</button>'+
+        '<button class="chip lock-chip" data-lock="font">Font</button>'+
+        '<button class="chip lock-chip" data-lock="bg">Background</button>'+
+      '</div>'+
+    '</div>'+
+
+    // One-click resize (#7) + Fit headline (#14) + Content pack (#13)
+    '<div class="std-block">'+
+      '<div class="std-title">📐 One-click resize</div>'+
+      '<div class="std-sub">Re-fit this exact design for any platform.</div>'+
+      '<div class="chip-row" id="resizeRow"></div>'+
+      '<button class="miniai" id="fitBtn" style="width:100%;margin-top:12px">✂️ Fit / shorten headline</button>'+
+      '<button class="miniai" id="packBtn" style="width:100%;margin-top:8px">📦 Download content pack (post + story + portrait)</button>'+
+    '</div>'+
+
+  '</div>';
+  if(actionRow){ actionRow.insertAdjacentHTML("afterend", studioHTML); }
+
+  /* ---- build chip rows ---- */
+  function chipRow(id, labels, handler){
+    var row=$(id); if(!row) return;
+    labels.forEach(function(l){
+      var b=document.createElement("button");
+      b.className="chip"; b.textContent=l;
+      b.onclick=function(){ handler(l,b,row); };
+      row.appendChild(b);
+    });
+  }
+  chipRow("suggestRow", Object.keys(SUGGESTIONS), function(l){ applySuggestion(l); });
+  chipRow("difficultyRow", Object.keys(DIFFICULTY), function(l,b,row){
+    row.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active");
+    applyDifficulty(l);
+  });
+  chipRow("moodRow", Object.keys(MOODS), function(l,b,row){
+    row.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active");
+    applyMood(l);
+  });
+  chipRow("goalRow", Object.keys(GOALS), function(l,b,row){
+    row.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active");
+    applyGoal(l);
+  });
+  var RESIZE=[["Instagram","post"],["Story","story"],["Portrait","portrait"],["Square","square"],["Facebook","facebook"],["LinkedIn","linkedin"],["Pinterest","pin"],["Landscape","landscape"]];
+  (function(){
+    var row=$("resizeRow"); if(!row) return;
+    RESIZE.forEach(function(r){
+      var b=document.createElement("button");
+      b.className="chip"; b.textContent=r[0]; b.setAttribute("data-fmt2",r[1]);
+      b.onclick=function(){
+        row.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active");
+        setFormat(r[1]); rerender(); toast(r[0]+" size ✓");
+      };
+      row.appendChild(b);
+    });
+  })();
+
+  /* ---- lock chips ---- */
+  $("lockRow").addEventListener("click", function(e){
+    var b=e.target.closest("[data-lock]"); if(!b) return;
+    var k=b.getAttribute("data-lock");
+    state.locks[k]=!state.locks[k];
+    b.classList.toggle("locked", state.locks[k]);
+  });
+
+  /* ---- creative slider ---- */
+  $("creativeRange").addEventListener("input", function(e){
+    state.creative=parseInt(e.target.value,10)/100;
+    var v=state.creative;
+    $("creativeVal").textContent = v<0.34?"Safe": v<0.67?"Balanced":"Creative";
+  });
+
+  /* =========================================================
+     FEATURE IMPLEMENTATIONS
+     ========================================================= */
+
+  // #6 suggestions
+  function applySuggestion(name){
+    if(!needResult()) return;
+    var s=SUGGESTIONS[name]; if(!s) return;
+    if(s.tpl) setTemplate(s.tpl);
+    if(s.font) setFont(s.font);
+    if(s.pal) setPalette(s.pal);
+    if(s.fx) setFx(s.fx);
+    if(s.border) state.fx.border=true;
+    if(s.custom) applyCustomColors(s.custom[0], s.custom[1]);
+    if(s.design && !state.locks.layout){ state.template="freestyle"; activate("#tplRow","tpl","freestyle"); state.result.design=s.design; }
+    rerender(); toast(name+" ✓");
+  }
+
+  // #10 difficulty
+  function applyDifficulty(name){
+    if(!needResult()) return;
+    var d=DIFFICULTY[name]; if(!d) return;
+    state.difficulty=name;
+    setTemplate(d.tpl); setFont(d.font); setFx(d.fx); setPalette(d.pal);
+    state.fx.border=!!d.border;
+    if(d.wild && !state.locks.layout){ state.template="freestyle"; state.result.design=randomSpecC(0.9); }
+    rerender(); toast(name+" look applied ✓");
+  }
+
+  // #11 mood
+  function applyMood(name){
+    var m=MOODS[name]; if(!m) return;
+    if(m.pal) setPalette(m.pal);
+    else if(m.custom) applyCustomColors(m.custom[0], m.custom[1]);
+    if(state.result) rerender();
+    toast(name+" mood ✓");
+  }
+
+  // #4 smart colors
+  $("smartColorBtn").onclick=function(){
+    var biz=$("bizType").value;
+    var id=SMART_COLORS[biz]||"ivory";
+    setPalette(id);
+    if(state.result) rerender();
+    toast("Matched "+palById(id).name+" to "+biz.split(" / ")[0]+" ✓");
+  };
+
+  // #9 goal
+  function applyGoal(name){
+    var g=GOALS[name]; if(!g) return;
+    state.goal=name;
+    setTone(g.tone); setStyle(g.style);
+    if(state.result){ setTemplate(g.tpl); rerender(); toast("Optimized for: "+name+" ✓"); }
+    else { toast("Set for "+name+" — will shape your next post ✓"); }
+  }
+
+  // #3 variations
+  $("varBtn").onclick=function(){
+    if(!needResult()) return;
+    var grid=$("varGrid"); grid.style.display="grid"; grid.innerHTML="Rendering…";
+    withFonts(function(){
+      grid.innerHTML="";
+      var configs=[];
+      if(state.locks.layout){
+        // vary palette instead of layout
+        var pals=PALETTES.map(function(p){return p.id;}).filter(function(id){return !state.locks.color;});
+        for(var i=0;i<4;i++){ configs.push({palette: palById(pals[i%pals.length])}); }
+      } else {
+        for(var j=0;j<4;j++){ configs.push({template:"freestyle", design:randomSpecC()}); }
+      }
+      configs.forEach(function(cfg,i){
+        var c=studioRender(cfg);
+        var el=document.createElement("div");
+        el.className="thumb";
+        el.innerHTML='<span class="tlabel">'+String.fromCharCode(65+i)+'</span><img src="'+thumbFrom(c)+'"><div class="tpick">Use this</div>';
+        el.onclick=function(){
+          if(cfg.template && !state.locks.layout){ state.template="freestyle"; activate("#tplRow","tpl","freestyle"); state.result.design=cfg.design; }
+          if(cfg.palette && !state.locks.color){ setPalette(cfg.palette.id); }
+          rerender(); toast("Layout "+String.fromCharCode(65+i)+" applied ✓");
+        };
+        grid.appendChild(el);
+      });
+    });
+  };
+
+  // #8 remix
+  $("remixBtn").onclick=function(){
+    if(!needResult()) return;
+    if(state.locks.layout){ toast("Unlock Layout to remix templates"); return; }
+    var grid=$("remixGrid"); grid.style.display="grid"; grid.innerHTML="Rendering…";
+    var pool=["bold","editorial","arc","frame","split","promo","poster","dots","banner","quote"].filter(function(t){return t!==state.template;});
+    // shuffle & take 3
+    for(var i=pool.length-1;i>0;i--){ var k=Math.floor(Math.random()*(i+1)); var tmp=pool[i]; pool[i]=pool[k]; pool[k]=tmp; }
+    var picks=pool.slice(0,3);
+    withFonts(function(){
+      grid.innerHTML="";
+      picks.forEach(function(tpl){
+        var c=studioRender({template:tpl});
+        var el=document.createElement("div");
+        el.className="thumb";
+        el.innerHTML='<span class="tlabel">'+tpl+'</span><img src="'+thumbFrom(c)+'"><div class="tpick">Use this</div>';
+        el.onclick=function(){ setTemplate(tpl); rerender(); toast(tpl+" style applied ✓"); };
+        grid.appendChild(el);
+      });
+    });
+  };
+
+  // 💎 battle
+  var battleState=null;
+  function randomFullConfig(){
+    var pal = state.locks.color ? getPalette() : palById(pick(PALETTES.map(function(p){return p.id;})));
+    var tpl = state.locks.layout ? state.template : pick(["freestyle","bold","editorial","frame","split","poster","dots","banner"]);
+    var design = (tpl==="freestyle")?randomSpecC(Math.max(0.6,state.creative)):undefined;
+    return {template:tpl, palette:pal, design:design};
+  }
+  $("battleBtn").onclick=function(){
+    if(!needResult()) return;
+    $("battleWrap").style.display="block";
+    withFonts(function(){
+      var A=randomFullConfig(), B=randomFullConfig();
+      battleState={A:A,B:B};
+      renderBattleSide("battleA","A",A);
+      renderBattleSide("battleB","B",B);
+    });
+  };
+  function renderBattleSide(elId,label,cfg){
+    var c=studioRender(cfg);
+    var el=$(elId);
+    el.innerHTML='<span class="tlabel">'+label+'</span><img src="'+thumbFrom(c)+'">';
+  }
+  function applyBattleConfig(cfg){
+    if(cfg.template && !state.locks.layout){
+      state.template=cfg.template; activate("#tplRow","tpl",cfg.template);
+      if(cfg.design) state.result.design=cfg.design;
+    }
+    if(cfg.palette && !state.locks.color){ setPalette(cfg.palette.id); }
+    rerender();
+  }
+  $("pickA").onclick=function(){ if(battleState){ applyBattleConfig(battleState.A); toast("Winner: A ✓"); } };
+  $("pickB").onclick=function(){ if(battleState){ applyBattleConfig(battleState.B); toast("Winner: B ✓"); } };
+  $("pickMix").onclick=function(){
+    if(!battleState) return;
+    // A's layout + B's palette
+    applyBattleConfig({template:battleState.A.template, design:battleState.A.design, palette:battleState.B.palette});
+    toast("Mixed A layout × B colors ⚡");
+  };
+
+  // #14 fit / shorten headline
+  var STOP=/^(the|a|an|of|to|for|and|our|your|with|this|that|is|are|on|in|at|it|we|you|all|now|new|just|get|from)$/i;
+  $("fitBtn").onclick=function(){
+    if(!needResult()) return;
+    var h=(state.result.headline||"").trim();
+    var words=h.split(/\s+/);
+    if(words.length<=5 && h.length<=26){ toast("Headline already fits nicely ✓"); return; }
+    // keep strongest words: drop stopwords first, then cap length
+    var kept=words.filter(function(w){ return !STOP.test(w.replace(/[^\w']/g,"")); });
+    if(kept.length<2) kept=words;
+    kept=kept.slice(0,5);
+    var out=kept.join(" ");
+    // strip trailing punctuation duplicates
+    out=out.replace(/[.,;:]+$/,"");
+    state.result.headline=out;
+    // sync slide store if present
+    if(state.slides && state.slides[state.slideIndex]) state.slides[state.slideIndex].headline=out;
+    rerender(); updateScore();
+    toast("Headline tightened ✓");
+  };
+
+  // #13 content pack
+  $("packBtn").onclick=function(){
+    if(!needResult()) return;
+    var brand=($("brand").value||"post").trim().toLowerCase().replace(/\s+/g,"-");
+    var jobs=[["post",1080],["story",1920],["portrait",1350]];
+    toast("Preparing content pack…");
+    withFonts(function(){
+      jobs.forEach(function(j,i){
+        setTimeout(function(){
+          var c=studioRender({H:j[1]});
+          var a=document.createElement("a");
+          a.download=brand+"-"+j[0]+".png";
+          a.href=c.toDataURL("image/png");
+          a.click();
+          if(i===jobs.length-1){
+            // copy caption + hashtags too
+            var full=(state.result.caption||"")+"\n\n"+((state.result.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
+            if(navigator.clipboard) navigator.clipboard.writeText(full);
+            toast("Content pack downloaded + caption copied ✓");
+          }
+        }, i*450);
+      });
+    });
+  };
+
+  /* =========================================================
+     DESIGN SCORE (#5)  — recomputed on every rerender
+     ========================================================= */
+  function relLum(hex){
+    var n=parseInt(hex.slice(1),16);
+    var c=[ (n>>16)&255, (n>>8)&255, n&255 ].map(function(v){
+      v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4);
+    });
+    return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];
+  }
+  function contrastRatio(a,b){
+    try{ var l1=relLum(a), l2=relLum(b); var hi=Math.max(l1,l2), lo=Math.min(l1,l2); return (hi+0.05)/(lo+0.05); }catch(e){ return 3; }
+  }
+  function clamp(n){ return Math.max(0,Math.min(100,Math.round(n))); }
+  function computeScore(){
+    var p=getPalette();
+    var head=(state.result&&state.result.headline)||"";
+    var cap=(state.result&&state.result.caption)||"";
+    var tags=(state.result&&state.result.hashtags)||[];
+    // readability: text vs bg contrast (7:1 = excellent)
+    var crText=contrastRatio(p.text||"#fff", p.bg||"#000");
+    var readability=clamp((crText/7)*100);
+    // contrast: brand/primary vs bg
+    var crPrim=contrastRatio(p.primary||"#fff", p.bg||"#000");
+    var contrast=clamp((crPrim/4.5)*100*0.9+8);
+    // visual balance: headline word count sweet spot 2-6, subline present
+    var hw=head.trim()?head.trim().split(/\s+/).length:0;
+    var balance = hw===0?40 : (hw>=2&&hw<=6?92 : hw<=8?78 : 60);
+    if((state.result&&state.result.subline||"").trim()) balance+=6;
+    balance=clamp(balance);
+    // marketing impact: CTA + hashtag range + emoji + reasonable caption length
+    var cta=/[?!]|comment|tag|dm|order|book|visit|link|call|whatsapp|shop|save|اطلب|احجز|زور|commandez|réservez/i.test(cap);
+    var emoji=/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test(cap);
+    var tagOk=tags.length>=6&&tags.length<=13;
+    var lenOk=cap.length>=60&&cap.length<=320;
+    var mk=45+(cta?22:0)+(tagOk?16:0)+(emoji?8:0)+(lenOk?9:0);
+    var marketing=clamp(mk);
+    var overall=Math.round(readability*0.28+contrast*0.22+balance*0.22+marketing*0.28);
+    return { rows:[["Readability",readability],["Visual balance",balance],["Contrast",contrast],["Marketing impact",marketing]], overall:overall };
+  }
+  function updateScore(){
+    var card=$("studioCard"); if(!card) return;
+    var body=$("scoreBody"); if(!body) return;
+    if(!state.result){ return; }
+    var s=computeScore();
+    var html="";
+    s.rows.forEach(function(r){
+      html+='<div class="score-row"><span class="sname">'+r[0]+'</span>'+
+            '<span class="score-bar"><i style="width:'+r[1]+'%"></i></span>'+
+            '<span class="sval">'+r[1]+'%</span></div>';
+    });
+    html+='<div class="score-overall"><b>'+s.overall+'</b><span>overall design score</span></div>';
+    body.innerHTML=html;
+  }
+
+  /* =========================================================
+     SHOW STUDIO WHEN A RESULT EXISTS  +  hook rerender
+     ========================================================= */
+  var _origRerender = rerender;
+  rerender = function(){
+    _origRerender.apply(this, arguments);
+    var card=$("studioCard");
+    if(card){ card.style.display = state.result ? "block" : "none"; }
+    var ok=$("okLine"); if(ok) ok.style.display = state.result ? "flex" : "none";
+    try{ updateScore(); }catch(e){}
+  };
+
+  /* =========================================================
+     BRAND PERSONALITY (+ quick post types, offers, spin)
+     ========================================================= */
+  var PERSONAS = {
+    "💎 Luxury":   {pal:"gold",  font:"luxe",   tpl:"editorial", tone:"luxury",       style:"luxury",    fx:"luxury"},
+    "😊 Friendly": {pal:"sand",  font:"clean",  tpl:"split",     tone:"friendly",     style:"creative",  fx:"none"},
+    "🚀 Startup":  {pal:"noir",  font:"default",tpl:"bold",      tone:"professional", style:"viral",     fx:"neon"},
+    "💼 Corporate":{pal:"stone", font:"clean",  tpl:"editorial", tone:"professional", style:"corporate", fx:"none"},
+    "🌿 Organic":  {pal:"mint",  font:"elegant",tpl:"arc",       tone:"friendly",     style:"creative",  fx:"none"},
+    "🍔 Fast Food":{custom:["#141414","#E4342B"], font:"impact", tpl:"promo",     tone:"funny",        style:"viral",     fx:"none"},
+    "☕ Cozy Café": {pal:"sand",  font:"editorial",tpl:"dots",    tone:"friendly",     style:"creative",  fx:"vintage"},
+    "🎉 Youthful": {custom:["#141018","#FF4D8D"], font:"playful",tpl:"banner",    tone:"funny",        style:"viral",     fx:"neon"},
+    "🏋️ Fitness":  {pal:"noir",  font:"strong", tpl:"bold",      tone:"professional", style:"viral",     fx:"none"},
+    "👑 Premium":  {pal:"gold",  font:"fashion",tpl:"frame",     tone:"luxury",       style:"luxury",    fx:"foil"},
+    "🩺 Healthcare":{pal:"mint", font:"clean",  tpl:"split",     tone:"professional", style:"corporate", fx:"none"},
+    "🎨 Creative": {pal:"noir",  font:"vogue",  tpl:"poster",    tone:"friendly",     style:"creative",  fx:"mesh"}
+  };
+  var QUICK_POSTS = {
+    "⏳ Countdown":     {topic:"Only a few days left! Our big event is almost here — get ready.", tpl:"banner", tone:"friendly"},
+    "🔜 Coming soon":   {topic:"Coming soon: something exciting is on the way. Stay tuned.", tpl:"poster", tone:"luxury"},
+    "⚡ Flash sale":     {topic:"FLASH SALE — today only! Huge discounts for a few hours.", tpl:"promo", tone:"friendly"},
+    "🆕 New collection":{topic:"New collection just dropped — be the first to explore it.", tpl:"editorial", tone:"luxury"},
+    "📦 Limited stock": {topic:"Limited stock alert! Once it's gone, it's gone.", tpl:"promo", tone:"professional"},
+    "🎂 Birthday":      {topic:"Happy birthday from all of us! Celebrate with a special treat today.", tpl:"quote", tone:"friendly"},
+    "👋 Welcome":       {topic:"Welcome! So happy to have you here — here's what we're about.", tpl:"split", tone:"friendly"},
+    "🕐 Opening hours": {topic:"Our opening hours this week — come visit us any time.", tpl:"frame", tone:"professional"},
+    "💵 Price list":    {topic:"Our price list — quality you can always count on.", tpl:"dots", tone:"professional"},
+    "🍽️ Menu":          {topic:"Today's menu — freshly made, just for you.", tpl:"editorial", tone:"friendly"},
+    "✉️ Event invite":  {topic:"You're invited! Join us for a special event. Save the date.", tpl:"banner", tone:"luxury"},
+    "🙏 Thank you":      {topic:"Thank you to our amazing customers — we couldn't do it without you.", tpl:"quote", tone:"friendly"},
+    "❤️ Appreciation":  {topic:"Customer appreciation week — a little something to say we care.", tpl:"promo", tone:"friendly"},
+    "🎁 Giveaway":       {topic:"GIVEAWAY time! Follow, like and tag 2 friends to win.", tpl:"giveaway", tone:"friendly"},
+    "🏆 Contest":        {topic:"Contest: share your best photo with us for a chance to win.", tpl:"banner", tone:"friendly"},
+    "🎊 Grand opening":  {topic:"Grand opening! Come celebrate with us — offers all day.", tpl:"bold", tone:"friendly"},
+    "🔓 Opening soon":   {topic:"Opening soon in your area — get ready for something great.", tpl:"poster", tone:"luxury"},
+    "💡 Did you know":   {topic:"Did you know? A surprising fact about what we do.", tpl:"quote", tone:"professional"},
+    "⚖️ Myth vs fact":   {topic:"Myth vs Fact: clearing up a common misconception in our field.", tpl:"split", tone:"professional"},
+    "📝 Quick tips":     {topic:"3 quick tips to get the most out of our product/service.", tpl:"dots", tone:"professional"},
+    "❓ FAQ":            {topic:"Your most asked question — answered.", tpl:"editorial", tone:"friendly"},
+    "📊 Poll":           {topic:"We want your opinion! Vote in the comments: A or B?", tpl:"banner", tone:"friendly"},
+    "🌟 New arrival":    {topic:"Just arrived! The newest addition you've been waiting for.", tpl:"editorial", tone:"luxury"}
+  };
+  var OFFERS = ["Buy 2, Get 1 Free","Weekend Special — 25% off","Spend $50, get $10 off","Buy 1, Get 1 at 50% off","Free delivery this week only","First order 15% off","Bundle deal: 3 for the price of 2","Happy hour: 20% off from 4–6pm","Loyalty reward: your 5th one free","Flash 30% off — today only"];
+
+  // inject the pre-form personality / quick-post card (after the gallery)
+  var galleryCardEl = $("galleryCard");
+  var personaHTML =
+    '<div class="card" id="personaCard">'+
+      '<div class="std-title">🎭 Brand personality <span style="font-weight:400;color:var(--muted);font-size:12px">(optional)</span></div>'+
+      '<div class="std-sub">Pick a vibe — colors, font, layout, tone & caption style all adapt.</div>'+
+      '<div class="chip-row" id="personaRow"></div>'+
+      '<div class="std-title" style="margin-top:18px">⚡ Quick post types</div>'+
+      '<div class="std-sub">Fills a ready-made idea + layout. Add your details, then Generate.</div>'+
+      '<div class="chip-row" id="quickPostRow"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:12px">'+
+        '<button class="miniai" id="offerBtn2" style="flex:1">💰 Add an offer</button>'+
+        '<button class="miniai" id="spinBtn" style="flex:1">🎡 Spin for an idea</button>'+
+      '</div>'+
+    '</div>';
+  if(galleryCardEl){ galleryCardEl.insertAdjacentHTML("afterend", personaHTML); }
+  else { var ac=document.querySelector(".card.reveal"); if(ac) ac.insertAdjacentHTML("beforebegin", personaHTML); }
+
+  // build persona chips
+  var personaSnapshot=null;
+  function snapshotStyle(){
+    return {
+      tone:state.tone, style:state.style,
+      paletteId:state.paletteId, customActive:state.customActive,
+      cbg: $("customBg")?$("customBg").value:null, cpr: $("customPrimary")?$("customPrimary").value:null,
+      fontId:state.fontId, template:state.template,
+      fxMode:state.fx.mode, fxBorder:state.fx.border,
+      design: (state.result && state.result.design) ? JSON.parse(JSON.stringify(state.result.design)) : undefined
+    };
+  }
+  function restoreStyle(s){
+    if(!s) return;
+    setTone(s.tone); setStyle(s.style);
+    if(s.customActive && s.cbg && s.cpr) applyCustomColors(s.cbg, s.cpr);
+    else if(s.paletteId) setPalette(s.paletteId);
+    setFont(s.fontId); setTemplate(s.template); setFx(s.fxMode);
+    state.fx.border=s.fxBorder;
+    if(state.result && s.design!==undefined) state.result.design=s.design;
+    if(state.result) rerender();
+  }
+  (function(){
+    var row=$("personaRow"); if(!row) return;
+    Object.keys(PERSONAS).forEach(function(name){
+      var b=document.createElement("button"); b.className="chip"; b.textContent=name;
+      b.onclick=function(){
+        if(b.classList.contains("active")){
+          // tap again to remove it -> revert to how it was before
+          b.classList.remove("active");
+          restoreStyle(personaSnapshot);
+          personaSnapshot=null;
+          toast("Personality cleared");
+          return;
+        }
+        if(!personaSnapshot) personaSnapshot=snapshotStyle();
+        row.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");});
+        b.classList.add("active");
+        applyPersona(name);
+      };
+      row.appendChild(b);
+    });
+  })();
+  function applyPersona(name){
+    var pr=PERSONAS[name]; if(!pr) return;
+    setTone(pr.tone); setStyle(pr.style);
+    if(pr.custom) applyCustomColors(pr.custom[0], pr.custom[1]); else if(pr.pal) setPalette(pr.pal);
+    if(pr.font) setFont(pr.font);
+    if(pr.tpl) setTemplate(pr.tpl);
+    if(pr.fx) setFx(pr.fx);
+    if(state.result){ rerender(); toast(name.replace(/^[^\s]+\s/,"")+" personality ✓"); }
+    else { toast(name.replace(/^[^\s]+\s/,"")+" set — shapes your next post ✓"); }
+  }
+
+  // build quick post chips
+  (function(){
+    var row=$("quickPostRow"); if(!row) return;
+    Object.keys(QUICK_POSTS).forEach(function(name){
+      var b=document.createElement("button"); b.className="chip"; b.textContent=name;
+      b.onclick=function(){
+        var q=QUICK_POSTS[name];
+        $("topic").value=q.topic;
+        setTemplate(q.tpl); setTone(q.tone);
+        $("topic").focus();
+        toast("Filled — add your details, then Generate");
+        $("app").scrollIntoView({behavior:"smooth",block:"start"});
+      };
+      row.appendChild(b);
+    });
+  })();
+
+  // show only 6 + a "More" toggle for personality & quick posts
+  function collapseRow(rowId, visible){
+    var row=$(rowId); if(!row) return;
+    var chips=[].slice.call(row.querySelectorAll(".chip"));
+    if(chips.length<=visible+1) return;
+    chips.forEach(function(c,i){ if(i>=visible) c.style.display="none"; });
+    var more=document.createElement("button");
+    more.type="button"; more.className="chip";
+    more.style.cssText="border-style:dashed;color:var(--accent);border-color:#D8DBF6";
+    more.textContent="More +";
+    more.onclick=function(){
+      var showing = more.textContent.indexOf("+")>-1;
+      chips.forEach(function(c,i){ if(i>=visible) c.style.display = showing?"":"none"; });
+      more.textContent = showing?"Fewer −":"More +";
+    };
+    row.appendChild(more);
+  }
+  collapseRow("personaRow", 6);
+  collapseRow("quickPostRow", 6);
+  collapseRow("galleryCats", 6);
+
+  // offer + spin
+  $("offerBtn2").onclick=function(){
+    var t=$("topic"); var o=pick(OFFERS);
+    t.value = (t.value.trim()? t.value.trim()+" — " : "") + o + "!";
+    t.focus(); toast("Offer added: "+o);
+  };
+  $("spinBtn").onclick=function(){
+    var list = (typeof IDEAS!=="undefined" && IDEAS[$("bizType").value]) || (typeof IDEAS!=="undefined" && IDEAS["Other"]) || ["New arrivals this week","Behind the scenes today","Customer favorite of the month"];
+    $("topic").value = pick(list);
+    $("topic").focus(); toast("🎡 Idea spun in ✓");
+  };
+
+  // 🪄 Magic Improve
+  var STOP2=/^(the|a|an|of|to|for|and|our|your|with|this|that|is|are|on|in|at|it|we|you|all|now|new|just|get|from)$/i;
+  var _magic=$("magicBtn");
+  if(_magic) _magic.onclick=function(){
+    if(!needResult()) return;
+    var changed=[];
+    // 1. contrast — if palette text vs bg is weak, switch to a strong one
+    if(!state.locks.color){
+      var pcur=getPalette();
+      if(contrastRatio(pcur.text||"#fff", pcur.bg||"#000") < 4.5){
+        var bgLum = relLum(pcur.bg||"#000");
+        setPalette(bgLum > 0.4 ? "ivory" : "noir");
+        changed.push("contrast");
+      }
+    }
+    // 2. readability over photos
+    if(typeof bgImg!=="undefined" && bgImg){
+      if(state.tint < 0.42){ state.tint=0.5; var tr=$("tintRange"); if(tr) tr.value=50; changed.push("legibility"); }
+      if(!state.fx.shadow){ state.fx.shadow=true; var sc=document.querySelector('#fxToggleRow [data-fxt="shadow"]'); if(sc) sc.classList.add("active"); changed.push("text shadow"); }
+    }
+    // 3. tighten a long headline
+    var h=(state.result.headline||"").trim(), words=h.split(/\s+/);
+    if(words.length>6){
+      var kept=words.filter(function(w){return !STOP2.test(w.replace(/[^\w']/g,""));});
+      if(kept.length<2) kept=words;
+      var out=kept.slice(0,5).join(" ").replace(/[.,;:]+$/,"");
+      state.result.headline=out;
+      if(state.slides && state.slides[state.slideIndex]) state.slides[state.slideIndex].headline=out;
+      changed.push("headline");
+    }
+    // 4. balanced spacing for freestyle
+    if(state.template==="freestyle" && !state.locks.layout){
+      var f=getFont();
+      state.result.design={bg:(state.result.design&&state.result.design.bg)||"solid",align:"center",vpos:"middle",deco:"underline",caseStyle:"normal",serif:!!(f&&f.serif),brandPos:"top-center"};
+      changed.push("spacing");
+    }
+    rerender(); updateScore();
+    toast(changed.length? ("Improved: "+changed.slice(0,3).join(", ")+" ✓") : "Looks great already ✓");
+  };
+
+  /* =========================================================
+     AI COPY GENERATORS
+     Critic / Bio / Voice route through the existing `coach`
+     endpoint (question in -> advice[] out), so they work with
+     no Worker changes. Highlighter is fully client-side.
+     ========================================================= */
+  var aiCopyHTML =
+    '<div class="card" id="aiCopyCard">'+
+      '<div class="std-title">✍️ AI copy tools</div>'+
+      '<div class="std-sub">Critic, bio & voice use 1 credit each. Highlighter is free & instant.</div>'+
+      '<div class="chip-row" id="aiCopyRow">'+
+        '<button class="chip" id="criticBtn">🔍 Design critic</button>'+
+        '<button class="chip" id="bioBtn">🧬 Business bio</button>'+
+        '<button class="chip" id="voiceBtn2">🗣️ Brand voice</button>'+
+        '<button class="chip" id="hlBtn">✨ Highlight keywords</button>'+
+      '</div>'+
+      '<div id="aiCopyBody" style="display:none;margin-top:14px;font-size:14px;line-height:1.7"></div>'+
+      '<p class="error" id="aiCopyErr" style="margin-top:8px"></p>'+
+    '</div>';
+  var personaCardEl = $("personaCard");
+  if(personaCardEl){ personaCardEl.insertAdjacentHTML("afterend", aiCopyHTML); }
+  else if($("galleryCard")){ $("galleryCard").insertAdjacentHTML("afterend", aiCopyHTML); }
+
+  var esc2 = function(t){ return String(t).replace(/[<>]/g,""); };
+  function copyChunk(text){ if(navigator.clipboard) navigator.clipboard.writeText(text); toast("Copied ✓"); }
+
+  async function askWorker(mode, extra){
+    var res = await fetch(WORKER_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(Object.assign({
+        code: state.code, mode: mode,
+        brand: ($("brand").value||"").trim(),
+        bizType: $("bizType").value, lang: state.lang, tone: state.tone,
+        audience: ($("audience").value||"").trim()
+      }, extra||{}))
+    });
+    var data = await res.json();
+    if(data.ok && data.result) return data.result;
+    throw new Error(data.message || "Unavailable. Check your credits and try again.");
+  }
+  function pickList(r, keys){
+    for(var i=0;i<keys.length;i++){ if(Array.isArray(r[keys[i]]) && r[keys[i]].length) return r[keys[i]]; }
+    return [];
+  }
+  function renderCopyList(title, items, opts){
+    opts=opts||{};
+    var body=$("aiCopyBody"); body.style.display="block";
+    var html='<div class="std-title" style="margin-bottom:8px">'+title+'</div>';
+    items.forEach(function(it){
+      var clean=esc2(it).replace(/^[-•\d.\)\s]+/,"");
+      html+='<div style="display:flex;gap:8px;align-items:flex-start;margin:8px 0;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg)">'+
+              '<span style="flex:1">'+clean+'</span>'+
+              (opts.copyEach?'<button class="mini-copy" data-c="'+encodeURIComponent(clean)+'" style="flex-shrink:0;background:transparent;border:1px solid var(--lime-dark);color:var(--lime);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600">Copy</button>':'')+
+            '</div>';
+    });
+    body.innerHTML=html;
+    body.querySelectorAll(".mini-copy").forEach(function(b){
+      b.onclick=function(){ copyChunk(decodeURIComponent(b.getAttribute("data-c"))); };
+    });
+    $("aiCopyCard").scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+  function busy(btn, on, rest){ btn.disabled=on; btn.textContent = on?"…":rest; }
+
+  // 🔍 Design critic
+  var criticBtn=$("criticBtn");
+  criticBtn.onclick=async function(){
+    $("aiCopyErr").textContent="";
+    var brand=($("brand").value||"this business").trim();
+    var biz=$("bizType").value;
+    var ctx="";
+    if(state.result){ ctx='Headline: "'+(state.result.headline||"").slice(0,90)+'". Caption: "'+(state.result.caption||"").slice(0,300)+'".'; }
+    else { var tp=($("topic").value||"").trim(); ctx = tp ? tp.slice(0,300) : "our latest Instagram post"; }
+    if(ctx.length>480) ctx=ctx.slice(0,480);
+    busy(criticBtn,true);
+    try{ var r=await askWorker("critic",{topic:ctx}); renderCopyList("🔍 Design critique", pickList(r,["critique","advice"]), {}); }
+    catch(e){ $("aiCopyErr").textContent=e.message; }
+    finally{ busy(criticBtn,false,"🔍 Design critic"); }
+  };
+
+  // 🧬 Business bio
+  var bioBtn=$("bioBtn");
+  bioBtn.onclick=async function(){
+    $("aiCopyErr").textContent="";
+    var brand=($("brand").value||"").trim();
+    if(!brand){ $("aiCopyErr").textContent="Enter the business name first."; return; }
+    busy(bioBtn,true);
+    try{ var r=await askWorker("bio",{}); renderCopyList("🧬 Bio options", pickList(r,["options","advice"]), {copyEach:true}); }
+    catch(e){ $("aiCopyErr").textContent=e.message; }
+    finally{ busy(bioBtn,false,"🧬 Business bio"); }
+  };
+
+  // 🗣️ Brand voice
+  var voiceBtn2=$("voiceBtn2");
+  voiceBtn2.onclick=async function(){
+    $("aiCopyErr").textContent="";
+    busy(voiceBtn2,true);
+    try{ var r=await askWorker("voice",{}); renderCopyList("🗣️ Brand voice guide", pickList(r,["voice","advice"]), {copyEach:true}); }
+    catch(e){ $("aiCopyErr").textContent=e.message; }
+    finally{ busy(voiceBtn2,false,"🗣️ Brand voice"); }
+  };
+
+  // ✨ Keyword highlighter (client-side)
+  var POWER=/(\b\d+%|\$\s?\d+(?:\.\d+)?|\b\d+\s?(?:for|off)\b|\bfree\b|\bsale\b|\bnew\b|\bnow\b|\btoday\b|\blimited\b|\bexclusive\b|\bsave\b|\boff\b|\bbest\b|\bloved?\b|\bdiscount\b|\boffer\b|\bonly\b|\blast\b|\bhurry\b|\bgift\b|\bdeal\b|\bpremium\b|\bluxury\b|\bfresh\b|\bwin\b|\bbonus\b|\bguarantee\b|\bhalf price\b|\bbogo\b|\bbuy \d+\b|\bget \d+\b)/gi;
+  var hlBtn=$("hlBtn");
+  hlBtn.onclick=function(){
+    $("aiCopyErr").textContent="";
+    var cap = (state.result && state.result.caption) || ($("topic").value||"").trim();
+    if(!cap){ $("aiCopyErr").textContent="Generate a post (or type a topic) first."; return; }
+    var found=cap.match(POWER)||[];
+    var shown=esc2(cap).replace(POWER, function(m){ return '<mark style="background:var(--lime-bg);color:var(--lime);font-weight:700;padding:1px 4px;border-radius:4px">'+m+'</mark>'; });
+    var markdown=cap.replace(POWER, function(m){ return "**"+m+"**"; });
+    var body=$("aiCopyBody"); body.style.display="block";
+    var uniq=[]; found.forEach(function(f){ if(uniq.indexOf(f.toLowerCase())<0) uniq.push(f.toLowerCase()); });
+    body.innerHTML='<div class="std-title" style="margin-bottom:8px">✨ Keyword highlights</div>'+
+      '<div style="padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);white-space:pre-wrap">'+shown+'</div>'+
+      '<div class="std-sub" style="margin-top:10px">'+(uniq.length? (uniq.length+" power word"+(uniq.length>1?"s":"")+" found — these are what stops the scroll."):"No strong power words yet — try adding an offer, number, or urgency word.")+'</div>'+
+      '<button id="hlCopy" class="miniai" style="width:100%;margin-top:6px">Copy caption with **bold** keywords</button>';
+    var hc=$("hlCopy"); if(hc) hc.onclick=function(){ copyChunk(markdown); };
+    $("aiCopyCard").scrollIntoView({behavior:"smooth",block:"nearest"});
+  };
+
+  // If a result already exists (e.g. restored), reveal + score now.
+  if(state.result){ var c=$("studioCard"); if(c) c.style.display="block"; updateScore(); }
+
+  /* =========================================================
+     BASIC / PRO MODE
+     Basic = clean essentials (describe, generate, download).
+     Pro   = every card + the full studio. Defaults to Basic.
+     ========================================================= */
+  (function(){
+    // mark the power-user cards
+    ["batchCard","kitCard","coachCard","boostCard","bgCard","historyCard","campaignCard",
+     "galleryCard","personaCard","aiCopyCard","studioCard",
+     "luckyBtn","enhanceBtn","ideaBtn"].forEach(function(id){
+      var el=$(id); if(el) el.classList.add("pro-only");
+    });
+
+    // build the toggle and place it at the very top of the app area
+    var wrap=document.createElement("div");
+    wrap.id="modeToggle";
+    wrap.innerHTML='<button data-mode="basic">Basic</button><button data-mode="pro">Pro</button>';
+    var anchor=$("galleryCard") || document.querySelector(".card.reveal") || document.querySelector("#app .card");
+    if(anchor && anchor.parentNode){ anchor.parentNode.insertBefore(wrap, anchor); }
+
+    // Every visit starts in Basic mode (clean landing for clients).
+    // The toggle still lets them switch to Pro during the session.
+    var mode = "basic";
+
+    function apply(m){
+      mode=m;
+      document.body.classList.toggle("basic-mode", m==="basic");
+      wrap.querySelectorAll("button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-mode")===m); });
+      try{ localStorage.setItem("postkit_mode", m); }catch(e){}
+    }
+    wrap.querySelectorAll("button").forEach(function(b){
+      b.onclick=function(){ apply(b.getAttribute("data-mode")); };
+    });
+    apply(mode);
+  })();
+
+  /* =========================================================
+     AUTO color & font  — default "let AI decide by business"
+     ========================================================= */
+  (function(){
+    var palRow=$("palRow"), fontRow=$("fontRow");
+    if(palRow){
+      autoPalBtn=document.createElement("button");
+      autoPalBtn.type="button"; autoPalBtn.className="chip"; autoPalBtn.id="autoPalBtn";
+      autoPalBtn.textContent="✨ Auto — best for your business";
+      var w=document.createElement("div"); w.className="chip-row"; w.style.marginBottom="10px"; w.appendChild(autoPalBtn);
+      palRow.insertAdjacentElement("beforebegin", w);
+      autoPalBtn.onclick=function(){
+        state.autoPalette=true; state.customActive=false;
+        var cp=$("customPanel"); if(cp) cp.style.display="none";
+        palRow.querySelectorAll(".swatch").forEach(function(s){ s.classList.remove("active"); });
+        autoPalBtn.classList.add("active");
+        if(state.result){ state.paletteId=SMART_COLORS[$("bizType").value]||"ivory"; rerender(); }
+      };
+      palRow.addEventListener("click", function(e){
+        if(e.target.closest(".swatch")){ state.autoPalette=false; autoPalBtn.classList.remove("active"); }
+      });
+      // default ON: clear the pre-activated swatch, light up Auto
+      palRow.querySelectorAll(".swatch").forEach(function(s){ s.classList.remove("active"); });
+      autoPalBtn.classList.add("active");
+    }
+    if(fontRow){
+      autoFontBtn=document.createElement("button");
+      autoFontBtn.type="button"; autoFontBtn.className="chip"; autoFontBtn.id="autoFontBtn";
+      autoFontBtn.textContent="✨ Auto";
+      var fw=document.createElement("div"); fw.className="chip-row"; fw.style.marginBottom="10px"; fw.appendChild(autoFontBtn);
+      fontRow.insertAdjacentElement("beforebegin", fw);
+      autoFontBtn.onclick=function(){
+        state.autoFont=true;
+        fontRow.querySelectorAll("[data-font]").forEach(function(c){ c.classList.remove("active"); });
+        autoFontBtn.classList.add("active");
+        if(state.result){ state.fontId=fontForBiz($("bizType").value); rerender(); }
+      };
+      fontRow.addEventListener("click", function(e){
+        if(e.target.closest("[data-font]")){ state.autoFont=false; autoFontBtn.classList.remove("active"); }
+      });
+      // default ON
+      fontRow.querySelectorAll("[data-font]").forEach(function(c){ c.classList.remove("active"); });
+      autoFontBtn.classList.add("active");
+    }
+  })();
+
+  /* =========================================================
+     FIRST-VISIT ONBOARDING
+     Prefill a clear example so a first-timer can hit Generate
+     and see a great result in one tap. Only on the first visit.
+     ========================================================= */
+  (function(){
+    try{
+      if(localStorage.getItem("postkit_seen")) return;
+      localStorage.setItem("postkit_seen","1");
+      var t=$("topic"), br=$("brand"), sel=$("bizType");
+      if(t && !t.value.trim()) t.value="30% off all summer dresses this weekend, 3 days only";
+      if(br && !br.value.trim()) br.value="Bella Boutique";
+      if(sel){ sel.value="Fashion / Boutique"; sel.dispatchEvent(new Event("change")); }
+    }catch(e){}
+  })();
+
+  /* =========================================================
+     EASE-OF-USE: starter chips, share/WhatsApp, success line
+     ========================================================= */
+  // Starter topic chips — one tap fills the "what's the post about" box
+  (function(){
+    var t=$("topic"); if(!t) return;
+    var STARTERS=[
+      ["🏷️ Weekend sale","Weekend sale, up to 30% off, this weekend only"],
+      ["🆕 New arrival","New arrival just landed, come check it out"],
+      ["✅ We're open","We're open today, come visit us"],
+      ["🙏 Thank you","Thank you to all our amazing customers"],
+      ["📣 Announcement","We have exciting news to share with you"]
+    ];
+    var row=document.createElement("div");
+    row.className="chip-row"; row.id="starterRow"; row.style.marginTop="8px";
+    STARTERS.forEach(function(s){
+      var b=document.createElement("button");
+      b.type="button"; b.className="chip"; b.textContent=s[0];
+      b.onclick=function(){ t.value=s[1]; t.focus(); };
+      row.appendChild(b);
+    });
+    t.insertAdjacentElement("afterend", row);
+  })();
+
+  // Share / Save to phone / WhatsApp — closes the loop after generating
+  (function(){
+    var actionRow=$("actionRow"); if(!actionRow) return;
+    // success reassurance line
+    var ok=document.createElement("div");
+    ok.id="okLine";
+    ok.style.cssText="display:none;align-items:center;gap:8px;margin-bottom:12px;padding:11px 14px;background:#EAF7EE;border:1px solid #CFEBD8;border-radius:12px;color:#1F7A44;font-weight:600;font-size:14px";
+    ok.innerHTML="✓ Your post is ready — save it or send it to WhatsApp below";
+    actionRow.parentNode.insertBefore(ok, actionRow);
+
+    var share=document.createElement("button");
+    share.id="shareBtn"; share.type="button"; share.className="dl-btn";
+    share.style.cssText="background:var(--lime);color:#fff;border:none;font-weight:700";
+    share.textContent="📲 Share / WhatsApp";
+    actionRow.insertBefore(share, actionRow.firstChild);
+
+    share.onclick=function(){
+      var cv=$("canvas"); if(!cv) return;
+      var cap = state.result ? ((state.result.caption||"") + "\n\n" + ((state.result.hashtags||[]).map(function(h){return "#"+h;}).join(" "))) : "";
+      if(cv.toBlob){
+        cv.toBlob(function(blob){
+          if(!blob){ fallback(); return; }
+          var file=new File([blob], "postkit-post.png", {type:"image/png"});
+          if(navigator.canShare && navigator.canShare({files:[file]})){
+            navigator.share({files:[file], text:cap}).catch(function(){});
+          } else { fallback(); }
+        }, "image/png");
+      } else { fallback(); }
+      function fallback(){
+        // no native share (e.g. desktop): save the image, copy caption, open WhatsApp
+        var a=document.createElement("a");
+        a.download="postkit-post.png"; a.href=cv.toDataURL("image/png"); a.click();
+        if(navigator.clipboard && cap) navigator.clipboard.writeText(cap);
+        if(typeof WHATSAPP!=="undefined" && WHATSAPP){
+          window.open("https://wa.me/?text="+encodeURIComponent("My new post is ready! (image saved to your device)"), "_blank");
+        }
+      }
+    };
+  })();
+
+  /* ---- Corner badge picker ---- */
+  var BADGES=["None","NEW","SALE","-50%","HOT","BESTSELLER","SOLD OUT","LIMITED","FREE"];
+  (function(){
+    var row=$("badgeRow"); if(!row) return;
+    BADGES.forEach(function(lbl,i){
+      var b=document.createElement("button"); b.className="chip"+(i===0?" active":""); b.textContent=lbl;
+      b.onclick=function(){
+        row.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active");
+        state.badge = (lbl==="None")?null:lbl;
+        if(state.result) rerender();
+      };
+      row.appendChild(b);
+    });
+  })();
+
+  /* ---- Randomize ---- */
+  var _rndRow=$("randomRow");
+  if(_rndRow) _rndRow.addEventListener("click", function(e){
+    var b=e.target.closest("[data-rnd]"); if(!b) return;
+    if(!needResult()) return;
+    var what=b.getAttribute("data-rnd");
+    if(what==="palette"||what==="all"){ if(!state.locks.color) setPalette(pick(PALETTES.map(function(p){return p.id;}))); }
+    if(what==="font"||what==="all"){ if(!state.locks.font){ var fonts=["default","clean","luxe","fashion","impact","strong","vogue","elegant","playful","editorial"]; setFont(pick(fonts)); } }
+    if(what==="layout"||what==="all"){ if(!state.locks.layout){ state.template="freestyle"; activate("#tplRow","tpl","freestyle"); state.result.design=randomSpecC(); } }
+    rerender(); toast("Randomized "+(what==="all"?"everything":what)+" ✓");
+  });
+
+  /* ---- Design DNA ---- */
+  var DNA_MOOD={ Elegant:"ivory", Energetic:null, Calm:"mint", Playful:null, Corporate:"stone", Warm:"sand" };
+  function dnaFmt(v){ return Math.round(v*100)+"%"; }
+  function bindDna(id, key){
+    var el=$(id), lab=$(id+"V"); if(!el) return;
+    el.value=Math.round(state.dna[key]*100); if(lab) lab.textContent=dnaFmt(state.dna[key]);
+    el.addEventListener("input", function(){ state.dna[key]=parseInt(el.value,10)/100; if(lab) lab.textContent=dnaFmt(state.dna[key]); updateDnaCode(); });
+  }
+  bindDna("dnaCreativity","creativity"); bindDna("dnaMinimalism","minimalism");
+  bindDna("dnaBoldness","boldness"); bindDna("dnaLuxury","luxury");
+  function updateDnaCode(){
+    var d=state.dna, box=$("dnaCode"); if(!box) return;
+    var lux = d.luxury>0.66?"High": d.luxury>0.33?"Medium":"Low";
+    var mood = ($("dnaMood")&&$("dnaMood").value) || (d.luxury>0.6?"Elegant": d.boldness>0.6?"Energetic": d.minimalism>0.6?"Calm":"Modern");
+    var temp = ($("dnaTemp")&&$("dnaTemp").value) || (d.luxury>0.5?"warm":"neutral");
+    box.innerHTML = "STYLE ⟶ Creativity "+dnaFmt(d.creativity)+" · Minimalism "+dnaFmt(d.minimalism)+" · Boldness "+dnaFmt(d.boldness)+"<br>Luxury "+lux+" · Mood "+mood+" · Temp "+temp;
+  }
+  if($("dnaMood")) $("dnaMood").addEventListener("change", updateDnaCode);
+  if($("dnaTemp")) $("dnaTemp").addEventListener("change", updateDnaCode);
+  updateDnaCode();
+
+  var _dnaApply=$("dnaApplyBtn");
+  if(_dnaApply) _dnaApply.onclick=function(){
+    if(!needResult()) return;
+    var d=state.dna;
+    state.creative=d.creativity;
+    var cr=$("creativeRange"); if(cr){ cr.value=Math.round(d.creativity*100); var cv=$("creativeVal"); if(cv) cv.textContent=d.creativity<0.34?"Safe":d.creativity<0.67?"Balanced":"Creative"; }
+
+    // palette: mood/temp first, else luxury/boldness
+    if(!state.locks.color){
+      var moodPal = $("dnaMood") && DNA_MOOD.hasOwnProperty($("dnaMood").value) ? DNA_MOOD[$("dnaMood").value] : undefined;
+      var temp = $("dnaTemp") ? $("dnaTemp").value : "";
+      if(moodPal){ setPalette(moodPal); }
+      else if($("dnaMood") && $("dnaMood").value==="Energetic"){ applyCustomColors("#0F0F12","#FF3B30"); }
+      else if($("dnaMood") && $("dnaMood").value==="Playful"){ applyCustomColors("#141018","#FF4D8D"); }
+      else if(d.luxury>0.66){ setPalette("gold"); }
+      else if(temp==="warm"){ setPalette("sand"); }
+      else if(temp==="cool"){ setPalette("mint"); }
+      else if(d.boldness>0.6){ setPalette("noir"); }
+      else if(d.minimalism>0.6){ setPalette("ivory"); }
+      else { setPalette("stone"); }
+    }
+    // font: luxury/boldness/minimalism
+    if(!state.locks.font){
+      var font = d.luxury>0.66?"luxe": d.boldness>0.66?"impact": d.minimalism>0.66?"clean": d.creativity>0.7?"vogue":"default";
+      setFont(font);
+    }
+    // template: minimalism -> simpler; boldness -> poster/bold; creativity -> freestyle
+    if(!state.locks.layout){
+      var tpl;
+      if(d.creativity>0.72) tpl="freestyle";
+      else if(d.boldness>0.66) tpl="bold";
+      else if(d.minimalism>0.66) tpl="split";
+      else if(d.luxury>0.66) tpl="editorial";
+      else tpl="dots";
+      setTemplate(tpl);
+      if(tpl==="freestyle"){
+        state.result.design={
+          bg: d.minimalism>0.6?"solid":(d.creativity>0.6?pick(["duotone-split","corner-arc","wave","big-circle"]):"gradient"),
+          align: d.minimalism>0.6?"center":pick(["left","center"]),
+          vpos:"middle",
+          deco: d.minimalism>0.7?"none":(d.boldness>0.6?"double-bar":"underline"),
+          caseStyle: d.boldness>0.6?"upper":"normal",
+          serif: d.luxury>0.5,
+          brandPos:"top-center"
+        };
+      }
+    }
+    // fx: luxury/boldness
+    var fx = d.luxury>0.75?"foil": d.luxury>0.55?"luxury": d.boldness>0.75?"neon": d.creativity>0.75?"mesh":"none";
+    setFx(fx);
+    state.fx.border = d.luxury>0.6 && d.minimalism<0.5;
+
+    rerender(); updateScore(); updateDnaCode();
+    toast("DNA applied ✓");
+  };
+
+  /* ---------------------------------------------------------
+     PREMIUM UX: font collapse, floating Generate, staged loader
+     --------------------------------------------------------- */
+
+  // Show 6 fonts + "More fonts" toggle
+  (function(){
+    var fr=$("fontRow"); if(!fr) return;
+    var chips=[].slice.call(fr.querySelectorAll("[data-font]"));
+    if(chips.length<=7) return;
+    chips.forEach(function(c,i){ if(i>=6) c.style.display="none"; });
+    var more=document.createElement("button");
+    more.type="button"; more.className="chip"; more.id="moreFontsBtn";
+    more.style.cssText="border-style:dashed;color:var(--accent);border-color:#D8DBF6";
+    more.textContent="More fonts +";
+    more.onclick=function(){
+      var hidden = more.textContent.indexOf("+")>-1;
+      chips.forEach(function(c,i){ if(i>=6) c.style.display = hidden?"":"none"; });
+      more.textContent = hidden ? "Fewer fonts −" : "More fonts +";
+    };
+    fr.appendChild(more);
+  })();
+
+  // Staged loading screen — wraps generate() so every call gets it
+  (function(){
+    var overlay=document.createElement("div");
+    overlay.id="stageLoad";
+    overlay.innerHTML='<div class="sl-box"><div class="sl-msg" id="slMsg">Warming up…</div><div class="sl-sub">This usually takes ~15 seconds</div><div class="sl-dots"><i></i><i></i><i></i></div></div>';
+    document.body.appendChild(overlay);
+    var STAGES=["🧠 Writing your caption…","🎨 Designing the layout…","🎯 Picking the colors…","🔥 Crafting hashtags…","✨ Adding finishing touches…"];
+    var timer=null, idx=0;
+    function start(){
+      idx=0; $("slMsg").textContent=STAGES[0];
+      overlay.classList.add("show");
+      timer=setInterval(function(){ idx=(idx+1)%STAGES.length; $("slMsg").textContent=STAGES[idx]; }, 1500);
+    }
+    function stop(){ clearInterval(timer); overlay.classList.remove("show"); }
+    if(typeof generate==="function"){
+      var _g=generate;
+      generate=function(){
+        // resolve "Auto" choices from the business type before generating
+        try{
+          if(state.autoPalette && !state.locks.color){ state.paletteId = SMART_COLORS[$("bizType").value] || "ivory"; state.customActive=false; }
+          if(state.autoFont && !state.locks.font){ state.fontId = fontForBiz($("bizType").value); }
+        }catch(e){}
+        start();
+        try{
+          var out=_g.apply(this, arguments);
+          if(out && typeof out.finally==="function") return out.finally(stop);
+          stop(); return out;
+        }catch(e){ stop(); throw e; }
+      };
+    }
+  })();
+
+  /* ---------------------------------------------------------
+     Remove the sticky focus outline left after a TAP.
+     Keyboard users (Tab/Enter) never fire pointerup, so their
+     focus ring is preserved — only touch/mouse taps get cleared.
+     --------------------------------------------------------- */
+  document.addEventListener("pointerup", function(e){
+    var b = e.target && e.target.closest && e.target.closest("button, summary, [tabindex]");
+    if(!b) return;
+    setTimeout(function(){ if(document.activeElement === b) b.blur(); }, 0);
+  }, true);
+
+})();
+</script>
+
 <!-- GoatCounter analytics: create a free account at goatcounter.com,
      then replace YOURCODE below and remove the comment markers.
 <script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

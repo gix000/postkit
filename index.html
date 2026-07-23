@@ -349,12 +349,15 @@
   #conceptsCard{display:none}
   .cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
   .cc-slot{border:1px solid #EDEBE4;border-radius:16px;overflow:hidden;background:#FBFAF7;position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer}
-  .cc-slot img{width:100%;height:100%;object-fit:cover;display:block}
-  .cc-label{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.03em;z-index:2}
+  /* once an image is in, the tile grows to fit the design + its own action bar */
+  .cc-slot.loaded{aspect-ratio:auto;display:block;cursor:default}
+  .cc-slot img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
+  .cc-label{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.03em;z-index:2;pointer-events:none}
   .cc-hint{color:var(--muted);font-size:13px;font-weight:600;padding:0 10px}
-  .cc-actions{position:absolute;bottom:8px;left:8px;right:8px;display:none;gap:6px;justify-content:center;z-index:2}
+  .cc-actions{display:none;gap:4px;justify-content:space-between;padding:7px 8px;background:#fff;border-top:1px solid #EDEBE4}
   .cc-slot.loaded .cc-actions{display:flex}
-  .cc-actions button{background:rgba(0,0,0,.62);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700}
+  .cc-actions button{flex:1;background:transparent;color:var(--text);border:1px solid #E6E4DD;border-radius:8px;padding:7px 4px;font-size:11px;font-weight:700;line-height:1.1}
+  .cc-actions button:active{background:#F2F1EC}
   .cc-spin{width:34px;height:34px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
   @keyframes ccspin{to{transform:rotate(360deg)}}
 
@@ -4859,6 +4862,128 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     return cv.toDataURL("image/png");
   }
 
+  /* ---------- Advanced: layout preference, typography override, alt palette ---------- */
+  function buildTplPicker(){
+    var box=$("advExtras"); if(!box || box.__missing) return;
+    var all=allTemplates();
+    box.innerHTML='<label>Layout preference</label><div class="chip-row" id="tplPick"></div>'+
+      '<label style="margin-top:14px">Typography override</label><div class="chip-row" id="typePick"></div>'+
+      '<label style="margin-top:14px">Colours</label><div class="chip-row" id="palPick"></div>';
+    var tp=$("tplPick");
+    var mk=function(name,val){
+      var b=document.createElement("button"); b.type="button";
+      b.className="chip"+((window.__pkTemplate===val)?" active":"");
+      b.textContent=name;
+      b.onclick=function(){ window.__pkTemplate=val; brandKit.template=val; saveKit(); buildTplPicker(); };
+      return b;
+    };
+    tp.appendChild(mk("\u2728 Auto (rotate)",""));
+    Object.keys(all).forEach(function(k){ tp.appendChild(mk(k,k)); });
+    var typ=$("typePick");
+    [["\u2728 Auto",""],["Modern sans","modern geometric sans"],["Editorial serif","editorial serif"],
+     ["High contrast serif","high contrast serif"],["Bold condensed","bold condensed sans"],["Clean humanist","clean humanist sans"]]
+    .forEach(function(f){
+      var b=document.createElement("button"); b.type="button";
+      b.className="chip"+(((brandKit.fontOverride||"")===f[1])?" active":"");
+      b.textContent=f[0];
+      b.onclick=function(){ brandKit.fontOverride=f[1]; if(f[1]) brandKit.font=f[1]; saveKit(); buildTplPicker(); };
+      typ.appendChild(b);
+    });
+    var pp=$("palPick");
+    var alt=document.createElement("button"); alt.type="button"; alt.className="chip";
+    alt.textContent="\ud83c\udfa8 Try alternative palette";
+    alt.onclick=function(){
+      if(!brandKit.primary) return;
+      var t=brandKit.primary; brandKit.primary=brandKit.accent||t; brandKit.accent=t;
+      saveKit(); applyKitUI();
+    };
+    pp.appendChild(alt);
+  }
+
+  /* ---------- automatic brand analysis ---------- */
+  async function analyzeBrand(){
+    var note=$("kitNote");
+    note.textContent="Analysing your brand\u2026";
+    try{
+      var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ code:state.code, mode:"brandanalyze", brandKit:brandKit,
+          brand:($("brand").value||"").trim(), bizType:$("bizType").value,
+          website:($("kitSite").value||"").trim(), instagram:($("kitIg").value||"").trim(), lang:state.lang })});
+      var d=await res.json();
+      if(d.ok && d.result){
+        var r=d.result;
+        brandKit.personality=r.personality||""; brandKit.audience=r.audience||"";
+        brandKit.designLanguage=r.designLanguage||""; brandKit.font=r.fontPersonality||brandKit.font;
+        if(r.tone) state.tone=r.tone;
+        if(r.palette && !brandKit.primary){
+          brandKit.primary=r.palette.primary||""; brandKit.accent=r.palette.accent||"";
+          brandKit.bg=r.palette.bg||""; brandKit.text=r.palette.text||"";
+        }
+        if(r.audience && !$("audience").value.trim()) $("audience").value=r.audience;
+        saveKit(); applyKitUI();
+        note.innerHTML="<b>"+esc2(brandKit.personality)+"</b><br>"+esc2(brandKit.designLanguage);
+      } else { note.textContent=d.message||"Could not analyse the brand."; }
+    }catch(e){ note.textContent="Could not analyse the brand."; }
+  }
+
+  /* ---------- carousels (3 or 5 slides) ---------- */
+  async function callSlides(n){
+    var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ code:state.code, mode:"slides", slideCount:n, brandKit:brandKit,
+        photoRef:window.__pkPhotoRef,
+        topic:($("topic").value||"").trim(), brand:($("brand").value||"").trim(),
+        bizType:$("bizType").value, lang:state.lang, tone:state.tone,
+        audience:($("audience").value||"").trim() })});
+    var data=await res.json();
+    if(data.ok && data.result) return data.result;
+    throw new Error(data.message||"Couldn't build the carousel.");
+  }
+  function renderSlides(r){
+    lastConcepts={brand:r.brand, shared:r.shared};
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
+    if(r.shared){
+      var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
+      $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+
+        '<div style="white-space:pre-wrap;font-size:14px;line-height:1.6;margin-bottom:8px">'+esc2(full)+'</div>'+
+        '<button class="miniai" id="ccCopy" style="width:100%">Copy caption + hashtags</button>';
+      var cc=$("ccCopy"); cc.onclick=function(){ if(navigator.clipboard) navigator.clipboard.writeText(full); };
+    }
+    (r.slides||[]).forEach(function(s,i){
+      var slot=document.createElement("div"); slot.className="cc-slot";
+      slot.innerHTML='<span class="cc-label">'+esc2(s.label||("Slide "+(i+1)))+'</span>'+
+                     (i===0?'<div class="cc-spin"></div>':'<div class="cc-hint"><b>'+esc2(s.headline||"")+'</b><br>Tap to generate</div>');
+      s.__tpl=0;
+      slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,s); };
+      grid.appendChild(slot);
+      if(i===0) loadConceptImage(slot,s);
+    });
+  }
+
+  /* ---------- monthly content pack ---------- */
+  async function callPack(){
+    var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ code:state.code, mode:"pack", brandKit:brandKit, photoRef:window.__pkPhotoRef,
+        topic:($("topic").value||"").trim()||"a balanced month of content",
+        brand:($("brand").value||"").trim(), bizType:$("bizType").value,
+        lang:state.lang, tone:state.tone, audience:($("audience").value||"").trim() })});
+    var data=await res.json();
+    if(data.ok && data.result) return data.result;
+    throw new Error(data.message||"Couldn't plan the month. Try again.");
+  }
+  function renderPack(r){
+    lastConcepts={brand:r.brand, shared:null};
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
+    $("ccShared").innerHTML='<div class="std-sub" style="margin:0">Tap any post to generate its design. Each one uses the same brand system.</div>';
+    (r.posts||[]).forEach(function(p,i){
+      var slot=document.createElement("div"); slot.className="cc-slot";
+      slot.innerHTML='<span class="cc-label">'+esc2(p.label||("Post "+(i+1)))+'</span>'+
+                     '<div class="cc-hint"><b>'+esc2(p.headline||"")+'</b><br>Tap to generate</div>';
+      p.__tpl=i;
+      slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,p); };
+      grid.appendChild(slot);
+    });
+  }
+
   async function callConcepts(){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ code:state.code, mode:"concepts", brandKit:brandKit, photoRef:window.__pkPhotoRef,
@@ -4905,7 +5030,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     try{
       var img=await callImage(c);
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
-        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="tpl" title="Save as Brand Template">★</button><button data-a="save">⤓ Save</button><button data-a="share">📲 Share</button></div>';
+        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="tpl" title="Save as brand template">★</button><button data-a="save" title="Download">⤓</button><button data-a="share" title="Share">Share</button></div>';
       slot.classList.add("loaded"); slot._loaded=true;
       slot.querySelector('[data-a="regen"]').onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
       var tplBtn=slot.querySelector('[data-a="tpl"]');

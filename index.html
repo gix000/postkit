@@ -5148,9 +5148,16 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     }
     ctx.font=(L.weight||700)+" "+L.size+"px "+L.font;
     var t=L.upper?(L.text||"").toUpperCase():(L.text||"");
-    var w=ctx.measureText(t).width;
-    if(L.type==="pill") w += ED.W*0.075;
-    var h=(L.type==="pill")? L.size*2.3 : L.size*1.25;
+    var w, h;
+    if(L.type==="pill"){
+      w=ctx.measureText(t).width+ED.W*0.075; h=L.size*2.3;
+    } else {
+      var mw=ED.W*0.86, ls=[];
+      String(t).split("\n").forEach(function(p){ wrapLines(ctx,p,mw).forEach(function(x){ ls.push(x); }); });
+      w=0; ls.forEach(function(x){ w=Math.max(w, ctx.measureText(x).width); });
+      w=Math.min(w, mw);
+      h=Math.max(1,ls.length)*Math.round(L.size*(L.lh||1.2));
+    }
     var x=L.x;
     if(L.align==="center") x=L.x-w/2;
     else if(L.align==="right") x=L.x-w;
@@ -5212,8 +5219,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       }
       if(L.shadow){ ctx.shadowColor="rgba(0,0,0,0.45)"; ctx.shadowBlur=Math.round(ED.W*0.025); }
       ctx.fillStyle=L.color;
-      // multi-line support, split on newlines
-      var lines=String(t).split("\n");
+      // wrap to the safe width, and shrink a single long word if it still overflows
+      var maxW=ED.W*0.86, lines=[];
+      String(t).split("\n").forEach(function(para){
+        wrapLines(ctx, para, maxW).forEach(function(ln){ lines.push(ln); });
+      });
+      var longest=0;
+      lines.forEach(function(ln){ longest=Math.max(longest, ctx.measureText(ln).width); });
+      if(longest>maxW){
+        var shrink=maxW/longest;
+        ctx.font=(L.weight||700)+" "+Math.max(10, Math.floor(L.size*shrink))+"px "+L.font;
+      }
       var lh=Math.round(L.size*(L.lh||1.2));
       lines.forEach(function(ln,i){ ctx.fillText(ln, L.x, L.y + i*lh); });
       ctx.shadowColor="transparent"; ctx.shadowBlur=0;
@@ -5690,7 +5706,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
      Plans go in localStorage; images go in IndexedDB (much bigger).
      ========================================================= */
   var lastPlan=null;                    // { kind, data, limit }
-  var sessionImages={};                 // { slotIndex: dataURI }
+  var sessionImages={};                 // { slotIndex: finished dataURI }
+  var sessionRaws={};                   // { slotIndex: text free artwork, used by the editor }
 
   function idb(){
     return new Promise(function(res,rej){
@@ -5707,15 +5724,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     window.__pkTplOffset = Math.floor(Math.random()*99);   // new layout rotation each generation
     designHashes = {};
     lastPlan={kind:kind, data:data, limit:limit||4};
-    sessionImages={};
+    sessionImages={}; sessionRaws={};
     try{ localStorage.setItem("postkit_session", JSON.stringify(lastPlan)); }catch(e){}
-    idbSet("images", {});
+    idbSet("images", {}); idbSet("raws", {});
   }
   function rememberImage(c, img){
     if(!lastPlan) return;
     var i=(typeof c.__idx==="number")?c.__idx:0;
     sessionImages[i]=img;
+    if(c.__raw) sessionRaws[i]=c.__raw;
     idbSet("images", sessionImages);
+    idbSet("raws", sessionRaws);
   }
   async function restoreSession(){
     var raw=null;
@@ -5732,13 +5751,20 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     else renderConcepts(plan.data, plan.limit, true);
 
     var imgs=await idbGet("images");
+    var raws=await idbGet("raws");
+    if(raws) sessionRaws=raws;
     if(!imgs) return;
     sessionImages=imgs;
     var slots=$("ccGrid").querySelectorAll(".cc-slot");
     var items=(plan.data.concepts||plan.data.posts||plan.data.slides||[]);
     Object.keys(imgs).forEach(function(k){
       var i=parseInt(k,10);
-      if(slots[i] && items[i]){ items[i].__idx=i; showConceptImage(slots[i], items[i], imgs[k]); slots[i]._loaded=true; }
+      if(slots[i] && items[i]){
+        items[i].__idx=i;
+        if(sessionRaws && sessionRaws[i]) items[i].__raw=sessionRaws[i];   // editor uses the clean art
+        showConceptImage(slots[i], items[i], imgs[k]);
+        slots[i]._loaded=true;
+      }
     });
   }
 
@@ -5918,7 +5944,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       sendPrompt += " Pure photographic artwork only. No text, no letters, no numbers, no captions, no watermark, "+
         "no logos, no user interface, no app or phone screenshot, no social media mockup, no browser or device frame, "+
         "no buttons or icons, no borders or picture frames around the image, "+
-        "no flat colour blocks, no solid bands, no diagonal panels or graphic shapes painted over the photo.";
+        "no flat colour blocks, no solid bands, no diagonal panels or graphic shapes painted over the photo, "+
+        "and absolutely no logo, emblem, badge, monogram, crest, watermark, signage or printed branding "+
+        "on packaging, cups, walls, menus, napkins or any surface, every surface must be blank and unbranded.";
     }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", size:(window.__pkFormat||"square") })});

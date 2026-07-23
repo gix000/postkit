@@ -5116,8 +5116,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var lock = window.__pkBrandLock && !!ap;
     var sendPrompt = lock ? ap : (pp || ap);
     if(!sendPrompt || !sendPrompt.trim()) sendPrompt = fallbackArtPrompt(c);
+    var kind = c.kind;
+    if(lock){
+      // we draw the text ourselves, so avoid the text-rendering engine here:
+      // it tends to invent UI mockups and gibberish lettering.
+      if(kind==="poster") kind="marketing";
+      sendPrompt += " Pure photographic artwork only. No text, no letters, no numbers, no captions, no watermark, "+
+        "no logos, no user interface, no app or phone screenshot, no social media mockup, no browser or device frame, "+
+        "no buttons or icons, no borders or picture frames around the image.";
+    }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"image", prompt:sendPrompt, kind:c.kind, model:"auto", size:(window.__pkFormat||"square") })});
+      body:JSON.stringify({ code:state.code, mode:"image", prompt:sendPrompt, kind:kind, model:"auto", size:(window.__pkFormat||"square") })});
     var data=await res.json();
     if(data.ok && data.image){
       if(data.usage){

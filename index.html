@@ -341,6 +341,9 @@
   #modeToggle button.active{background:#fff;color:var(--accent);box-shadow:0 2px 8px -2px rgba(25,26,23,.18)}
   #modeToggle .mode-hint{align-self:center;font-size:12px;color:var(--dim);padding-left:6px;font-weight:400}
   body.basic-mode .pro-only{display:none!important}
+  .fmt-ico{display:inline-block;border:1.6px solid currentColor;border-radius:2.5px;vertical-align:-1px;margin-right:7px;opacity:.75}
+  /* Phase 8: minimal homepage */
+  #personaCard,#aiCopyCard,#studioCard,#batchCard,#kitCard,#coachCard,#historyCard{display:none!important}
 
   /* multi-model concepts grid */
   #conceptsCard{display:none}
@@ -429,6 +432,8 @@
     <details class="acc" id="advancedOpts">
       <summary>⚙️ Advanced options <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">— optional, or just hit Generate</span></summary>
       <div class="adv-body">
+    <div id="advExtras"></div>
+    <div id="advGallerySlot"></div>
     <label for="audience">Target audience <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional)</span></label>
     <input id="audience" placeholder="e.g. young mothers in Jounieh, mid budget">
     <details class="acc">
@@ -827,7 +832,7 @@
   </div>
 
   <footer>
-    PostKit · Built in Lebanon 🇱🇧 · A <a href="https://gbuildstudio.com" target="_blank" rel="noopener">GBuild Studio</a> product
+    <div style="opacity:.75">PostKit • All rights reserved 2026</div>
   </footer>
 </div>
 
@@ -1170,13 +1175,24 @@ document.getElementById("styleRow").addEventListener("click", e => {
   [...document.querySelectorAll("#styleRow .chip")].forEach(c => c.classList.remove("active"));
   btn.classList.add("active");
 });
+function pickChip(row, btn, text){
+  const t = document.getElementById("topic");
+  if (btn.classList.contains("active")) {          // tap again to deselect
+    btn.classList.remove("active");
+    if (t.value.trim() === text.trim()) t.value = "";
+    return;
+  }
+  row.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  t.value = text;
+}
 document.getElementById("trendRow").addEventListener("click", e => {
   const btn = e.target.closest("button"); if (!btn) return;
-  document.getElementById("topic").value = btn.textContent;
+  pickChip(document.getElementById("trendRow"), btn, btn.textContent);
 });
 document.getElementById("holidayRow").addEventListener("click", e => {
   const btn = e.target.closest("button"); if (!btn) return;
-  document.getElementById("topic").value = btn.textContent + " for our customers";
+  pickChip(document.getElementById("holidayRow"), btn, btn.textContent + " for our customers");
 });
 /* custom occasions, saved on this device */
 function addOccasionChip(name) {
@@ -2029,7 +2045,10 @@ document.getElementById("siteBtn").onclick = async () => {
   } catch {
     siteError.textContent = "Connection failed. Try again.";
   } finally {
-    btn.disabled = false; btn.textContent = "Scan";
+    btn.disabled = false;
+    btn.textContent = "Scanned!";
+    btn.style.background = "#1F7A44";
+    setTimeout(() => { btn.textContent = "Scan"; btn.style.background = "var(--lime)"; }, 2500);
   }
 };
 
@@ -3062,7 +3081,18 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   function ready(){ return (typeof state!=="undefined" && typeof rerender==="function" && typeof drawPost==="function" && typeof PALETTES!=="undefined"); }
   if(!ready()){ return setTimeout(arguments.callee, 60); }
 
-  var $ = function(id){ return document.getElementById(id); };
+  // safe getter: never returns null, so one missing node can't kill the whole app
+  var _noop=function(){};
+  var $ = function(id){
+    var el=document.getElementById(id);
+    if(el) return el;
+    return { style:{}, classList:{ add:_noop, remove:_noop, toggle:_noop, contains:function(){return false;} },
+             addEventListener:_noop, appendChild:_noop, insertAdjacentElement:_noop,
+             querySelectorAll:function(){return [];}, querySelector:function(){return null;},
+             scrollIntoView:_noop, focus:_noop, click:_noop,
+             set onclick(v){}, get onclick(){return null;},
+             value:"", textContent:"", innerHTML:"", disabled:false, files:null, __missing:true };
+  };
   var pick = function(a){ return a[Math.floor(Math.random()*a.length)]; };
 
   /* ---- extend state ---- */
@@ -3153,6 +3183,50 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
   /* toasts disabled — no popups on selection */
   function toast(msg){ /* intentionally does nothing */ }
+
+  /* =========================================================
+     BRAND KIT (Phase 2) — colours from the logo, saved once
+     Declared early: templates, gallery and generation all use it.
+     ========================================================= */
+  var brandKit = { primary:"", accent:"", bg:"", text:"", font:"", template:"",
+                   personality:"", audience:"", designLanguage:"", website:"", instagram:"", fontOverride:"" };
+  try { var _bk = localStorage.getItem("postkit_brandkit"); if(_bk){ brandKit = Object.assign(brandKit, JSON.parse(_bk)||{}); } } catch(e){}
+  function saveKit(){ try{ localStorage.setItem("postkit_brandkit", JSON.stringify(brandKit)); }catch(e){} }
+  function rgbToHex(r,g,b){ return "#"+[r,g,b].map(function(v){ return ("0"+Math.round(v).toString(16)).slice(-2); }).join("").toUpperCase(); }
+  function lumOf(r,g,b){ return (0.299*r+0.587*g+0.114*b)/255; }
+  function extractPalette(img){
+    var n=140, cv=document.createElement("canvas"); cv.width=n; cv.height=n;
+    var ctx=cv.getContext("2d"); ctx.drawImage(img,0,0,n,n);
+    var d; try{ d=ctx.getImageData(0,0,n,n).data; }catch(e){ return null; }
+    var buckets={};
+    for(var i=0;i<d.length;i+=4){
+      var r=d[i],g=d[i+1],b=d[i+2],a=d[i+3];
+      if(a<128) continue;
+      var mx=Math.max(r,g,b), mn=Math.min(r,g,b);
+      var sat=mx===0?0:(mx-mn)/mx, l=lumOf(r,g,b);
+      if(l>0.95||l<0.05) continue;
+      var key=(Math.round(r/24)+"_"+Math.round(g/24)+"_"+Math.round(b/24));
+      if(!buckets[key]) buckets[key]={r:0,g:0,b:0,c:0,s:0};
+      var k=buckets[key]; k.r+=r; k.g+=g; k.b+=b; k.c++; k.s+=sat;
+    }
+    var list=Object.keys(buckets).map(function(k){ var v=buckets[k];
+      return { r:v.r/v.c, g:v.g/v.c, b:v.b/v.c, count:v.c, sat:v.s/v.c }; });
+    if(!list.length) return null;
+    list.sort(function(a,b){ return (b.count*(0.4+b.sat)) - (a.count*(0.4+a.sat)); });
+    var p=list[0], sec=list[1]||list[0];
+    var pl=lumOf(p.r,p.g,p.b);
+    return { primary:rgbToHex(p.r,p.g,p.b), accent:rgbToHex(sec.r,sec.g,sec.b),
+             bg: pl>0.55?"#111214":"#F7F6F2", text: pl>0.55?"#FFFFFF":"#111214" };
+  }
+  function applyKitUI(){
+    var el=$("kitSwatches"); if(!el) return;
+    if(!brandKit.primary){ el.innerHTML=""; return; }
+    el.innerHTML='<span style="font-size:12px;color:var(--muted);margin-right:6px">Your brand colours:</span>'+
+      ["primary","accent","bg"].map(function(k){
+        return '<i style="display:inline-block;width:20px;height:20px;border-radius:6px;border:1px solid #E6E4DD;vertical-align:middle;margin-right:5px;background:'+(brandKit[k]||"#fff")+'"></i>';
+      }).join("");
+  }
+
 
   /* =========================================================
      OFFSCREEN RENDER (for variation / remix / battle thumbs)
@@ -3394,41 +3468,80 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     '</div>';
   if(appCard){ appCard.insertAdjacentHTML("beforebegin", galleryHTML); }
 
-  var cats=Object.keys(GALLERY);
+  /* =========================================================
+     PHASE 4 — AI INSPIRATION GALLERY
+     Styles are invented by the same engine, then applied to the
+     user's own brand (colours, logo, business) on tap.
+     ========================================================= */
+  var GAL_CATS = ["Restaurant","Coffee","Fashion","Furniture","Beauty","Gym","Bakery",
+                  "Jewelry","Real Estate","Automotive","Corporate","Travel","Technology","Healthcare"];
+  var galCache = {};
   var gc=$("galleryCats");
-  cats.forEach(function(cat,i){
+  GAL_CATS.forEach(function(cat,i){
     var b=document.createElement("button");
-    b.className="chip"+(i===0?" active":"");
+    b.type="button"; b.className="chip"+(i===0?" active":"");
     b.textContent=cat;
     b.onclick=function(){
       gc.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");});
       b.classList.add("active");
-      renderGallery(cat);
+      loadGallery(cat);
     };
     gc.appendChild(b);
   });
-  function renderGallery(cat){
-    var wrap=$("galleryEx"); wrap.style.display="grid"; wrap.innerHTML="";
-    GALLERY[cat].forEach(function(ex){
-      var p=palById(ex.pal);
-      var card=document.createElement("div");
-      card.className="gallery-card";
-      card.innerHTML='<div class="gc-strip" style="background:linear-gradient(135deg,'+p.bg+' 55%,'+p.primary+' 55%)"></div>'+
-                     '<b>'+ex.topic.replace(/</g,"")+'</b><span>'+ex.biz+' · '+ex.tpl+'</span>';
-      card.onclick=function(){ loadExample(ex); };
-      wrap.appendChild(card);
-    });
+  var galSub=document.querySelector("#galleryCard .std-sub");
+  if(galSub) galSub.textContent="Pick your industry, then tap a style to build it with your own brand.";
+
+  async function loadGallery(cat){
+    var wrap=$("galleryEx"); wrap.style.display="grid"; wrap.innerHTML='<div class="cc-hint">Creating fresh styles…</div>';
+    try{
+      var styles = galCache[cat];
+      if(!styles){
+        var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ code:state.code, mode:"gallery", topic:cat, brandKit:brandKit, photoRef:window.__pkPhotoRef,
+            brand:($("brand").value||"").trim(), bizType:$("bizType").value, lang:state.lang })});
+        var data=await res.json();
+        if(!(data.ok&&data.result&&data.result.styles)) throw new Error(data.message||"Couldn't load styles.");
+        styles=data.result.styles; galCache[cat]=styles;
+      }
+      wrap.innerHTML="";
+      styles.slice(0,4).forEach(function(s){
+        var card=document.createElement("div");
+        card.className="gallery-card";
+        card.innerHTML='<div class="gc-strip" style="background:linear-gradient(135deg,'+((brandKit.primary)||"#2B44DE")+' 55%,'+((brandKit.accent)||"#111214")+' 55%)"></div>'+
+                       '<b>'+esc2(s.label||"Style")+'</b><span>'+esc2(s.note||"")+'</span>'+
+                       '<div style="display:flex;gap:6px;margin-top:8px">'+'<button class="miniai" data-g="use" style="flex:1">Use</button>'+'<button class="miniai" data-g="sim" style="flex:1">Similar</button>'+'<button class="miniai" data-g="cust" style="flex:1">Customize</button></div>';
+        card.querySelector('[data-g="use"]').onclick=function(e){ e.stopPropagation(); useStyle(s); };
+        card.querySelector('[data-g="sim"]').onclick=function(e){ e.stopPropagation(); delete galCache[cat]; loadGallery(cat); };
+        card.querySelector('[data-g="cust"]').onclick=function(e){
+          e.stopPropagation();
+          if(s.headline) $("topic").value = s.headline + (s.support? (", "+s.support) : "");
+          var adv=$("advancedOpts"); if(adv) adv.open=true;
+          $("app").scrollIntoView({behavior:"smooth",block:"start"});
+        };
+        card.onclick=function(){ useStyle(s); };
+        wrap.appendChild(card);
+      });
+    }catch(e){
+      wrap.innerHTML='<div class="cc-hint">'+esc2(e.message||"Couldn't load styles")+'</div>';
+    }
   }
-  function loadExample(ex){
-    var sel=$("bizType");
-    if([].some.call(sel.options,function(o){return o.value===ex.biz;})){ sel.value=ex.biz; sel.dispatchEvent(new Event("change")); }
-    $("topic").value=ex.topic;
-    setPalette(ex.pal); setTemplate(ex.tpl); setTone(ex.tone);
-    toast("Loaded — generating…");
-    $("app").scrollIntoView({behavior:"smooth",block:"start"});
-    if(typeof generate==="function") generate();
+
+  // apply a gallery style to the user's own business + brand kit
+  function useStyle(s){
+    var topic=($("topic").value||"").trim();
+    var c={ label:s.label||"Inspired", kind:s.kind||"marketing",
+            headline:s.headline||topic||"Your headline", support:s.support||"", cta:s.cta||"Learn more",
+            artPrompt:s.artPrompt, prompt:s.artPrompt };
+    lastConcepts={ brand:{ primary:brandKit.primary, accent:brandKit.accent, bg:brandKit.bg, text:brandKit.text, serif:false }, shared:null };
+    var card=$("conceptsCard"); card.style.display="block";
+    card.querySelector(".std-sub").textContent="Built from an inspiration style, using your brand.";
+    $("ccShared").innerHTML=""; $("ccErr").textContent="";
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
+    var slot=document.createElement("div"); slot.className="cc-slot"; grid.appendChild(slot);
+    card.scrollIntoView({behavior:"smooth",block:"start"});
+    loadConceptImage(slot,c);
   }
-  renderGallery(cats[0]);
+  loadGallery(GAL_CATS[0]);
 
   // --- Prompt Enhancer button (feature #1), near the topic ---
   var ideaBtn=$("ideaBtn");
@@ -4276,7 +4389,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
     function apply(m){
       mode=m;
-      document.body.classList.toggle("basic-mode", m==="basic");
+      document.body.classList.remove("basic-mode"); // Phase 1+: no Basic/Pro, everything visible
       wrap.querySelectorAll("button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-mode")===m); });
       try{ localStorage.setItem("postkit_mode", m); }catch(e){}
     }
@@ -4577,9 +4690,178 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
      Model names stay hidden; users see Clean/Editorial/Bold/Luxury.
      ========================================================= */
   var lastConcepts=null;
+  /* =========================================================
+     BRAND TEMPLATES  (reusable layout systems, not images)
+     Each template controls how the canvas lays out every post.
+     ========================================================= */
+  var TEMPLATES = {
+    "Luxury Editorial": { logo:"top-center", align:"center", vpos:"center", scrim:"soft", headScale:0.088, caseStyle:"normal", pad:0.10, ctaStyle:"outline", serif:true },
+    "Minimal Modern":   { logo:"top-left",   align:"left",   vpos:"bottom", scrim:"light", headScale:0.095, caseStyle:"normal", pad:0.075, ctaStyle:"pill", serif:false },
+    "Bold Promotion":   { logo:"top-left",   align:"left",   vpos:"bottom", scrim:"strong", headScale:0.125, caseStyle:"upper", pad:0.07, ctaStyle:"solid", serif:false },
+    "Product Showcase": { logo:"top-right",  align:"center", vpos:"bottom", scrim:"soft", headScale:0.085, caseStyle:"normal", pad:0.085, ctaStyle:"pill", serif:false },
+    "Magazine Style":   { logo:"top-left",   align:"left",   vpos:"top",    scrim:"light", headScale:0.10, caseStyle:"upper", pad:0.08, ctaStyle:"underline", serif:true }
+  };
+  var TPL_ORDER = ["Luxury Editorial","Minimal Modern","Bold Promotion","Product Showcase","Magazine Style"];
+  window.__pkTemplate = "";        // "" = auto (rotate / brand default)
+  var savedTemplates = {};
+  try { savedTemplates = JSON.parse(localStorage.getItem("postkit_templates")||"{}") || {}; } catch(e){}
+  function allTemplates(){ var o={}; TPL_ORDER.forEach(function(k){o[k]=TEMPLATES[k];}); Object.keys(savedTemplates).forEach(function(k){o[k]=savedTemplates[k];}); return o; }
+  function templateFor(i){
+    var all=allTemplates(), names=Object.keys(all);
+    if(window.__pkTemplate && all[window.__pkTemplate]) return all[window.__pkTemplate];
+    if(brandKit.template && all[brandKit.template]) return all[brandKit.template];
+    return all[names[(i||0) % names.length]];
+  }
+
+  /* =========================================================
+     PHASE 3 — BRAND LOCK CANVAS LAYER
+     AI makes the art (no text). Canvas draws the logo, headline,
+     support line and CTA perfectly, in the same brand system,
+     on every concept. This is what makes posts truly consistent.
+     ========================================================= */
+  var brandLogo=null;                 // Image object of the user's PNG logo
+  window.__pkBrandLock = true;        // on by default (perfect text)
+
+  function loadImg(src){
+    return new Promise(function(res,rej){ var i=new Image(); i.crossOrigin="anonymous"; i.onload=function(){res(i);}; i.onerror=rej; i.src=src; });
+  }
+  function wrapLines(ctx, text, maxW){
+    var words=String(text||"").split(/\s+/), lines=[], cur="";
+    words.forEach(function(w){
+      var t=cur?cur+" "+w:w;
+      if(ctx.measureText(t).width>maxW && cur){ lines.push(cur); cur=w; } else cur=t;
+    });
+    if(cur) lines.push(cur);
+    return lines;
+  }
+  function fitFont(ctx, text, maxW, start, weight, family, minSize){
+    var s=start;
+    while(s>(minSize||22)){
+      ctx.font=weight+" "+s+"px "+family;
+      if(ctx.measureText(text).width<=maxW) break;
+      s-=2;
+    }
+    return s;
+  }
+  // Composite: AI art + brand text + logo -> data URI
+  async function brandCompose(imgUri, c, brand, tplIdx){
+    var art=await loadImg(imgUri);
+    var W=art.naturalWidth||1024, H=art.naturalHeight||1024;
+    var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+    var ctx=cv.getContext("2d");
+    ctx.drawImage(art,0,0,W,H);
+
+    var T=templateFor(tplIdx||0);
+    var b=(lastConcepts&&lastConcepts.brand)||{};
+    var txtCol=b.text||"#FFFFFF";
+    var accent=b.accent||b.primary||"#FFFFFF";
+    var serif = (typeof T.serif==="boolean") ? T.serif : !!b.serif;
+    var fam=serif?"'Playfair Display', Georgia, serif":"'Archivo', 'Space Grotesk', sans-serif";
+    var pad=Math.round(W*(T.pad||0.075));
+    var maxW=W-pad*2;
+    var alignLeft = T.align!=="center";
+    var ax = alignLeft ? pad : W/2;
+
+    // readability scrim, strength from the template
+    var top = T.vpos==="top" ? 0 : (T.vpos==="center" ? H*0.20 : H*0.42);
+    var strength = T.scrim==="strong" ? 0.80 : T.scrim==="light" ? 0.55 : 0.68;
+    var g=ctx.createLinearGradient(0, T.vpos==="top"?0:top, 0, T.vpos==="top"?H*0.6:H);
+    if(T.vpos==="top"){ g.addColorStop(0,"rgba(0,0,0,"+strength+")"); g.addColorStop(1,"rgba(0,0,0,0)"); }
+    else { g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,"+strength+")"); }
+    ctx.fillStyle=g; ctx.fillRect(0, T.vpos==="top"?0:top, W, T.vpos==="top"?H*0.6:H-top);
+
+    ctx.textAlign = alignLeft ? "left" : "center";
+    var head=(c.headline||"").trim();
+    if(T.caseStyle==="upper") head=head.toUpperCase();
+    var sup=(c.support||"").trim();
+    var cta=(c.cta||"").trim();
+
+    // measure the text block so we can place it top / center / bottom
+    var hs=fitFont(ctx,head,maxW,Math.round(W*(T.headScale||0.095)),"800",fam,Math.round(W*0.045));
+    ctx.font="800 "+hs+"px "+fam;
+    var hl=wrapLines(ctx,head,maxW), hlh=Math.round(hs*1.12);
+    ctx.font="500 "+Math.round(W*0.032)+"px "+fam;
+    var sl=sup?wrapLines(ctx,sup,maxW):[], slh=Math.round(W*0.045);
+    var ctaH = cta ? Math.round(W*0.030)*2.3 + Math.round(H*0.02) : 0;
+    var blockH = hl.length*hlh + (sl.length?sl.length*slh+Math.round(H*0.012):0) + ctaH;
+
+    var yTop;
+    if(T.vpos==="top") yTop = pad + Math.round(H*0.06);
+    else if(T.vpos==="center") yTop = (H-blockH)/2;
+    else yTop = H - pad - blockH;
+
+    // headline
+    var y = yTop + hs;
+    ctx.font="800 "+hs+"px "+fam; ctx.fillStyle=txtCol; ctx.textBaseline="alphabetic";
+    ctx.shadowColor="rgba(0,0,0,0.35)"; ctx.shadowBlur=Math.round(W*0.02); ctx.shadowOffsetY=2;
+    hl.forEach(function(line){ ctx.fillText(line, ax, y); y+=hlh; });
+    ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+
+    // support
+    if(sl.length){
+      y += Math.round(H*0.006);
+      ctx.font="500 "+Math.round(W*0.032)+"px "+fam;
+      ctx.fillStyle="rgba(255,255,255,0.92)";
+      sl.forEach(function(line){ ctx.fillText(line, ax, y); y+=slh; });
+    }
+
+    // CTA in the template's style
+    if(cta){
+      y += Math.round(H*0.02);
+      var fs=Math.round(W*0.030);
+      ctx.font="700 "+fs+"px "+fam;
+      var label=cta.toUpperCase(), tw=ctx.measureText(label).width;
+      var ph=fs*2.3, pw=tw+pad*0.9;
+      var rx = alignLeft ? pad : (W-pw)/2;
+      if(T.ctaStyle==="underline"){
+        ctx.fillStyle=txtCol; ctx.textAlign=alignLeft?"left":"center";
+        ctx.fillText(label, ax, y+fs);
+        ctx.strokeStyle=accent; ctx.lineWidth=Math.max(2,W*0.004);
+        ctx.beginPath();
+        var ux0 = alignLeft ? pad : (W-tw)/2;
+        ctx.moveTo(ux0, y+fs*1.35); ctx.lineTo(ux0+tw, y+fs*1.35); ctx.stroke();
+      } else {
+        var rr=ph/2, ry=y;
+        ctx.beginPath();
+        ctx.moveTo(rx+rr,ry); ctx.lineTo(rx+pw-rr,ry); ctx.quadraticCurveTo(rx+pw,ry,rx+pw,ry+rr);
+        ctx.lineTo(rx+pw,ry+ph-rr); ctx.quadraticCurveTo(rx+pw,ry+ph,rx+pw-rr,ry+ph);
+        ctx.lineTo(rx+rr,ry+ph); ctx.quadraticCurveTo(rx,ry+ph,rx,ry+ph-rr);
+        ctx.lineTo(rx,ry+rr); ctx.quadraticCurveTo(rx,ry,rx+rr,ry); ctx.closePath();
+        if(T.ctaStyle==="outline"){ ctx.strokeStyle=accent; ctx.lineWidth=Math.max(2,W*0.004); ctx.stroke(); ctx.fillStyle=txtCol; }
+        else { ctx.fillStyle=accent; ctx.fill();
+          var n=parseInt((accent||"#fff").slice(1),16)||0xffffff;
+          var lum=(0.299*((n>>16)&255)+0.587*((n>>8)&255)+0.114*(n&255))/255;
+          ctx.fillStyle=lum>0.62?"#111111":"#FFFFFF"; }
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(label, rx+pw/2, ry+ph/2);
+        ctx.textBaseline="alphabetic";
+      }
+    }
+
+    // brand mark, position from the template
+    var lx = T.logo==="top-right" ? W-pad : (T.logo==="top-center" ? W/2 : pad);
+    if(brandLogo){
+      var lw=Math.min(W*0.26, brandLogo.naturalWidth);
+      var lh=lw*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+      var maxLh=H*0.10;
+      if(lh>maxLh){ lh=maxLh; lw=lh*(brandLogo.naturalWidth/brandLogo.naturalHeight); }
+      var dx = T.logo==="top-right" ? (W-pad-lw) : (T.logo==="top-center" ? (W-lw)/2 : pad);
+      ctx.drawImage(brandLogo,dx,pad,lw,lh);
+    } else if(brand){
+      ctx.font="700 "+Math.round(W*0.030)+"px "+fam;
+      ctx.fillStyle="rgba(255,255,255,0.96)";
+      ctx.textAlign = T.logo==="top-right" ? "right" : (T.logo==="top-center" ? "center" : "left");
+      ctx.textBaseline="top";
+      ctx.shadowColor="rgba(0,0,0,0.4)"; ctx.shadowBlur=Math.round(W*0.015);
+      ctx.fillText(brand.toUpperCase(), lx, pad);
+      ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.textBaseline="alphabetic";
+    }
+    return cv.toDataURL("image/png");
+  }
+
   async function callConcepts(){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"concepts",
+      body:JSON.stringify({ code:state.code, mode:"concepts", brandKit:brandKit, photoRef:window.__pkPhotoRef,
         topic:($("topic").value||"").trim(), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
         audience:($("audience").value||"").trim() })});
@@ -4588,10 +4870,23 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     throw new Error(data.message||"Couldn't create concepts. Try again.");
   }
   async function callImage(c){
+    var lock = window.__pkBrandLock && c.artPrompt;
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"image", prompt:c.prompt, kind:c.kind, model:"auto", size:"1024x1024" })});
+      body:JSON.stringify({ code:state.code, mode:"image", prompt:(lock?c.artPrompt:c.prompt), kind:c.kind, model:"auto", size:(window.__pkFormat||"square") })});
     var data=await res.json();
-    if(data.ok && data.image) return data.image;
+    if(data.ok && data.image){
+      if(data.usage){
+        var cr=$("ccCredits");
+        if(cr) cr.textContent = data.usage.plan==="trial"
+          ? ("Free posts left: "+Math.max(0,data.usage.limit-data.usage.used)+" of "+data.usage.limit)
+          : (data.usage.plan+": "+data.usage.used+" / "+data.usage.limit+" this month");
+      }
+      if(lock){
+        try{ return await brandCompose(data.image, c, ($("brand").value||"").trim(), c.__tpl||0); }
+        catch(e){ return data.image; }   // if compositing fails, still show the art
+      }
+      return data.image;
+    }
     throw new Error(data.message||"Image failed.");
   }
   function saveDataUri(uri, name){ var a=document.createElement("a"); a.download="postkit-"+String(name||"concept").toLowerCase().replace(/\s+/g,"-")+".png"; a.href=uri; a.click(); }
@@ -4610,11 +4905,29 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     try{
       var img=await callImage(c);
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
-        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="save">⤓ Save</button><button data-a="share">📲 Share</button></div>';
+        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="tpl" title="Save as Brand Template">★</button><button data-a="save">⤓ Save</button><button data-a="share">📲 Share</button></div>';
       slot.classList.add("loaded"); slot._loaded=true;
       slot.querySelector('[data-a="regen"]').onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
+      var tplBtn=slot.querySelector('[data-a="tpl"]');
+      if(tplBtn) tplBtn.onclick=function(e){
+        e.stopPropagation();
+        var base=templateFor(c.__tpl||0);
+        var name=prompt("Name this brand template:", (c.label||"My Style"));
+        if(!name) return;
+        savedTemplates[name]=JSON.parse(JSON.stringify(base));
+        brandKit.template=name;
+        try{ localStorage.setItem("postkit_templates", JSON.stringify(savedTemplates)); }catch(err){}
+        saveKit(); if(typeof buildTplPicker==="function") buildTplPicker();
+        tplBtn.textContent="★ Saved";
+      };
       slot.querySelector('[data-a="save"]').onclick=function(e){ e.stopPropagation(); saveDataUri(img,c.label); };
-      slot.querySelector('[data-a="share"]').onclick=function(e){ e.stopPropagation(); shareDataUri(img); };
+      slot.querySelector('[data-a="share"]').onclick=function(e){
+        e.stopPropagation();
+        if(c.caption && navigator.clipboard){
+          navigator.clipboard.writeText(c.caption+"\n\n"+((c.hashtags||[]).map(function(h){return "#"+h;}).join(" ")));
+        }
+        shareDataUri(img);
+      };
     }catch(e){
       slot._loaded=false;
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-hint">'+esc2(e.message||"Failed")+'<br>tap to retry</div>';
@@ -4636,6 +4949,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     (r.concepts||[]).slice(0,limit).forEach(function(c,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||("Concept "+(i+1)))+'</span>'+(i===0?'<div class="cc-spin"></div>':'<div class="cc-hint">Tap to reveal</div>');
+      c.__tpl=i;
       slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,c); };
       grid.appendChild(slot);
       if(i===0) loadConceptImage(slot,c);   // first one is free & auto
@@ -4650,6 +4964,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       '<div class="std-sub">Four unique directions from four different AI designers. The first is ready — tap the others to reveal them.</div>'+
       '<div class="cc-grid" id="ccGrid"></div>'+
       '<div id="ccShared" style="margin-top:14px"></div>'+
+      '<div id="ccCredits" style="margin-top:10px;font-size:13px;color:var(--muted);text-align:center;font-weight:600"></div>'+
       '<p class="error" id="ccErr" style="margin-top:8px"></p>'+
     '</div>';
     if(formCard){ formCard.insertAdjacentHTML("afterend", html); }
@@ -4680,10 +4995,101 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var ir=$("p1Ideas");
       IDEAS14.forEach(function(x){
         var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=x[0];
-        b.onclick=function(){ topic.value=x[1]; ir.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active"); topic.focus(); };
+        b.onclick=function(){
+          if(b.classList.contains("active")){            // tap again to deselect
+            b.classList.remove("active");
+            if(topic.value.trim()===x[1]) topic.value="";
+            return;
+          }
+          ir.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");});
+          b.classList.add("active"); topic.value=x[1]; topic.focus();
+        };
         ir.appendChild(b);
       });
       var tl=document.querySelector('label[for="topic"]'); if(tl) tl.textContent="Or describe your own idea";
+
+      // format picker (post / story / portrait / landscape)
+      var fw=document.createElement("div");
+      fw.innerHTML='<div class="p1-q" style="font-size:15px;margin-top:16px">Format</div><div class="p1-ideas" id="p1Fmt"></div>';
+      topic.insertAdjacentElement("afterend", fw);
+      // shapes are drawn with CSS so they show true proportions and match the chip colour
+      var FMTS=[["Square","square",13,13],["Portrait","portrait",11,14],["Story","story",9,16],["Landscape","landscape",18,11]];
+      var fr=fw.querySelector("#p1Fmt");
+      FMTS.forEach(function(f,i){
+        var b=document.createElement("button"); b.type="button"; b.className="chip"+(i===0?" active":"");
+        b.innerHTML='<i class="fmt-ico" style="width:'+f[2]+'px;height:'+f[3]+'px"></i>'+f[0];
+        b.onclick=function(){ fr.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active"); window.__pkFormat=f[1]; };
+        fr.appendChild(b);
+      });
+      window.__pkFormat="square";
+      brandKit.font = fontForBiz($("bizType").value);
+      $("bizType").addEventListener("change", function(){ brandKit.font = fontForBiz(this.value); saveKit(); });
+
+      // Brand kit: logo (PNG) + brand-lock toggle
+      var bw=document.createElement("div");
+      bw.innerHTML=
+        '<div class="p1-q" style="font-size:15px;margin-top:16px">Your brand</div>'+
+        '<div class="p1-ideas">'+
+          '<button type="button" class="chip active" id="lockChip">🔒 Perfect text &amp; logo</button>'+
+          '<label class="chip" for="brandLogoFile" style="cursor:pointer">🖼️ Upload logo (PNG)</label>'+'<label class="chip" for="refPhotos" style="cursor:pointer">📷 Inspire with my photos</label>'+
+        '</div>'+
+        '<input type="file" id="brandLogoFile" accept="image/png,image/*" style="display:none">'+'<input type="file" id="refPhotos" accept="image/*" multiple style="display:none">'+'<div id="photoNote" style="font-size:12px;color:var(--muted);margin-top:4px"></div>'+
+        '<div id="logoNote" style="font-size:12px;color:var(--muted);margin-top:4px"></div><div id="kitSwatches" style="margin-top:6px"></div>'+
+        '<input id="kitSite" placeholder="Website (optional)" style="margin-top:8px">'+
+        '<input id="kitIg" placeholder="Instagram (optional)" style="margin-top:6px">'+
+        '<button type="button" class="miniai" id="kitAnalyze" style="width:100%;margin-top:8px">\u2728 Analyse my brand automatically</button>'+
+        '<div id="kitNote" style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5"></div>';
+      fw.insertAdjacentElement("afterend", bw);
+
+      if($("lockChip")) $("lockChip").onclick=function(){
+        window.__pkBrandLock=!window.__pkBrandLock;
+        this.classList.toggle("active", window.__pkBrandLock);
+        this.textContent = window.__pkBrandLock ? "🔒 Perfect text & logo" : "🔓 Let AI draw the text";
+      };
+      applyKitUI();
+      if($("kitSite")) $("kitSite").value = brandKit.website||"";
+      if($("kitIg")) $("kitIg").value = brandKit.instagram||"";
+      if(brandKit.personality && $("kitNote")) $("kitNote").innerHTML="<b>"+esc2(brandKit.personality)+"</b><br>"+esc2(brandKit.designLanguage||"");
+      if($("kitAnalyze")) $("kitAnalyze").onclick=function(){
+        brandKit.website=($("kitSite").value||"").trim();
+        brandKit.instagram=($("kitIg").value||"").trim();
+        saveKit(); analyzeBrand();
+      };
+      if($("refPhotos")) $("refPhotos").addEventListener("change", async function(e){
+        var files=[].slice.call(e.target.files||[]).slice(0,3);
+        if(!files.length) return;
+        $("photoNote").textContent="Reading your photos…";
+        try{
+          var uris=await Promise.all(files.map(function(f){
+            return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(r.result);}; r.onerror=rej; r.readAsDataURL(f); });
+          }));
+          var res2=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ code:state.code, mode:"describe", images:uris })});
+          var d=await res2.json();
+          if(d.ok && d.result && d.result.description){
+            window.__pkPhotoRef=d.result.description;
+            $("photoNote").textContent="Photos added ✓ Your designs will follow their look.";
+          } else { $("photoNote").textContent=(d.message||"Couldn't read those photos."); }
+        }catch(err){ $("photoNote").textContent="Couldn't read those photos."; }
+      });
+      if($("brandLogoFile")) $("brandLogoFile").addEventListener("change", function(e){
+        var f=e.target.files && e.target.files[0]; if(!f) return;
+        if(!/png|image\//i.test(f.type)){ $("logoNote").textContent="Please use a PNG image."; return; }
+        var rd=new FileReader();
+        rd.onload=function(){
+          loadImg(rd.result).then(function(img){
+            brandLogo=img;
+            var pal=extractPalette(img);
+            if(pal){ brandKit.primary=pal.primary; brandKit.accent=pal.accent; brandKit.bg=pal.bg; brandKit.text=pal.text; }
+            brandKit.font = fontForBiz($("bizType").value);
+            saveKit(); applyKitUI();
+            $("logoNote").textContent = pal
+              ? "Logo added ✓ Brand colours detected automatically."
+              : "Logo added ✓ It will appear on every post.";
+          }).catch(function(){ $("logoNote").textContent="Couldn't read that image."; });
+        };
+        rd.readAsDataURL(f);
+      });
     }
 
     // --- Phase 1: three clear actions replace the old buttons ---
@@ -4691,7 +5097,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     actions.innerHTML=
       '<button type="button" id="act4" class="gen-btn">🎨 Generate 4 Concepts</button>'+
       '<button type="button" id="act1" class="gen-btn p1-secondary">⚡ Generate 1 Post</button>'+
-      '<button type="button" id="actM" class="gen-btn p1-ghost">📅 Generate Monthly Pack</button>';
+      '<button type="button" id="act3" class="gen-btn p1-ghost">🎞️ 3-Slide Carousel</button>'+'<button type="button" id="act5" class="gen-btn p1-ghost">🎬 5-Slide Carousel</button>'+'<button type="button" id="actM" class="gen-btn p1-ghost">📅 Generate Monthly Pack</button>';
     gen.insertAdjacentElement("beforebegin", actions);
 
     async function run(limit){
@@ -4708,15 +5114,47 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       catch(e){ $("ccErr").textContent=e.message; }
       finally{ btns.forEach(function(b){b.disabled=false;}); a.textContent=old; }
     }
-    $("act4").onclick=function(){ run(4); };
-    $("act1").onclick=function(){ run(1); };
-    $("actM").onclick=function(){
+    if($("act4")) $("act4").onclick=function(){ run(4); };
+    if($("act1")) $("act1").onclick=function(){ run(1); };
+    async function runSlides(n){
+      var t=($("topic").value||"").trim();
+      if(!t){ $("topic").focus(); return; }
       var card=$("conceptsCard"); card.style.display="block";
-      $("ccGrid").innerHTML=""; $("ccShared").innerHTML="";
-      $("ccErr").textContent="";
-      $("conceptsCard").querySelector(".std-sub").textContent="Monthly Content Packs — a full month of on-brand posts — are coming next. For now, generate concepts one at a time.";
+      card.querySelector(".std-sub").textContent="Building a "+n+"-slide carousel that tells one story…";
+      $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
+      var all=[$("act4"),$("act1"),$("actM"),$("act3"),$("act5")]; all.forEach(function(b){ if(b) b.disabled=true; });
+      var btn=(n===3?$("act3"):$("act5")); var old=btn.textContent; btn.textContent="Creating…";
       card.scrollIntoView({behavior:"smooth",block:"start"});
+      try{ var r=await callSlides(n); card.querySelector(".std-sub").textContent=n+" slides, one brand, one story. Tap each to generate."; renderSlides(r); }
+      catch(e){ $("ccErr").textContent=e.message; }
+      finally{ all.forEach(function(b){ if(b) b.disabled=false; }); btn.textContent=old; }
+    }
+    if($("act3")) $("act3").onclick=function(){ runSlides(3); };
+    if($("act5")) $("act5").onclick=function(){ runSlides(5); };
+    if($("actM")) $("actM").onclick=async function(){
+      var card=$("conceptsCard"); card.style.display="block";
+      card.querySelector(".std-sub").textContent="Planning a full month of on-brand posts…";
+      $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
+      var btns=[$("act4"),$("act1"),$("actM")]; btns.forEach(function(b){b.disabled=true;});
+      var old=$("actM").textContent; $("actM").textContent="Planning your month…";
+      card.scrollIntoView({behavior:"smooth",block:"start"});
+      try{
+        var r=await callPack();
+        card.querySelector(".std-sub").textContent="Your month of content, all in one brand system.";
+        renderPack(r);
+      }
+      catch(e){ $("ccErr").textContent=e.message; }
+      finally{ btns.forEach(function(b){b.disabled=false;}); $("actM").textContent=old; }
     };
+  })();
+
+  /* ---------- 7/8: tidy homepage — gallery + extras live in Advanced options ---------- */
+  (function(){
+    try{
+      var slot=$("advGallerySlot"), gal=$("galleryCard");
+      if(slot && gal){ slot.appendChild(gal); gal.style.margin="14px 0 0"; gal.style.boxShadow="none"; gal.style.border="1px solid #EDEBE4"; }
+      buildTplPicker();
+    }catch(e){}
   })();
 
   /* ---------------------------------------------------------

@@ -5156,7 +5156,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         '<div class="p1-q" style="font-size:15px;margin-top:16px">Your brand</div>'+
         '<div class="p1-ideas">'+
           '<button type="button" class="chip active" id="lockChip">🔒 Perfect text &amp; logo</button>'+
-          '<label class="chip" for="brandLogoFile" style="cursor:pointer">🖼️ Upload logo (PNG)</label>'+'<label class="chip" for="refPhotos" style="cursor:pointer">📷 Inspire with my photos</label>'+
+          '<label class="chip" for="brandLogoFile" style="cursor:pointer">🖼️ Upload logo (PNG)</label>'+
+          '<button type="button" class="chip" id="removeLogo" style="display:none">✕ Remove logo</button>'+'<label class="chip" for="refPhotos" style="cursor:pointer">📷 Inspire with my photos</label>'+
         '</div>'+
         '<input type="file" id="brandLogoFile" accept="image/png,image/*" style="display:none">'+'<input type="file" id="refPhotos" accept="image/*" multiple style="display:none">'+'<div id="photoNote" style="font-size:12px;color:var(--muted);margin-top:4px"></div>'+
         '<div id="logoNote" style="font-size:12px;color:var(--muted);margin-top:4px"></div><div id="kitSwatches" style="margin-top:6px"></div>'+
@@ -5172,6 +5173,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         this.textContent = window.__pkBrandLock ? "🔒 Perfect text & logo" : "🔓 Let AI draw the text";
       };
       applyKitUI();
+      if($("removeLogo")) $("removeLogo").onclick=function(){
+        brandLogo=null;
+        if($("brandLogoFile")) $("brandLogoFile").value="";
+        $("logoNote").textContent="Logo removed. Your business name will be used instead.";
+        this.style.display="none";
+      };
       if($("kitSite")) $("kitSite").value = brandKit.website||"";
       if($("kitIg")) $("kitIg").value = brandKit.instagram||"";
       if(brandKit.personality && $("kitNote")) $("kitNote").innerHTML="<b>"+esc2(brandKit.personality)+"</b><br>"+esc2(brandKit.designLanguage||"");
@@ -5211,6 +5218,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
             $("logoNote").textContent = pal
               ? "Logo added ✓ Brand colours detected automatically."
               : "Logo added ✓ It will appear on every post.";
+            $("removeLogo").style.display="";
           }).catch(function(){ $("logoNote").textContent="Couldn't read that image."; });
         };
         rd.readAsDataURL(f);

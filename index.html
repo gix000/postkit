@@ -378,6 +378,22 @@
   @media (prefers-reduced-motion: reduce){
     html.pk-intro *{animation:none!important}
   }
+  #edOverlay{position:fixed;inset:0;z-index:400;display:none;flex-direction:column;background:#14150F}
+  .ed-top{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#1C1D17;color:#fff}
+  .ed-top .ed-title{font-weight:700;font-size:15px}
+  .ed-x{background:transparent;border:none;color:#fff;font-size:20px;padding:4px 8px}
+  .ed-top .chip{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff;padding:6px 12px}
+  .ed-top .chip:disabled{opacity:.35}
+  .ed-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;background:#14150F}
+  #edCanvas{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);touch-action:none}
+  .ed-panel{background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:44vh;overflow:auto}
+  .ed-hint{color:var(--muted);font-size:13px;text-align:center;padding:10px 0}
+  .ed-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .ed-panel textarea{width:100%;min-height:56px}
+  .ed-panel input[type=range]{width:100%;accent-color:var(--lime)}
+  .ed-actions{display:flex;gap:8px;margin-top:14px}
+  .ed-actions .gen-btn{margin:0;flex:2}
+  .ed-actions .miniai{flex:1}
   /* Phase 8: minimal homepage */
   #personaCard,#aiCopyCard,#studioCard,#batchCard,#kitCard,#coachCard,#historyCard{display:none!important}
 
@@ -388,7 +404,7 @@
   /* once an image is in, the tile grows to fit the design + its own action bar */
   .cc-slot.loaded{aspect-ratio:auto;display:block;cursor:default}
   .cc-slot img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
-  .cc-label{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.03em;z-index:2;pointer-events:none}
+  .cc-label{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 10px 0;text-align:center}
   .cc-hint{color:var(--muted);font-size:13px;font-weight:600;padding:0 10px}
   .cc-actions{display:none;gap:4px;justify-content:space-between;padding:7px 8px;background:#fff;border-top:1px solid #EDEBE4}
   .cc-slot.loaded .cc-actions{display:flex}
@@ -4759,18 +4775,24 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     "Minimal Modern":   { logo:"top-left",   align:"left",   vpos:"bottom", scrim:"light",  headScale:0.092, caseStyle:"normal", pad:0.07,  ctaStyle:"pill",      serif:false },
     "Bold Promotion":   { logo:"top-left",   align:"left",   vpos:"bottom", scrim:"strong", headScale:0.135, caseStyle:"upper",  pad:0.055, ctaStyle:"solid",     serif:false },
     "Product Showcase": { logo:"top-right",  align:"center", vpos:"bottom", scrim:"soft",   headScale:0.078, caseStyle:"normal", pad:0.10,  ctaStyle:"pill",      serif:false },
-    "Magazine Style":   { logo:"top-left",   align:"left",   vpos:"top",    scrim:"light",  headScale:0.105, caseStyle:"upper",  pad:0.075, ctaStyle:"underline", serif:true  }
+    "Magazine Style":   { logo:"top-left",   align:"left",   vpos:"top",    scrim:"light",  headScale:0.105, caseStyle:"upper",  pad:0.075, ctaStyle:"underline", serif:true  },
+    "Statement Centre": { logo:"top-center", align:"center", vpos:"center", scrim:"strong", headScale:0.128, caseStyle:"upper",  pad:0.09,  ctaStyle:"solid",     serif:false },
+    "Quiet Luxury":     { logo:"top-right",  align:"right",  vpos:"top",    scrim:"light",  headScale:0.074, caseStyle:"normal", pad:0.13,  ctaStyle:"underline", serif:true  },
+    "Poster Left":      { logo:"top-left",   align:"left",   vpos:"center", scrim:"soft",   headScale:0.118, caseStyle:"upper",  pad:0.065, ctaStyle:"outline",   serif:false },
+    "Soft Serif":       { logo:"top-center", align:"center", vpos:"bottom", scrim:"soft",   headScale:0.088, caseStyle:"normal", pad:0.10,  ctaStyle:"pill",      serif:true  }
   };
-  var TPL_ORDER = ["Luxury Editorial","Minimal Modern","Bold Promotion","Product Showcase","Magazine Style"];
+  var TPL_ORDER = ["Luxury Editorial","Minimal Modern","Bold Promotion","Product Showcase","Magazine Style","Statement Centre","Quiet Luxury","Poster Left","Soft Serif"];
   window.__pkTemplate = "";        // "" = auto (rotate / brand default)
   var savedTemplates = {};
   try { savedTemplates = JSON.parse(localStorage.getItem("postkit_templates")||"{}") || {}; } catch(e){}
   function allTemplates(){ var o={}; TPL_ORDER.forEach(function(k){o[k]=TEMPLATES[k];}); Object.keys(savedTemplates).forEach(function(k){o[k]=savedTemplates[k];}); return o; }
+  window.__pkTplOffset = Math.floor(Math.random()*9);   // reshuffled on every new plan
   function templateFor(i){
     var all=allTemplates(), names=Object.keys(all);
     if(window.__pkTemplate && all[window.__pkTemplate]) return all[window.__pkTemplate];
     if(brandKit.template && all[brandKit.template]) return all[brandKit.template];
-    return all[names[(i||0) % names.length]];
+    var off = window.__pkTplOffset || 0;
+    return all[names[((i||0) + off) % names.length]];
   }
 
   /* =========================================================
@@ -5022,6 +5044,269 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }); }catch(e){}
 
   /* =========================================================
+     PHASE A EDITOR
+     The five real layers of a PostKit design become editable:
+     artwork, headline, support line, call to action, brand mark.
+     Drag to move, resize, restyle, undo, export.
+     ========================================================= */
+  var ED = null;   // { art, W, H, layers, hist, hi, sel, drag }
+
+  function edClone(o){ return JSON.parse(JSON.stringify(o)); }
+  function edPush(){
+    if(!ED) return;
+    ED.hist = ED.hist.slice(0, ED.hi+1);
+    ED.hist.push(edClone(ED.layers));
+    if(ED.hist.length>40) ED.hist.shift();
+    ED.hi = ED.hist.length-1;
+    edSyncUndo();
+  }
+  function edSyncUndo(){
+    var u=$("edUndo"), r=$("edRedo");
+    if(u) u.disabled = !(ED && ED.hi>0);
+    if(r) r.disabled = !(ED && ED.hi < ED.hist.length-1);
+  }
+  function edUndo(){ if(ED && ED.hi>0){ ED.hi--; ED.layers=edClone(ED.hist[ED.hi]); edRender(); edSyncUndo(); edFillControls(); } }
+  function edRedo(){ if(ED && ED.hi<ED.hist.length-1){ ED.hi++; ED.layers=edClone(ED.hist[ED.hi]); edRender(); edSyncUndo(); edFillControls(); } }
+
+  var ED_FONTS = [
+    ["Modern", "'Archivo', 'Space Grotesk', sans-serif"],
+    ["Serif",  "'Playfair Display', Georgia, serif"],
+    ["Clean",  "'Space Grotesk', system-ui, sans-serif"],
+    ["Classic","Georgia, 'Times New Roman', serif"]
+  ];
+
+  function edInit(imgUri, c){
+    return loadImg(imgUri).then(function(art){
+      var W=art.naturalWidth||1024, H=art.naturalHeight||1024;
+      var T=templateFor(c.__tpl||0);
+      var b=(lastConcepts&&lastConcepts.brand)||{};
+      var serif = (typeof T.serif==="boolean")?T.serif:!!b.serif;
+      var fam = serif?ED_FONTS[1][1]:ED_FONTS[0][1];
+      var pad = Math.round(W*(T.pad||0.075));
+      var alignL = T.align!=="center";
+      var ax = alignL?pad:W/2;
+      var head=(c.headline||"").trim(), sup=(c.support||"").trim(), cta=(c.cta||"").trim();
+      var brandTxt=($("brand").value||"").trim();
+
+      var layers=[];
+      if(head) layers.push({id:"head", type:"text", text:head, x:ax, y:Math.round(H*0.70),
+        size:Math.round(W*(T.headScale||0.095)), color:"#FFFFFF", align:T.align||"left",
+        font:fam, weight:800, upper:(T.caseStyle==="upper"), visible:true, shadow:true});
+      if(sup) layers.push({id:"sup", type:"text", text:sup, x:ax, y:Math.round(H*0.79),
+        size:Math.round(W*0.032), color:"#FFFFFF", align:T.align||"left",
+        font:fam, weight:500, upper:false, visible:true, shadow:true});
+      if(cta) layers.push({id:"cta", type:"pill", text:cta, x:ax, y:Math.round(H*0.87),
+        size:Math.round(W*0.030), color:(b.accent||b.primary||"#2B44DE"), align:T.align||"left",
+        font:fam, weight:700, upper:true, visible:true, shadow:false});
+      layers.push(brandLogo
+        ? {id:"logo", type:"logo", x:pad, y:pad, size:Math.round(W*0.22), visible:true}
+        : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND", x:pad, y:pad+Math.round(W*0.03),
+           size:Math.round(W*0.030), color:"#FFFFFF", align:"left", font:fam, weight:700,
+           upper:true, visible:!!brandTxt, shadow:true});
+
+      ED={ art:art, W:W, H:H, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c };
+      edPush();
+      return ED;
+    });
+  }
+
+  function edLayerBox(ctx, L){
+    if(L.type==="logo"){
+      if(!brandLogo) return {x:L.x,y:L.y,w:0,h:0};
+      var w=L.size, hh=w*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+      return {x:L.x, y:L.y, w:w, h:hh};
+    }
+    ctx.font=(L.weight||700)+" "+L.size+"px "+L.font;
+    var t=L.upper?(L.text||"").toUpperCase():(L.text||"");
+    var w=ctx.measureText(t).width;
+    if(L.type==="pill") w += ED.W*0.075;
+    var h=(L.type==="pill")? L.size*2.3 : L.size*1.25;
+    var x=L.x;
+    if(L.align==="center") x=L.x-w/2;
+    else if(L.align==="right") x=L.x-w;
+    return {x:x, y:L.y-(L.type==="pill"?0:L.size), w:w, h:h};
+  }
+
+  function edRender(){
+    if(!ED) return;
+    var cv=$("edCanvas"); if(cv.__missing) return;
+    cv.width=ED.W; cv.height=ED.H;
+    var ctx=cv.getContext("2d");
+    ctx.drawImage(ED.art,0,0,ED.W,ED.H);
+
+    ED.layers.forEach(function(L){
+      if(!L.visible) return;
+      if(L.type==="logo"){
+        if(!brandLogo) return;
+        var w=L.size, hh=w*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+        ctx.drawImage(brandLogo, L.x, L.y, w, hh);
+        return;
+      }
+      var t=L.upper?(L.text||"").toUpperCase():(L.text||"");
+      ctx.font=(L.weight||700)+" "+L.size+"px "+L.font;
+      ctx.textAlign=L.align==="center"?"center":(L.align==="right"?"right":"left");
+      ctx.textBaseline="alphabetic";
+      if(L.type==="pill"){
+        var tw=ctx.measureText(t).width, ph=L.size*2.3, pw=tw+ED.W*0.075;
+        var rx=L.x; if(L.align==="center") rx=L.x-pw/2; else if(L.align==="right") rx=L.x-pw;
+        var rr=ph/2;
+        ctx.beginPath();
+        ctx.moveTo(rx+rr,L.y); ctx.lineTo(rx+pw-rr,L.y);
+        ctx.quadraticCurveTo(rx+pw,L.y,rx+pw,L.y+rr);
+        ctx.lineTo(rx+pw,L.y+ph-rr); ctx.quadraticCurveTo(rx+pw,L.y+ph,rx+pw-rr,L.y+ph);
+        ctx.lineTo(rx+rr,L.y+ph); ctx.quadraticCurveTo(rx,L.y+ph,rx,L.y+ph-rr);
+        ctx.lineTo(rx,L.y+rr); ctx.quadraticCurveTo(rx,L.y,rx+rr,L.y); ctx.closePath();
+        ctx.fillStyle=L.color; ctx.fill();
+        var n=parseInt((L.color||"#fff").slice(1),16)||0xffffff;
+        var lum=(0.299*((n>>16)&255)+0.587*((n>>8)&255)+0.114*(n&255))/255;
+        ctx.fillStyle=lum>0.62?"#111111":"#FFFFFF";
+        ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(t, rx+pw/2, L.y+ph/2);
+        ctx.textBaseline="alphabetic";
+        return;
+      }
+      if(L.shadow){ ctx.shadowColor="rgba(0,0,0,0.45)"; ctx.shadowBlur=Math.round(ED.W*0.025); }
+      ctx.fillStyle=L.color;
+      ctx.fillText(t, L.x, L.y);
+      ctx.shadowColor="transparent"; ctx.shadowBlur=0;
+    });
+
+    // selection outline + snap guides while dragging
+    if(ED.sel){
+      var L=ED.layers.find(function(x){return x.id===ED.sel;});
+      if(L && L.visible){
+        var bx=edLayerBox(ctx,L);
+        ctx.save();
+        ctx.strokeStyle="rgba(43,68,222,.95)"; ctx.lineWidth=Math.max(2,ED.W*0.004);
+        ctx.setLineDash([ED.W*0.02, ED.W*0.014]);
+        ctx.strokeRect(bx.x-8, bx.y-8, bx.w+16, bx.h+16);
+        ctx.restore();
+      }
+    }
+    if(ED.guides && ED.guides.length){
+      ctx.save(); ctx.strokeStyle="rgba(43,68,222,.65)"; ctx.lineWidth=Math.max(1,ED.W*0.0025);
+      ED.guides.forEach(function(g){
+        ctx.beginPath();
+        if(g.v){ ctx.moveTo(g.p,0); ctx.lineTo(g.p,ED.H); } else { ctx.moveTo(0,g.p); ctx.lineTo(ED.W,g.p); }
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+  }
+
+  /* ---------- interaction: select, drag, snap ---------- */
+  function edPoint(e){
+    var cv=$("edCanvas"), r=cv.getBoundingClientRect();
+    var t=(e.touches&&e.touches[0])||e;
+    return { x:(t.clientX-r.left)*(ED.W/r.width), y:(t.clientY-r.top)*(ED.H/r.height) };
+  }
+  function edHit(p){
+    var ctx=$("edCanvas").getContext("2d");
+    for(var i=ED.layers.length-1;i>=0;i--){
+      var L=ED.layers[i]; if(!L.visible) continue;
+      var b=edLayerBox(ctx,L);
+      if(p.x>=b.x-14 && p.x<=b.x+b.w+14 && p.y>=b.y-14 && p.y<=b.y+b.h+14) return L;
+    }
+    return null;
+  }
+  function edSnap(L){
+    var g=[], SNAP=ED.W*0.018;
+    var targets=[{p:ED.W/2,v:true},{p:ED.W/3,v:true},{p:ED.W*2/3,v:true},
+                 {p:ED.H/2,v:false},{p:ED.H/3,v:false},{p:ED.H*2/3,v:false},
+                 {p:ED.W*(0.075),v:true},{p:ED.W*(0.925),v:true}];
+    targets.forEach(function(t){
+      if(t.v && Math.abs(L.x-t.p)<SNAP){ L.x=t.p; g.push(t); }
+      if(!t.v && Math.abs(L.y-t.p)<SNAP){ L.y=t.p; g.push(t); }
+    });
+    ED.guides=g;
+  }
+  function edBindCanvas(){
+    var cv=$("edCanvas"); if(cv.__missing) return;
+    function down(e){
+      if(!ED) return;
+      var p=edPoint(e), L=edHit(p);
+      ED.sel = L?L.id:null;
+      ED.drag = L?{dx:p.x-L.x, dy:p.y-L.y}:null;
+      edFillControls(); edRender();
+      if(L) e.preventDefault();
+    }
+    function move(e){
+      if(!ED||!ED.drag||!ED.sel) return;
+      var p=edPoint(e), L=ED.layers.find(function(x){return x.id===ED.sel;});
+      if(!L) return;
+      L.x=Math.round(p.x-ED.drag.dx); L.y=Math.round(p.y-ED.drag.dy);
+      edSnap(L); edRender(); e.preventDefault();
+    }
+    function up(){ if(ED&&ED.drag){ ED.drag=null; ED.guides=[]; edPush(); edRender(); } }
+    cv.addEventListener("pointerdown",down); cv.addEventListener("pointermove",move);
+    window.addEventListener("pointerup",up);
+  }
+
+  /* ---------- controls ---------- */
+  function edSelected(){ return ED && ED.layers.find(function(x){return x.id===ED.sel;}); }
+  function edFillControls(){
+    var box=$("edProps"); if(box.__missing) return;
+    var L=edSelected();
+    if(!L){ box.innerHTML='<div class="ed-hint">Tap any text or your logo on the design to edit it.</div>'; return; }
+    var isText = L.type!=="logo";
+    box.innerHTML =
+      '<div class="ed-row"><b>'+({head:"Headline",sup:"Support line",cta:"Call to action",logo:"Logo",brand:"Brand name"}[L.id]||L.id)+'</b>'+
+        '<button class="chip" id="edHide">'+(L.visible?"Hide":"Show")+'</button></div>'+
+      (isText?'<textarea id="edText" rows="2">'+esc2(L.text||"")+'</textarea>':'')+
+      '<label>Size</label><input type="range" id="edSize" min="'+Math.round(ED.W*0.015)+'" max="'+Math.round(ED.W*0.22)+'" value="'+L.size+'">'+
+      (isText?
+        '<label>Font</label><div class="chip-row" id="edFontRow"></div>'+
+        '<label>Colour</label><div class="chip-row" id="edColRow"></div>'+
+        '<label>Align</label><div class="chip-row" id="edAlignRow"></div>'
+      :'');
+    $("edHide").onclick=function(){ L.visible=!L.visible; edPush(); edRender(); edFillControls(); };
+    $("edSize").addEventListener("input", function(){ L.size=parseInt(this.value,10); edRender(); });
+    $("edSize").addEventListener("change", edPush);
+    if(!isText) return;
+    $("edText").addEventListener("input", function(){ L.text=this.value; edRender(); });
+    $("edText").addEventListener("change", edPush);
+    ED_FONTS.forEach(function(f){
+      var b=document.createElement("button"); b.type="button";
+      b.className="chip"+(L.font===f[1]?" active":""); b.textContent=f[0];
+      b.onclick=function(){ L.font=f[1]; edPush(); edRender(); edFillControls(); };
+      $("edFontRow").appendChild(b);
+    });
+    var bk=(lastConcepts&&lastConcepts.brand)||{};
+    [["White","#FFFFFF"],["Black","#111214"],["Brand",bk.primary||"#2B44DE"],["Accent",bk.accent||"#C9A227"]]
+    .forEach(function(cpair){
+      var b=document.createElement("button"); b.type="button";
+      b.className="chip"+((L.color||"").toUpperCase()===cpair[1].toUpperCase()?" active":"");
+      b.innerHTML='<i style="display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #ccc;background:'+cpair[1]+';vertical-align:-1px;margin-right:6px"></i>'+cpair[0];
+      b.onclick=function(){ L.color=cpair[1]; edPush(); edRender(); edFillControls(); };
+      $("edColRow").appendChild(b);
+    });
+    ["left","center","right"].forEach(function(a){
+      var b=document.createElement("button"); b.type="button";
+      b.className="chip"+(L.align===a?" active":""); b.textContent=a;
+      b.onclick=function(){ L.align=a; edPush(); edRender(); edFillControls(); };
+      $("edAlignRow").appendChild(b);
+    });
+  }
+
+  /* ---------- open / close / export ---------- */
+  function edExport(type){
+    var cv=$("edCanvas");
+    var sel=ED.sel; ED.sel=null; ED.guides=[]; edRender();   // clean output, no selection box
+    var uri = type==="jpg" ? cv.toDataURL("image/jpeg",0.92) : cv.toDataURL("image/png");
+    ED.sel=sel; edRender();
+    return uri;
+  }
+  function openEditor(imgUri, c){
+    var ov=$("edOverlay"); ov.style.display="flex";
+    document.body.style.overflow="hidden";
+    edInit(imgUri, c).then(function(){ edRender(); edFillControls(); edSyncUndo(); }).catch(function(){});
+  }
+  function closeEditor(){
+    var ov=$("edOverlay"); ov.style.display="none";
+    document.body.style.overflow=""; ED=null;
+  }
+
+  /* =========================================================
      SESSION PERSISTENCE
      Your work survives leaving the app, a reload, or a crash.
      Plans go in localStorage; images go in IndexedDB (much bigger).
@@ -5041,6 +5326,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   async function idbGet(k){ try{ var db=await idb(); return await new Promise(function(res){ var t=db.transaction("imgs","readonly"); var q=t.objectStore("imgs").get(k); q.onsuccess=function(){res(q.result||null);}; q.onerror=function(){res(null);}; }); }catch(e){ return null; } }
 
   function savePlan(kind, data, limit){
+    window.__pkTplOffset = Math.floor(Math.random()*99);   // new layout rotation each generation
+    designHashes = {};
     lastPlan={kind:kind, data:data, limit:limit||4};
     sessionImages={};
     try{ localStorage.setItem("postkit_session", JSON.stringify(lastPlan)); }catch(e){}
@@ -5252,7 +5539,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       if(kind==="poster") kind="marketing";
       sendPrompt += " Pure photographic artwork only. No text, no letters, no numbers, no captions, no watermark, "+
         "no logos, no user interface, no app or phone screenshot, no social media mockup, no browser or device frame, "+
-        "no buttons or icons, no borders or picture frames around the image.";
+        "no buttons or icons, no borders or picture frames around the image, "+
+        "no flat colour blocks, no solid bands, no diagonal panels or graphic shapes painted over the photo.";
     }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", size:(window.__pkFormat||"square") })});
@@ -5289,11 +5577,44 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       else { saveDataUri(uri,"post"); }
     }catch(e){}
   }
+  /* =========================================================
+     DUPLICATE DETECTION
+     Fingerprints each finished design; if two are too alike,
+     the later one is regenerated once with a fresh direction.
+     ========================================================= */
+  var designHashes = {};
+  function perceptualHash(imgEl){
+    try{
+      var n=8, cv=document.createElement("canvas"); cv.width=n; cv.height=n;
+      var cx=cv.getContext("2d"); cx.drawImage(imgEl,0,0,n,n);
+      var d=cx.getImageData(0,0,n,n).data, vals=[];
+      for(var i=0;i<d.length;i+=4) vals.push((0.299*d[i]+0.587*d[i+1]+0.114*d[i+2])/255);
+      var avg=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+      return vals.map(function(v){ return v>avg?1:0; });
+    }catch(e){ return null; }
+  }
+  function hashDistance(a,b){
+    if(!a||!b||a.length!==b.length) return 99;
+    var d=0; for(var i=0;i<a.length;i++) if(a[i]!==b[i]) d++;
+    return d;
+  }
+  function tooSimilar(hash, idx){
+    var keys=Object.keys(designHashes);
+    for(var i=0;i<keys.length;i++){
+      if(String(keys[i])===String(idx)) continue;
+      if(hashDistance(hash, designHashes[keys[i]]) <= 6) return true;   // near identical
+    }
+    return false;
+  }
+
   function showConceptImage(slot, c, img){
-      slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
-        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="tpl" title="Save as brand template">★</button><button data-a="save" title="Download">⤓</button><button data-a="share" title="Share">Share</button></div>';
+      slot.innerHTML='<img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
+        '<span class="cc-label">'+esc2(c.label||"")+'</span>'+
+        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="edit" title="Edit">✎</button><button data-a="tpl" title="Save as brand template">★</button><button data-a="save" title="Download">⤓</button><button data-a="share" title="Share">Share</button></div>';
       slot.classList.add("loaded"); slot._loaded=true;
       slot.querySelector('[data-a="regen"]').onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
+      var edBtn=slot.querySelector('[data-a="edit"]');
+      if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(img, c); };
       var tplBtn=slot.querySelector('[data-a="tpl"]');
       if(tplBtn) tplBtn.onclick=function(e){
         e.stopPropagation();
@@ -5320,6 +5641,24 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-spin"></div>';
     try{
       var img=await callImage(c);
+      // fingerprint it and, if it clashes with another concept, try once more
+      try{
+        var probe=await loadImg(img);
+        var ph=perceptualHash(probe);
+        var idx=(typeof c.__idx==="number")?c.__idx:0;
+        if(ph && tooSimilar(ph, idx) && !c.__retried){
+          c.__retried=true;
+          window.__pkTplOffset=(window.__pkTplOffset||0)+1;   // shift the layout too
+          var img2=await callImage(c);
+          var probe2=await loadImg(img2);
+          designHashes[idx]=perceptualHash(probe2)||ph;
+          showConceptImage(slot, c, img2);
+          rememberImage(c, img2);
+          slot._busy=false;
+          return;
+        }
+        if(ph) designHashes[idx]=ph;
+      }catch(e){}
       showConceptImage(slot, c, img);
       rememberImage(c, img);
     }catch(e){
@@ -5587,6 +5926,42 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       if(slot && gal){ slot.appendChild(gal); gal.style.margin="14px 0 0"; gal.style.boxShadow="none"; gal.style.border="1px solid #EDEBE4"; }
       buildTplPicker();
     }catch(e){}
+  })();
+
+
+  /* ---------- editor shell ---------- */
+  (function(){
+    var html='<div id="edOverlay">'+
+      '<div class="ed-top">'+
+        '<button class="ed-x" id="edClose">\u2715</button>'+
+        '<span class="ed-title">Edit design</span>'+
+        '<span style="flex:1"></span>'+
+        '<button class="chip" id="edUndo">\u21b6</button>'+
+        '<button class="chip" id="edRedo">\u21b7</button>'+
+      '</div>'+
+      '<div class="ed-stage"><canvas id="edCanvas"></canvas></div>'+
+      '<div class="ed-panel">'+
+        '<div id="edProps"></div>'+
+        '<div class="ed-actions">'+
+          '<button class="gen-btn" id="edSave">Save PNG</button>'+
+          '<button class="miniai" id="edSaveJpg">JPG</button>'+
+          '<button class="miniai" id="edShare">Share</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+    document.body.insertAdjacentHTML("beforeend", html);
+    edBindCanvas();
+    $("edClose").onclick=closeEditor;
+    $("edUndo").onclick=edUndo;
+    $("edRedo").onclick=edRedo;
+    $("edSave").onclick=function(){ saveDataUri(edExport("png"), "edited"); };
+    $("edSaveJpg").onclick=function(){ saveDataUri(edExport("jpg"), "edited"); };
+    $("edShare").onclick=function(){ shareDataUri(edExport("png")); };
+    document.addEventListener("keydown", function(e){
+      if(!ED) return;
+      if(e.key==="Escape") closeEditor();
+      if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?edRedo():edUndo(); }
+    });
   })();
 
   /* ---------------------------------------------------------

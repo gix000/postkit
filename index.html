@@ -342,6 +342,42 @@
   #modeToggle .mode-hint{align-self:center;font-size:12px;color:var(--dim);padding-left:6px;font-weight:400}
   body.basic-mode .pro-only{display:none!important}
   .fmt-ico{display:inline-block;border:1.6px solid currentColor;border-radius:2.5px;vertical-align:-1px;margin-right:7px;opacity:.75}
+  #emailGate{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(25,26,23,.45);backdrop-filter:blur(3px);padding:20px}
+  #emailGate .eg-box{background:var(--card);border-radius:22px;padding:26px 22px;max-width:340px;width:100%;box-shadow:0 24px 60px -20px rgba(25,26,23,.35)}
+  #emailGate .eg-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:20px;color:var(--text);margin-bottom:4px}
+  #emailGate .eg-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+  #emailGate input{width:100%}
+  /* ===== opening reveal: fast, premium, never blocks the user ===== */
+  @keyframes pkRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  /* full 360 turn that starts AND ends on 45deg, so it never lands as a square */
+  @keyframes pkMark{0%{transform:rotate(-315deg) scale(.35);opacity:0}
+                    60%{transform:rotate(57deg) scale(1.14);opacity:1}
+                    80%{transform:rotate(41deg) scale(.97);opacity:1}
+                    100%{transform:rotate(45deg) scale(1);opacity:1}}
+  @keyframes pkSweep{from{background-position:-140% 0}to{background-position:240% 0}}
+  @keyframes pkGlow{0%{box-shadow:0 0 0 0 rgba(43,68,222,.35)}
+                    70%{box-shadow:0 0 0 16px rgba(43,68,222,0)}
+                    100%{box-shadow:0 0 0 0 rgba(43,68,222,0)}}
+
+  html.pk-intro .logo-mark{animation:pkMark .78s cubic-bezier(.2,.8,.2,1) both, pkGlow 1.1s ease-out .5s both}
+  html.pk-intro .logo-text{animation:pkRise .5s cubic-bezier(.2,.8,.2,1) .10s both}
+  html.pk-intro .nav-cta{animation:pkRise .5s cubic-bezier(.2,.8,.2,1) .18s both}
+  html.pk-intro #heroTitle{animation:pkRise .58s cubic-bezier(.2,.8,.2,1) .16s both}
+  html.pk-intro header + section p,
+  html.pk-intro .hero p{animation:pkRise .55s cubic-bezier(.2,.8,.2,1) .26s both}
+  html.pk-intro .hero-btns{animation:pkRise .55s cubic-bezier(.2,.8,.2,1) .34s both}
+  html.pk-intro .hero-btns .btn-primary{
+    background-image:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.42) 42%,transparent 62%);
+    background-size:220% 100%;background-repeat:no-repeat;
+    animation:pkRise .55s cubic-bezier(.2,.8,.2,1) .34s both, pkSweep 1.05s ease-out .78s both;
+  }
+  html.pk-intro .step{animation:pkRise .5s cubic-bezier(.2,.8,.2,1) both}
+  html.pk-intro .step:nth-child(1){animation-delay:.40s}
+  html.pk-intro .step:nth-child(2){animation-delay:.48s}
+  html.pk-intro .step:nth-child(3){animation-delay:.56s}
+  @media (prefers-reduced-motion: reduce){
+    html.pk-intro *{animation:none!important}
+  }
   /* Phase 8: minimal homepage */
   #personaCard,#aiCopyCard,#studioCard,#batchCard,#kitCard,#coachCard,#historyCard{display:none!important}
 
@@ -371,6 +407,20 @@
   .p1-secondary{background:#fff!important;color:var(--lime)!important;border:1.5px solid var(--lime)!important;box-shadow:none!important}
   .p1-ghost{background:transparent!important;color:var(--muted)!important;border:1px solid #E6E4DD!important;box-shadow:none!important;font-size:15px!important;font-weight:600!important}
 </style>
+<script>
+(function(){
+  try{
+    // add ?intro=1 (or #intro) to the URL to replay it any time, useful for testing
+    var force = /[?&]intro=1/.test(location.search) || location.hash === "#intro";
+    if(!force && sessionStorage.getItem("pk_intro_done")) return;   // otherwise first load only
+    sessionStorage.setItem("pk_intro_done","1");
+    var r=document.documentElement;
+    r.classList.add("pk-intro");
+    // everything is interactive the whole time; we just clean up after the reveal
+    setTimeout(function(){ r.classList.remove("pk-intro"); }, 1400);
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
@@ -399,7 +449,7 @@
 
   <!-- APP -->
   <h2 class="section-title" id="app">Create your post</h2>
-  <p class="section-sub">Try 3 posts free. No signup needed.</p>
+  <p class="section-sub" id="trialLine">Try 3 posts for free. Just your email, no password.</p>
 
   <div class="card reveal">
     <label for="quickDesc">✨ Just describe it <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(AI fills the form for you)</span></label>
@@ -3500,7 +3550,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var styles = galCache[cat];
       if(!styles){
         var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ code:state.code, mode:"gallery", topic:cat, brandKit:brandKit, photoRef:window.__pkPhotoRef,
+          body:JSON.stringify({ code:state.code, mode:"gallery", clientId:pkClientId(), email:pkEmail(), topic:cat, brandKit:brandKit, photoRef:window.__pkPhotoRef,
             brand:($("brand").value||"").trim(), bizType:$("bizType").value, lang:state.lang })});
         var data=await res.json();
         if(!(data.ok&&data.result&&data.result.styles)) throw new Error(data.message||"Couldn't load styles.");
@@ -4783,13 +4833,21 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var hl=wrapLines(ctx,head,maxW), hlh=Math.round(hs*1.12);
     ctx.font="500 "+Math.round(W*0.032)+"px "+fam;
     var sl=sup?wrapLines(ctx,sup,maxW):[], slh=Math.round(W*0.045);
-    var ctaH = cta ? Math.round(W*0.030)*2.3 + Math.round(H*0.02) : 0;
-    var blockH = hl.length*hlh + (sl.length?sl.length*slh+Math.round(H*0.012):0) + ctaH;
+    var ctaFs = Math.round(W*0.030), ctaPh = ctaFs*2.3;
+    var ctaH = cta ? (ctaPh + Math.round(H*0.02)) : 0;
+    /* measure EXACTLY the way we draw: the first headline baseline sits hs below
+       the block top, so that hs must be counted or the CTA overflows the frame. */
+    var blockH = hs + hl.length*hlh
+               + (sl.length ? (Math.round(H*0.006) + sl.length*slh) : 0)
+               + ctaH
+               + Math.round(hs*0.18);            // descender breathing room
 
     var yTop;
     if(T.vpos==="top") yTop = pad + Math.round(H*0.06);
     else if(T.vpos==="center") yTop = (H-blockH)/2;
     else yTop = H - pad - blockH;
+    // never let the block leave the frame
+    yTop = Math.max(pad*0.6, Math.min(yTop, H - pad - blockH));
 
     /* ---- guarantee readability ----
        Look at the actual artwork behind the text block, then pick a scrim
@@ -4847,10 +4905,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     // CTA in the template's style
     if(cta){
       y += Math.round(H*0.02);
-      var fs=Math.round(W*0.030);
+      var fs=ctaFs;
       ctx.font="700 "+fs+"px "+fam;
       var label=cta.toUpperCase(), tw=ctx.measureText(label).width;
-      var ph=fs*2.3, pw=tw+pad*0.9;
+      var ph=ctaPh, pw=Math.min(tw+pad*0.9, W-pad*2);
       var rx = alignLeft ? pad : (W-pw)/2;
       if(T.ctaStyle==="underline"){
         ctx.fillStyle=txtCol; ctx.textAlign=alignLeft?"left":"center";
@@ -4897,6 +4955,70 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     }
     return cv.toDataURL("image/png");
   }
+
+  /* stable device id for fair free-trial counting (survives reloads) */
+  function pkClientId(){
+    var k="postkit_cid", v="";
+    try{ v=localStorage.getItem(k)||""; }catch(e){}
+    if(!v){
+      try{
+        var a=new Uint8Array(16);
+        (window.crypto||window.msCrypto).getRandomValues(a);
+        v=Array.from(a).map(function(x){return ("0"+x.toString(16)).slice(-2);}).join("");
+      }catch(e){ v=String(Date.now())+Math.random().toString(16).slice(2); }
+      try{ localStorage.setItem(k,v); }catch(e){}
+      // also keep a copy in IndexedDB, which "clear site data" often misses
+      try{ idbSet("cid", v); }catch(e){}
+    }
+    return v;
+  }
+  // if localStorage was wiped but IndexedDB survived, restore the same id
+  try{ idbGet("cid").then(function(saved){
+    if(!saved) return;
+    try{ if(!localStorage.getItem("postkit_cid")) localStorage.setItem("postkit_cid", saved); }catch(e){}
+  }); }catch(e){}
+
+  /* =========================================================
+     FREE TRIAL EMAIL GATE
+     Asked once, only for trial users, only when they first generate.
+     ========================================================= */
+  function pkEmail(){ try{ return localStorage.getItem("postkit_email")||""; }catch(e){ return ""; } }
+  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v||"").trim()); }
+  function ensureEmail(){
+    if(state.code && state.code.trim()) return Promise.resolve("");   // paid users skip this
+    var have=pkEmail();
+    if(validEmail(have)) return Promise.resolve(have);
+    return new Promise(function(resolve, reject){
+      var wrap=document.createElement("div");
+      wrap.id="emailGate";
+      wrap.innerHTML=
+        '<div class="eg-box">'+
+          '<div class="eg-title">Start your 3 free posts</div>'+
+          '<div class="eg-sub">Just your email. No password, no spam.</div>'+
+          '<input id="egInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com">'+
+          '<p class="error" id="egErr" style="margin:6px 0 0"></p>'+
+          '<button class="gen-btn" id="egGo" style="margin-top:12px">Continue</button>'+
+          '<button class="miniai" id="egCancel" style="width:100%;margin-top:8px">Cancel</button>'+
+        '</div>';
+      document.body.appendChild(wrap);
+      var inp=wrap.querySelector("#egInput");
+      setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 50);
+      function close(){ try{ document.body.removeChild(wrap); }catch(e){} }
+      wrap.querySelector("#egCancel").onclick=function(){ close(); reject(new Error("Enter your email to start your free posts.")); };
+      wrap.querySelector("#egGo").onclick=function(){
+        var v=(inp.value||"").trim().toLowerCase();
+        if(!validEmail(v)){ wrap.querySelector("#egErr").textContent="Please enter a valid email."; return; }
+        try{ localStorage.setItem("postkit_email", v); }catch(e){}
+        try{ idbSet("email", v); }catch(e){}
+        close(); resolve(v);
+      };
+      inp.addEventListener("keydown", function(e){ if(e.key==="Enter") wrap.querySelector("#egGo").click(); });
+    });
+  }
+  // restore the email if localStorage was cleared but IndexedDB survived
+  try{ idbGet("email").then(function(v){
+    if(v){ try{ if(!localStorage.getItem("postkit_email")) localStorage.setItem("postkit_email", v); }catch(e){} }
+  }); }catch(e){}
 
   /* =========================================================
      SESSION PERSISTENCE
@@ -5014,7 +5136,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     note.textContent="Analysing your brand\u2026";
     try{
       var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ code:state.code, mode:"brandanalyze", brandKit:brandKit,
+        body:JSON.stringify({ code:state.code, mode:"brandanalyze", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit,
           brand:($("brand").value||"").trim(), bizType:$("bizType").value,
           website:($("kitSite").value||"").trim(), instagram:($("kitIg").value||"").trim(), lang:state.lang })});
       var d=await res.json();
@@ -5037,7 +5159,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   /* ---------- carousels (3 or 5 slides) ---------- */
   async function callSlides(n){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"slides", slideCount:n, brandKit:brandKit,
+      body:JSON.stringify({ code:state.code, mode:"slides", clientId:pkClientId(), email:pkEmail(), slideCount:n, brandKit:brandKit,
         photoRef:window.__pkPhotoRef,
         topic:($("topic").value||"").trim(), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
@@ -5070,7 +5192,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   /* ---------- monthly content pack ---------- */
   async function callPack(){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"pack", brandKit:brandKit, photoRef:window.__pkPhotoRef,
+      body:JSON.stringify({ code:state.code, mode:"pack", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit, photoRef:window.__pkPhotoRef,
         topic:($("topic").value||"").trim()||"a balanced month of content",
         brand:($("brand").value||"").trim(), bizType:$("bizType").value,
         lang:state.lang, tone:state.tone, audience:($("audience").value||"").trim() })});
@@ -5094,7 +5216,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
   async function callConcepts(){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"concepts", brandKit:brandKit, photoRef:window.__pkPhotoRef,
+      body:JSON.stringify({ code:state.code, mode:"concepts", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit, photoRef:window.__pkPhotoRef,
         topic:($("topic").value||"").trim(), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
         audience:($("audience").value||"").trim() })});
@@ -5126,14 +5248,21 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         "no buttons or icons, no borders or picture frames around the image.";
     }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"image", prompt:sendPrompt, kind:kind, model:"auto", size:(window.__pkFormat||"square") })});
+      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", size:(window.__pkFormat||"square") })});
     var data=await res.json();
     if(data.ok && data.image){
       if(data.usage){
+        var left=Math.max(0,(data.usage.limit||0)-(data.usage.used||0));
         var cr=$("ccCredits");
         if(cr) cr.textContent = data.usage.plan==="trial"
-          ? ("Free posts left: "+Math.max(0,data.usage.limit-data.usage.used)+" of "+data.usage.limit)
+          ? (left>0 ? ("Free posts left: "+left+" of "+data.usage.limit) : "Free posts used up. Enter a code to continue.")
           : (data.usage.plan+": "+data.usage.used+" / "+data.usage.limit+" this month");
+        var tl=$("trialLine");
+        if(tl && data.usage.plan==="trial"){
+          tl.textContent = left>0
+            ? (left+" of "+data.usage.limit+" free posts left. No signup needed.")
+            : "You have used your free posts. Enter an access code below to keep creating.";
+        } else if(tl){ tl.textContent = "Your plan: "+data.usage.plan+". "+data.usage.used+" of "+data.usage.limit+" used this month."; }
       }
       if(lock){
         try{ return await brandCompose(data.image, c, ($("brand").value||"").trim(), c.__tpl||0); }
@@ -5351,7 +5480,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
             return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(r.result);}; r.onerror=rej; r.readAsDataURL(f); });
           }));
           var res2=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({ code:state.code, mode:"describe", images:uris })});
+            body:JSON.stringify({ code:state.code, mode:"describe", clientId:pkClientId(), email:pkEmail(), images:uris })});
           var d=await res2.json();
           if(d.ok && d.result && d.result.description){
             window.__pkPhotoRef=d.result.description;
@@ -5390,6 +5519,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     gen.insertAdjacentElement("beforebegin", actions);
 
     async function run(limit){
+      try{ await ensureEmail(); }catch(e){ $("ccErr").textContent=e.message; return; }
       var t=($("topic").value||"").trim();
       if(!t){ $("topic").focus(); return; }
       var card=$("conceptsCard"); card.style.display="block";
@@ -5406,6 +5536,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if($("act4")) $("act4").onclick=function(){ run(4); };
     if($("act1")) $("act1").onclick=function(){ run(1); };
     async function runSlides(n){
+      try{ await ensureEmail(); }catch(e){ $("ccErr").textContent=e.message; return; }
       var t=($("topic").value||"").trim();
       if(!t){ $("topic").focus(); return; }
       var card=$("conceptsCard"); card.style.display="block";
@@ -5421,6 +5552,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if($("act3")) $("act3").onclick=function(){ runSlides(3); };
     if($("act5")) $("act5").onclick=function(){ runSlides(5); };
     if($("actM")) $("actM").onclick=async function(){
+      try{ await ensureEmail(); }catch(e){ $("conceptsCard").style.display="block"; $("ccErr").textContent=e.message; return; }
       var card=$("conceptsCard"); card.style.display="block";
       card.querySelector(".std-sub").textContent="Planning a full month of on-brand posts…";
       $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";

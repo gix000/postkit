@@ -4931,6 +4931,15 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ctx.fillStyle=g;
     ctx.fillRect(0, gy0, W, (T.vpos==="top"? (gy1-gy0) : (H-gy0)));
 
+    // record the layout as we draw it, so the editor reproduces it exactly
+    c.__layout = {
+      W:W, H:H, pad:pad, fam:fam, align:(alignLeft?"left":"center"), ax:ax,
+      head:{ text:head, size:hs, y:(yTop+hs), color:txtCol, upper:(T.caseStyle==="upper"), lh:(hlh/hs) },
+      sup:{ text:sup, size:Math.round(W*0.032), y:0, color:(darkText?"#111214":"#FFFFFF") },
+      cta:{ text:cta, size:ctaFs, y:0, color:accent, style:(T.ctaStyle||"pill") },
+      logo:{ pos:(T.logo||"top-left"), pad:pad }
+    };
+
     // headline
     var y = yTop + hs;
     ctx.font="800 "+hs+"px "+fam; ctx.fillStyle=txtCol; ctx.textBaseline="alphabetic";
@@ -4942,6 +4951,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(sl.length){
       y += Math.round(H*0.006);
       ctx.font="500 "+Math.round(W*0.032)+"px "+fam;
+      if(c.__layout) c.__layout.sup.y = y;
       ctx.fillStyle = darkText ? "rgba(17,18,20,0.88)" : "rgba(255,255,255,0.94)";
       sl.forEach(function(line){ ctx.fillText(line, ax, y); y+=slh; });
     }
@@ -4949,6 +4959,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     // CTA in the template's style
     if(cta){
       y += Math.round(H*0.02);
+      if(c.__layout) c.__layout.cta.y = y;
       var fs=ctaFs;
       ctx.font="700 "+fs+"px "+fam;
       var label=cta.toUpperCase(), tw=ctx.measureText(label).width;
@@ -5118,17 +5129,32 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var markGap = brandLogo
         ? (pad + Math.min(H*0.10, L_logoH(W)) + Math.round(H*0.05))
         : (pad + Math.round(W*0.09));
-      if(head) layers.push({id:"head", type:"text", text:head, x:ax, y:Math.max(Math.round(H*0.70), markGap),
-        size:Math.round(W*(T.headScale||0.095)), color:"#FFFFFF", align:T.align||"left",
-        font:fam, weight:800, upper:(T.caseStyle==="upper"), visible:true, shadow:true, rot:0, op:1, track:0, lh:1.12});
-      if(sup) layers.push({id:"sup", type:"text", text:sup, x:ax, y:Math.round(H*0.79),
-        size:Math.round(W*0.032), color:"#FFFFFF", align:T.align||"left",
+      if(head) layers.push({id:"head", type:"text", text:head, x:ax,
+        y:(LO&&LO.head&&LO.head.y) ? LO.head.y : Math.max(Math.round(H*0.70), markGap),
+        size:(LO&&LO.head&&LO.head.size) ? LO.head.size : Math.round(W*(T.headScale||0.095)),
+        color:(LO&&LO.head&&LO.head.color) ? LO.head.color : "#FFFFFF",
+        align:(LO?LO.align:(T.align||"left")),
+        font:fam, weight:800,
+        upper:(LO&&LO.head) ? !!LO.head.upper : (T.caseStyle==="upper"),
+        visible:true, shadow:true, rot:0, op:1, track:0,
+        lh:(LO&&LO.head&&LO.head.lh) ? LO.head.lh : 1.12});
+      if(sup) layers.push({id:"sup", type:"text", text:sup, x:ax,
+        y:(LO&&LO.sup&&LO.sup.y) ? LO.sup.y : Math.round(H*0.79),
+        size:(LO&&LO.sup&&LO.sup.size) ? LO.sup.size : Math.round(W*0.032),
+        color:(LO&&LO.sup&&LO.sup.color) ? LO.sup.color : "#FFFFFF",
+        align:(LO?LO.align:(T.align||"left")),
         font:fam, weight:500, upper:false, visible:true, shadow:true, rot:0, op:1, track:0, lh:1.3});
-      if(cta) layers.push({id:"cta", type:"pill", text:cta, x:ax, y:Math.round(H*0.87),
-        size:Math.round(W*0.030), color:(b.accent||b.primary||"#2B44DE"), align:T.align||"left",
+      if(cta) layers.push({id:"cta", type:"pill", text:cta, x:ax,
+        y:(LO&&LO.cta&&LO.cta.y) ? LO.cta.y : Math.round(H*0.87),
+        size:(LO&&LO.cta&&LO.cta.size) ? LO.cta.size : Math.round(W*0.030),
+        color:(LO&&LO.cta&&LO.cta.color) ? LO.cta.color : (b.accent||b.primary||"#2B44DE"),
+        align:(LO?LO.align:(T.align||"left")),
         font:fam, weight:700, upper:true, visible:true, shadow:false, rot:0, op:1, track:0.06, lh:1.2});
+      var lgPos=(LO&&LO.logo&&LO.logo.pos) ? LO.logo.pos : (T.logo||"top-left");
+      var lgW=Math.min(W*0.26, brandLogo?brandLogo.naturalWidth:W*0.26);
+      var lgX = lgPos==="top-right" ? (W-pad-lgW) : (lgPos==="top-center" ? (W-lgW)/2 : pad);
       layers.push(brandLogo
-        ? {id:"logo", type:"logo", x:pad, y:pad, size:Math.round(W*0.22), visible:true, rot:0, op:1}
+        ? {id:"logo", type:"logo", x:lgX, y:pad, size:lgW, visible:true, rot:0, op:1}
         : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND", x:pad, y:pad+Math.round(W*0.03),
            size:Math.round(W*0.030), color:"#FFFFFF", align:"left", font:fam, weight:700,
            upper:true, visible:!!brandTxt, shadow:true, rot:0, op:1, track:0.08, lh:1.2});
@@ -5949,7 +5975,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         "on packaging, cups, walls, menus, napkins or any surface, every surface must be blank and unbranded.";
     }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", size:(window.__pkFormat||"square") })});
+      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", bizType:$("bizType").value, size:(window.__pkFormat||"square") })});
     var data=await res.json();
     if(data.ok && data.image){
       if(data.usage){

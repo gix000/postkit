@@ -5237,8 +5237,18 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         this.textContent = window.__pkBrandLock ? "🔒 Perfect text & logo" : "🔓 Let AI draw the text";
       };
       applyKitUI();
+      // bring back a previously uploaded logo so the kit stays consistent
+      idbGet("logo").then(function(uri){
+        if(!uri) return;
+        loadImg(uri).then(function(img){
+          brandLogo=img;
+          $("removeLogo").style.display="";
+          $("logoNote").textContent="Logo added \u2713 It will appear on every post.";
+        }).catch(function(){});
+      });
       if($("removeLogo")) $("removeLogo").onclick=function(){
         brandLogo=null;
+        idbSet("logo", null);
         if($("brandLogoFile")) $("brandLogoFile").value="";
         // colours were detected from the logo, so clear them with it
         brandKit.primary=""; brandKit.accent=""; brandKit.bg=""; brandKit.text="";
@@ -5278,6 +5288,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         rd.onload=function(){
           loadImg(rd.result).then(function(img){
             brandLogo=img;
+            idbSet("logo", rd.result);          // keep the logo across sessions
             var pal=extractPalette(img);
             if(pal){ brandKit.primary=pal.primary; brandKit.accent=pal.accent; brandKit.bg=pal.bg; brandKit.text=pal.text; }
             brandKit.font = fontForBiz($("bizType").value);

@@ -394,6 +394,17 @@
   .ed-actions{display:flex;gap:8px;margin-top:14px}
   .ed-actions .gen-btn{margin:0;flex:2}
   .ed-actions .miniai{flex:1}
+  .ed-tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .ed-tools .chip{padding:7px 12px;font-size:12px}
+  .ed-tools .chip:disabled{opacity:.4}
+  .ed-layers{max-height:104px;overflow:auto;border:1px solid var(--border);border-radius:12px;margin-bottom:12px}
+  .ed-layer{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:13px;border-bottom:1px solid #F1EFE9;cursor:pointer}
+  .ed-layer:last-child{border-bottom:none}
+  .ed-layer.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+  .ed-eye{width:18px;text-align:center;opacity:.7}
+  .ed-val{color:var(--lime);font-weight:700}
+  .ed-pick{width:38px;height:34px;padding:0;border-radius:10px;border:1px solid var(--border);background:none}
+  .ed-panel label{margin:12px 0 4px;display:flex;justify-content:space-between}
   /* Phase 8: minimal homepage */
   #personaCard,#aiCopyCard,#studioCard,#batchCard,#kitCard,#coachCard,#historyCard{display:none!important}
 
@@ -408,8 +419,13 @@
   .cc-hint{color:var(--muted);font-size:13px;font-weight:600;padding:0 10px}
   .cc-actions{display:none;gap:4px;justify-content:space-between;padding:7px 8px;background:#fff;border-top:1px solid #EDEBE4}
   .cc-slot.loaded .cc-actions{display:flex}
-  .cc-actions button{flex:1;background:transparent;color:var(--text);border:1px solid #E6E4DD;border-radius:8px;padding:7px 4px;font-size:11px;font-weight:700;line-height:1.1}
-  .cc-actions button:active{background:#F2F1EC}
+  .cc-actions button{background:transparent;color:var(--text);border:1px solid #E6E4DD;border-radius:10px;padding:9px 6px;font-size:12px;font-weight:700;line-height:1.1;min-width:40px}
+  .cc-actions button:active{background:#F2F1EC;transform:scale(.97)}
+  .cc-actions .cc-primary{
+    flex:1;background:var(--lime);color:#fff;border:none;font-size:13px;padding:10px 8px;
+    box-shadow:0 6px 16px -6px rgba(43,68,222,.55);letter-spacing:.01em;
+  }
+  .cc-actions .cc-primary:active{background:#243BC4}
   .cc-spin{width:34px;height:34px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
   @keyframes ccspin{to{transform:rotate(360deg)}}
 
@@ -4866,7 +4882,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
                + Math.round(hs*0.18);            // descender breathing room
 
     var yTop;
-    if(T.vpos==="top") yTop = pad + Math.round(H*0.06);
+    // reserve room for the brand mark so text can never collide with it
+    var markH = brandLogo
+      ? Math.min(H*0.10, Math.min(W*0.26, brandLogo.naturalWidth)*(brandLogo.naturalHeight/brandLogo.naturalWidth))
+      : Math.round(W*0.030);
+    if(T.vpos==="top") yTop = pad + markH + Math.round(H*0.055);
     else if(T.vpos==="center") yTop = (H-blockH)/2;
     else yTop = H - pad - blockH;
     // never let the block leave the frame
@@ -5075,7 +5095,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ["Classic","Georgia, 'Times New Roman', serif"]
   ];
 
-  function edInit(imgUri, c){
+  function L_logoH(W){
+    if(!brandLogo) return 0;
+    var w=Math.min(W*0.26, brandLogo.naturalWidth);
+    return w*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+  }
+  function edInit(imgUri, c, bakedIn){
     return loadImg(imgUri).then(function(art){
       var W=art.naturalWidth||1024, H=art.naturalHeight||1024;
       var T=templateFor(c.__tpl||0);
@@ -5089,20 +5114,23 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var brandTxt=($("brand").value||"").trim();
 
       var layers=[];
-      if(head) layers.push({id:"head", type:"text", text:head, x:ax, y:Math.round(H*0.70),
+      var markGap = brandLogo
+        ? (pad + Math.min(H*0.10, L_logoH(W)) + Math.round(H*0.05))
+        : (pad + Math.round(W*0.09));
+      if(head) layers.push({id:"head", type:"text", text:head, x:ax, y:Math.max(Math.round(H*0.70), markGap),
         size:Math.round(W*(T.headScale||0.095)), color:"#FFFFFF", align:T.align||"left",
-        font:fam, weight:800, upper:(T.caseStyle==="upper"), visible:true, shadow:true});
+        font:fam, weight:800, upper:(T.caseStyle==="upper"), visible:true, shadow:true, rot:0, op:1, track:0, lh:1.12});
       if(sup) layers.push({id:"sup", type:"text", text:sup, x:ax, y:Math.round(H*0.79),
         size:Math.round(W*0.032), color:"#FFFFFF", align:T.align||"left",
-        font:fam, weight:500, upper:false, visible:true, shadow:true});
+        font:fam, weight:500, upper:false, visible:true, shadow:true, rot:0, op:1, track:0, lh:1.3});
       if(cta) layers.push({id:"cta", type:"pill", text:cta, x:ax, y:Math.round(H*0.87),
         size:Math.round(W*0.030), color:(b.accent||b.primary||"#2B44DE"), align:T.align||"left",
-        font:fam, weight:700, upper:true, visible:true, shadow:false});
+        font:fam, weight:700, upper:true, visible:true, shadow:false, rot:0, op:1, track:0.06, lh:1.2});
       layers.push(brandLogo
-        ? {id:"logo", type:"logo", x:pad, y:pad, size:Math.round(W*0.22), visible:true}
+        ? {id:"logo", type:"logo", x:pad, y:pad, size:Math.round(W*0.22), visible:true, rot:0, op:1}
         : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND", x:pad, y:pad+Math.round(W*0.03),
            size:Math.round(W*0.030), color:"#FFFFFF", align:"left", font:fam, weight:700,
-           upper:true, visible:!!brandTxt, shadow:true});
+           upper:true, visible:!!brandTxt, shadow:true, rot:0, op:1, track:0.08, lh:1.2});
 
       ED={ art:art, W:W, H:H, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c };
       edPush();
@@ -5111,6 +5139,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   function edLayerBox(ctx, L){
+    if(L.type==="shape"){ return {x:L.x-L.w/2, y:L.y-L.h/2, w:L.w, h:L.h}; }
     if(L.type==="logo"){
       if(!brandLogo) return {x:L.x,y:L.y,w:0,h:0};
       var w=L.size, hh=w*(brandLogo.naturalHeight/brandLogo.naturalWidth);
@@ -5132,18 +5161,32 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var cv=$("edCanvas"); if(cv.__missing) return;
     cv.width=ED.W; cv.height=ED.H;
     var ctx=cv.getContext("2d");
-    ctx.drawImage(ED.art,0,0,ED.W,ED.H);
+    (function(){
+      var a=ED.art, ar=a.naturalWidth/a.naturalHeight, cr=ED.W/ED.H, sw,sh,sx,sy;
+      if(ar>cr){ sh=a.naturalHeight; sw=sh*cr; sx=(a.naturalWidth-sw)/2; sy=0; }
+      else { sw=a.naturalWidth; sh=sw/cr; sx=0; sy=(a.naturalHeight-sh)/2; }
+      ctx.drawImage(a, sx, sy, sw, sh, 0, 0, ED.W, ED.H);
+    })();
 
     ED.layers.forEach(function(L){
       if(!L.visible) return;
+      if(L.type==="shape"){ edDrawShape(ctx,L); return; }
       if(L.type==="logo"){
         if(!brandLogo) return;
         var w=L.size, hh=w*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+        ctx.save();
+        ctx.globalAlpha=(typeof L.op==="number")?L.op:1;
+        if(L.rot){ ctx.translate(L.x+w/2, L.y+hh/2); ctx.rotate(L.rot*Math.PI/180); ctx.translate(-(L.x+w/2), -(L.y+hh/2)); }
         ctx.drawImage(brandLogo, L.x, L.y, w, hh);
+        ctx.restore();
         return;
       }
       var t=L.upper?(L.text||"").toUpperCase():(L.text||"");
+      ctx.save();
+      ctx.globalAlpha = (typeof L.op==="number")?L.op:1;
+      if(L.rot){ ctx.translate(L.x, L.y); ctx.rotate(L.rot*Math.PI/180); ctx.translate(-L.x, -L.y); }
       ctx.font=(L.weight||700)+" "+L.size+"px "+L.font;
+      if(ctx.letterSpacing!==undefined) ctx.letterSpacing=((L.track||0)*L.size).toFixed(2)+"px";
       ctx.textAlign=L.align==="center"?"center":(L.align==="right"?"right":"left");
       ctx.textBaseline="alphabetic";
       if(L.type==="pill"){
@@ -5163,12 +5206,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         ctx.textAlign="center"; ctx.textBaseline="middle";
         ctx.fillText(t, rx+pw/2, L.y+ph/2);
         ctx.textBaseline="alphabetic";
+        ctx.restore();
         return;
       }
       if(L.shadow){ ctx.shadowColor="rgba(0,0,0,0.45)"; ctx.shadowBlur=Math.round(ED.W*0.025); }
       ctx.fillStyle=L.color;
-      ctx.fillText(t, L.x, L.y);
+      // multi-line support, split on newlines
+      var lines=String(t).split("\n");
+      var lh=Math.round(L.size*(L.lh||1.2));
+      lines.forEach(function(ln,i){ ctx.fillText(ln, L.x, L.y + i*lh); });
       ctx.shadowColor="transparent"; ctx.shadowBlur=0;
+      ctx.restore();
     });
 
     // selection outline + snap guides while dragging
@@ -5176,10 +5224,26 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var L=ED.layers.find(function(x){return x.id===ED.sel;});
       if(L && L.visible){
         var bx=edLayerBox(ctx,L);
+        var pad2=Math.max(8, ED.W*0.012);
+        var bx0=bx.x-pad2, by0=bx.y-pad2, bw=bx.w+pad2*2, bh=bx.h+pad2*2;
         ctx.save();
-        ctx.strokeStyle="rgba(43,68,222,.95)"; ctx.lineWidth=Math.max(2,ED.W*0.004);
-        ctx.setLineDash([ED.W*0.02, ED.W*0.014]);
-        ctx.strokeRect(bx.x-8, bx.y-8, bx.w+16, bx.h+16);
+        if(L.rot){ var cxr=bx.x+bx.w/2, cyr=bx.y+bx.h/2;
+          ctx.translate(cxr,cyr); ctx.rotate((L.rot||0)*Math.PI/180); ctx.translate(-cxr,-cyr); }
+        ctx.strokeStyle="rgba(43,68,222,.95)"; ctx.lineWidth=Math.max(2,ED.W*0.0035);
+        ctx.strokeRect(bx0, by0, bw, bh);
+        // corner grips
+        var r=edHandleR();
+        var pts=edHandlePoints(bx0,by0,bw,bh);
+        ctx.fillStyle="#FFFFFF"; ctx.strokeStyle="rgba(43,68,222,.95)"; ctx.lineWidth=Math.max(2,ED.W*0.003);
+        pts.corners.forEach(function(p){
+          ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        });
+        // rotate grip above the box
+        ctx.beginPath(); ctx.moveTo(pts.rot.x, by0); ctx.lineTo(pts.rot.x, pts.rot.y); ctx.stroke();
+        ctx.beginPath(); ctx.arc(pts.rot.x, pts.rot.y, r*1.05, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle="rgba(43,68,222,.95)";
+        ctx.font="700 "+Math.round(r*1.3)+"px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText("\u21bb", pts.rot.x, pts.rot.y+1);
         ctx.restore();
       }
     }
@@ -5195,6 +5259,57 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   /* ---------- interaction: select, drag, snap ---------- */
+  function edHandleR(){ return Math.max(10, ED.W*0.022); }
+  function edHandlePoints(x,y,w,hh){
+    return {
+      corners:[{x:x,y:y,k:"tl"},{x:x+w,y:y,k:"tr"},{x:x,y:y+hh,k:"bl"},{x:x+w,y:y+hh,k:"br"}],
+      rot:{x:x+w/2, y:y-Math.max(26, ED.W*0.055)}
+    };
+  }
+  // rotate a point back into the layer's un-rotated space so hit tests work
+  function edUnrotate(p, L, box){
+    if(!L.rot) return p;
+    var cx=box.x+box.w/2, cy=box.y+box.h/2, a=-(L.rot||0)*Math.PI/180;
+    var dx=p.x-cx, dy=p.y-cy;
+    return { x: cx + dx*Math.cos(a) - dy*Math.sin(a), y: cy + dx*Math.sin(a) + dy*Math.cos(a) };
+  }
+  function edHitHandle(p){
+    var L=edSelected(); if(!L||!L.visible) return null;
+    var ctx=$("edCanvas").getContext("2d");
+    var bx=edLayerBox(ctx,L);
+    var pad2=Math.max(8, ED.W*0.012);
+    var pts=edHandlePoints(bx.x-pad2, bx.y-pad2, bx.w+pad2*2, bx.h+pad2*2);
+    var q=edUnrotate(p, L, bx);
+    var r=edHandleR()*1.6;
+    if(Math.hypot(q.x-pts.rot.x, q.y-pts.rot.y)<=r) return {mode:"rotate", box:bx};
+    for(var i=0;i<pts.corners.length;i++){
+      var c=pts.corners[i];
+      if(Math.hypot(q.x-c.x, q.y-c.y)<=r) return {mode:"scale", corner:c.k, box:bx};
+    }
+    return null;
+  }
+  function edApplyScale(L, p, st){
+    var cx=st.box.x+st.box.w/2, cy=st.box.y+st.box.h/2;
+    var d0=Math.hypot(st.startX-cx, st.startY-cy) || 1;
+    var d1=Math.hypot(p.x-cx, p.y-cy);
+    var f=Math.max(0.15, Math.min(6, d1/d0));
+    if(L.type==="shape"){
+      L.w=Math.max(6, Math.round(st.w0*f));
+      L.h=Math.max(3, Math.round(st.h0*f));
+    } else {
+      L.size=Math.max(8, Math.round(st.size0*f));
+    }
+  }
+  function edApplyRotate(L, p, st){
+    var cx=st.box.x+st.box.w/2, cy=st.box.y+st.box.h/2;
+    var a=Math.atan2(p.y-cy, p.x-cx)*180/Math.PI;
+    var a0=Math.atan2(st.startY-cy, st.startX-cx)*180/Math.PI;
+    var next=Math.round((st.rot0 + (a-a0)));
+    if(Math.abs(next)<4) next=0;                 // snap to straight
+    if(Math.abs(Math.abs(next)-90)<4) next=(next>0?90:-90);
+    L.rot=Math.max(-180, Math.min(180, next));
+  }
+
   function edPoint(e){
     var cv=$("edCanvas"), r=cv.getBoundingClientRect();
     var t=(e.touches&&e.touches[0])||e;
@@ -5224,47 +5339,237 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var cv=$("edCanvas"); if(cv.__missing) return;
     function down(e){
       if(!ED) return;
-      var p=edPoint(e), L=edHit(p);
+      var p=edPoint(e);
+      var hnd=edHitHandle(p);            // handles take priority over the layer body
+      if(hnd){
+        var S=edSelected();
+        ED.xform={ mode:hnd.mode, box:hnd.box, startX:p.x, startY:p.y,
+                   size0:S.size, w0:S.w, h0:S.h, rot0:S.rot||0 };
+        e.preventDefault(); return;
+      }
+      var L=edHit(p);
       ED.sel = L?L.id:null;
       ED.drag = L?{dx:p.x-L.x, dy:p.y-L.y}:null;
       edFillControls(); edRender();
       if(L) e.preventDefault();
     }
     function move(e){
+      if(ED && ED.xform && ED.sel){
+        var pp=edPoint(e), LL=edSelected();
+        if(LL){
+          if(ED.xform.mode==="scale") edApplyScale(LL, pp, ED.xform);
+          else edApplyRotate(LL, pp, ED.xform);
+          edRender(); e.preventDefault();
+        }
+        return;
+      }
       if(!ED||!ED.drag||!ED.sel) return;
       var p=edPoint(e), L=ED.layers.find(function(x){return x.id===ED.sel;});
       if(!L) return;
       L.x=Math.round(p.x-ED.drag.dx); L.y=Math.round(p.y-ED.drag.dy);
       edSnap(L); edRender(); e.preventDefault();
     }
-    function up(){ if(ED&&ED.drag){ ED.drag=null; ED.guides=[]; edPush(); edRender(); } }
+    function up(){
+      if(ED&&ED.xform){ ED.xform=null; edPush(); edRender(); edFillControls(); return; }
+      if(ED&&ED.drag){ ED.drag=null; ED.guides=[]; edPush(); edRender(); }
+    }
     cv.addEventListener("pointerdown",down); cv.addEventListener("pointermove",move);
     window.addEventListener("pointerup",up);
   }
 
   /* ---------- controls ---------- */
   function edSelected(){ return ED && ED.layers.find(function(x){return x.id===ED.sel;}); }
+  function edAddShape(kind){
+    if(!ED) return;
+    var b=(lastConcepts&&lastConcepts.brand)||{};
+    var id="s"+Date.now();
+    ED.layers.push({id:id, type:"shape", shape:kind,
+      x:Math.round(ED.W*0.5), y:Math.round(ED.H*0.5),
+      w:Math.round(ED.W*(kind==="line"?0.45:0.3)),
+      h:Math.round(ED.H*(kind==="line"?0.006:0.18)),
+      color:(b.accent||b.primary||"#2B44DE"), op:1, rot:0, visible:true, radius:kind==="rect"?18:0});
+    ED.sel=id; edPush(); edRender(); edFillControls();
+  }
+  function edDrawShape(ctx, L){
+    ctx.save();
+    ctx.globalAlpha=(typeof L.op==="number")?L.op:1;
+    if(L.rot){ ctx.translate(L.x, L.y); ctx.rotate(L.rot*Math.PI/180); ctx.translate(-L.x, -L.y); }
+    ctx.fillStyle=L.color;
+    var x=L.x-L.w/2, y=L.y-L.h/2;
+    if(L.shape==="circle"){
+      ctx.beginPath(); ctx.ellipse(L.x, L.y, L.w/2, L.h/2, 0, 0, Math.PI*2); ctx.fill();
+    } else {
+      var r=Math.min(L.radius||0, L.h/2, L.w/2);
+      ctx.beginPath();
+      ctx.moveTo(x+r,y); ctx.lineTo(x+L.w-r,y); ctx.quadraticCurveTo(x+L.w,y,x+L.w,y+r);
+      ctx.lineTo(x+L.w,y+L.h-r); ctx.quadraticCurveTo(x+L.w,y+L.h,x+L.w-r,y+L.h);
+      ctx.lineTo(x+r,y+L.h); ctx.quadraticCurveTo(x,y+L.h,x,y+L.h-r);
+      ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function edAddText(){
+    if(!ED) return;
+    var b=(lastConcepts&&lastConcepts.brand)||{};
+    var id="t"+Date.now();
+    ED.layers.push({id:id, type:"text", text:"New text", x:Math.round(ED.W/2), y:Math.round(ED.H/2),
+      size:Math.round(ED.W*0.06), color:"#FFFFFF", align:"center", font:ED_FONTS[0][1],
+      weight:700, upper:false, visible:true, shadow:true, rot:0, op:1, track:0, lh:1.2});
+    ED.sel=id; edPush(); edRender(); edFillControls();
+  }
+  function edDuplicate(){
+    var L=edSelected(); if(!L) return;
+    var c=edClone(L); c.id=L.id+"_"+Date.now();
+    c.x+=Math.round(ED.W*0.03); c.y+=Math.round(ED.H*0.03);
+    ED.layers.push(c); ED.sel=c.id; edPush(); edRender(); edFillControls();
+  }
+  function edDelete(){
+    var L=edSelected(); if(!L) return;
+    ED.layers=ED.layers.filter(function(x){return x.id!==L.id;});
+    ED.sel=null; edPush(); edRender(); edFillControls();
+  }
+  function edOrder(dir){
+    var L=edSelected(); if(!L) return;
+    var i=ED.layers.indexOf(L), j=i+dir;
+    if(j<0||j>=ED.layers.length) return;
+    ED.layers.splice(i,1); ED.layers.splice(j,0,L);
+    edPush(); edRender(); edFillControls();
+  }
+  function edAlign(where){
+    var L=edSelected(); if(!L) return;
+    var ctx=$("edCanvas").getContext("2d"), b=edLayerBox(ctx,L);
+    if(where==="left")   L.x += (ED.W*0.075) - b.x;
+    if(where==="cx")     L.x += (ED.W/2) - (b.x + b.w/2);
+    if(where==="right")  L.x += (ED.W*0.925) - (b.x + b.w);
+    if(where==="top")    L.y += (ED.H*0.075) - b.y;
+    if(where==="cy")     L.y += (ED.H/2) - (b.y + b.h/2);
+    if(where==="bottom") L.y += (ED.H*0.925) - (b.y + b.h);
+    edPush(); edRender();
+  }
+  function edLayerName(L){
+    return {head:"Headline", sup:"Support line", cta:"Call to action", logo:"Logo", brand:"Brand name"}[L.id]
+        || (L.type==="shape" ? (L.shape==='circle'?'Circle':(L.shape==='line'?'Line':'Rectangle')) : (L.type==="text" ? ((L.text||"Text").slice(0,16)) : L.id));
+  }
+
   function edFillControls(){
     var box=$("edProps"); if(box.__missing) return;
     var L=edSelected();
-    if(!L){ box.innerHTML='<div class="ed-hint">Tap any text or your logo on the design to edit it.</div>'; return; }
-    var isText = L.type!=="logo";
-    box.innerHTML =
-      '<div class="ed-row"><b>'+({head:"Headline",sup:"Support line",cta:"Call to action",logo:"Logo",brand:"Brand name"}[L.id]||L.id)+'</b>'+
-        '<button class="chip" id="edHide">'+(L.visible?"Hide":"Show")+'</button></div>'+
-      (isText?'<textarea id="edText" rows="2">'+esc2(L.text||"")+'</textarea>':'')+
-      '<label>Size</label><input type="range" id="edSize" min="'+Math.round(ED.W*0.015)+'" max="'+Math.round(ED.W*0.22)+'" value="'+L.size+'">'+
-      (isText?
-        '<label>Font</label><div class="chip-row" id="edFontRow"></div>'+
-        '<label>Colour</label><div class="chip-row" id="edColRow"></div>'+
-        '<label>Align</label><div class="chip-row" id="edAlignRow"></div>'
-      :'');
+    var isText = L && L.type!=="logo";
+
+    var html='<div class="ed-tools">'+
+      '<button class="chip" id="edAdd">+ Text</button>'+
+      '<button class="chip" id="edRect">+ Box</button>'+
+      '<button class="chip" id="edCirc">+ Circle</button>'+
+      '<button class="chip" id="edLine">+ Line</button>'+
+      '<label class="chip" for="edBgFile" style="cursor:pointer">Replace photo</label>'+
+      '<button class="chip" id="edDup"'+(L?"":" disabled")+'>Duplicate</button>'+
+      '<button class="chip" id="edDel"'+(L?"":" disabled")+'>Delete</button>'+
+      '<button class="chip" id="edFwd"'+(L?"":" disabled")+'>Forward</button>'+
+      '<button class="chip" id="edBack"'+(L?"":" disabled")+'>Back</button>'+
+      '</div>';
+
+    // layer list, newest on top like a real design tool
+    html+='<div class="ed-layers">';
+    for(var i=ED.layers.length-1;i>=0;i--){
+      var Q=ED.layers[i];
+      html+='<div class="ed-layer'+(ED.sel===Q.id?" on":"")+'" data-l="'+Q.id+'">'+
+              '<span class="ed-eye" data-eye="'+Q.id+'">'+(Q.visible?"\u25c9":"\u25cb")+'</span>'+
+              '<span>'+esc2(edLayerName(Q))+'</span></div>';
+    }
+    html+='</div>';
+
+    if(!L){
+      box.innerHTML = html + '<div class="ed-hint">'+(ED&&ED.baked
+        ? 'The words in this design were drawn by the AI, so they are part of the image. You can still add your own text and position your logo.'
+        : 'Tap a layer above, or tap anything on the design, to edit it.')+'</div>';
+    } else {
+      html+='<div class="ed-row"><b>'+esc2(edLayerName(L))+'</b>'+
+            '<button class="chip" id="edHide">'+(L.visible?"Hide":"Show")+'</button></div>'+
+        (isText?'<textarea id="edText" rows="2" placeholder="Type here, Enter makes a new line">'+esc2(L.text||"")+'</textarea>':'')+
+        (L.type==="shape"
+          ? '<label>Width</label><input type="range" id="edW" min="'+Math.round(ED.W*0.05)+'" max="'+ED.W+'" value="'+L.w+'">'+
+            '<label>Height</label><input type="range" id="edH" min="'+Math.round(ED.H*0.004)+'" max="'+ED.H+'" value="'+L.h+'">'+
+            '<label>Colour</label><div class="chip-row" id="edShapeCol"></div>'
+          : '<label>Size</label><input type="range" id="edSize" min="'+Math.round(ED.W*0.012)+'" max="'+Math.round(ED.W*0.24)+'" value="'+L.size+'">')+
+        '<label>Rotation <span class="ed-val">'+(L.rot||0)+'\u00b0</span></label><input type="range" id="edRot" min="-45" max="45" value="'+(L.rot||0)+'">'+
+        '<label>Opacity <span class="ed-val">'+Math.round((L.op==null?1:L.op)*100)+'%</span></label><input type="range" id="edOp" min="10" max="100" value="'+Math.round((L.op==null?1:L.op)*100)+'">'+
+        (isText?
+          '<label>Letter spacing</label><input type="range" id="edTrack" min="-5" max="30" value="'+Math.round((L.track||0)*100)+'">'+
+          '<label>Line height</label><input type="range" id="edLh" min="90" max="200" value="'+Math.round((L.lh||1.2)*100)+'">'+
+          '<label>Font</label><div class="chip-row" id="edFontRow"></div>'+
+          '<label>Colour</label><div class="chip-row" id="edColRow"></div>'+
+          '<label>Align text</label><div class="chip-row" id="edAlignRow"></div>'
+        :'')+
+        '<label>Position on canvas</label><div class="chip-row" id="edPosRow"></div>';
+      box.innerHTML=html;
+    }
+
+    // layer list interactions
+    box.querySelectorAll("[data-l]").forEach(function(el){
+      el.onclick=function(e){
+        if(e.target.getAttribute("data-eye")) return;
+        ED.sel=el.getAttribute("data-l"); edRender(); edFillControls();
+      };
+    });
+    box.querySelectorAll("[data-eye]").forEach(function(el){
+      el.onclick=function(e){
+        e.stopPropagation();
+        var Q=ED.layers.find(function(x){return x.id===el.getAttribute("data-eye");});
+        if(Q){ Q.visible=!Q.visible; edPush(); edRender(); edFillControls(); }
+      };
+    });
+    $("edAdd").onclick=edAddText;
+    if($("edRect")) $("edRect").onclick=function(){ edAddShape("rect"); };
+    if($("edCirc")) $("edCirc").onclick=function(){ edAddShape("circle"); };
+    if($("edLine")) $("edLine").onclick=function(){ edAddShape("line"); };
+    if($("edDup")) $("edDup").onclick=edDuplicate;
+    if($("edDel")) $("edDel").onclick=edDelete;
+    if($("edFwd")) $("edFwd").onclick=function(){ edOrder(1); };
+    if($("edBack")) $("edBack").onclick=function(){ edOrder(-1); };
+    if(!L) return;
+
     $("edHide").onclick=function(){ L.visible=!L.visible; edPush(); edRender(); edFillControls(); };
-    $("edSize").addEventListener("input", function(){ L.size=parseInt(this.value,10); edRender(); });
-    $("edSize").addEventListener("change", edPush);
-    if(!isText) return;
+    if(L.type==="shape"){
+      $("edW").addEventListener("input", function(){ L.w=parseInt(this.value,10); edRender(); });
+      $("edW").addEventListener("change", edPush);
+      $("edH").addEventListener("input", function(){ L.h=parseInt(this.value,10); edRender(); });
+      $("edH").addEventListener("change", edPush);
+      var bkS=(lastConcepts&&lastConcepts.brand)||{};
+      [["Brand",bkS.primary||"#2B44DE"],["Accent",bkS.accent||"#C9A227"],["White","#FFFFFF"],["Black","#111214"]].forEach(function(cp){
+        var b=document.createElement("button"); b.type="button"; b.className="chip";
+        b.innerHTML='<i style="display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #ccc;background:'+cp[1]+';vertical-align:-1px;margin-right:6px"></i>'+cp[0];
+        b.onclick=function(){ L.color=cp[1]; edPush(); edRender(); };
+        $("edShapeCol").appendChild(b);
+      });
+      var sp=document.createElement("input"); sp.type="color"; sp.value=L.color||"#2B44DE"; sp.className="ed-pick";
+      sp.addEventListener("input", function(){ L.color=this.value; edRender(); });
+      sp.addEventListener("change", edPush);
+      $("edShapeCol").appendChild(sp);
+    } else {
+      $("edSize").addEventListener("input", function(){ L.size=parseInt(this.value,10); edRender(); });
+      $("edSize").addEventListener("change", edPush);
+    }
+    $("edRot").addEventListener("input", function(){ L.rot=parseInt(this.value,10); edRender(); edSetVal("edRot", L.rot+"\u00b0"); });
+    $("edRot").addEventListener("change", edPush);
+    $("edOp").addEventListener("input", function(){ L.op=parseInt(this.value,10)/100; edRender(); edSetVal("edOp", Math.round(L.op*100)+"%"); });
+    $("edOp").addEventListener("change", edPush);
+
+    ["left","cx","right","top","cy","bottom"].forEach(function(a){
+      var lbl={left:"\u2190",cx:"\u2194",right:"\u2192",top:"\u2191",cy:"\u2195",bottom:"\u2193"}[a];
+      var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=lbl;
+      b.title=a; b.onclick=function(){ edAlign(a); };
+      $("edPosRow").appendChild(b);
+    });
+    if(!isText || L.type==="shape") return;
+
     $("edText").addEventListener("input", function(){ L.text=this.value; edRender(); });
     $("edText").addEventListener("change", edPush);
+    $("edTrack").addEventListener("input", function(){ L.track=parseInt(this.value,10)/100; edRender(); });
+    $("edTrack").addEventListener("change", edPush);
+    $("edLh").addEventListener("input", function(){ L.lh=parseInt(this.value,10)/100; edRender(); });
+    $("edLh").addEventListener("change", edPush);
+
     ED_FONTS.forEach(function(f){
       var b=document.createElement("button"); b.type="button";
       b.className="chip"+(L.font===f[1]?" active":""); b.textContent=f[0];
@@ -5273,19 +5578,91 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     });
     var bk=(lastConcepts&&lastConcepts.brand)||{};
     [["White","#FFFFFF"],["Black","#111214"],["Brand",bk.primary||"#2B44DE"],["Accent",bk.accent||"#C9A227"]]
-    .forEach(function(cpair){
+    .forEach(function(cp){
       var b=document.createElement("button"); b.type="button";
-      b.className="chip"+((L.color||"").toUpperCase()===cpair[1].toUpperCase()?" active":"");
-      b.innerHTML='<i style="display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #ccc;background:'+cpair[1]+';vertical-align:-1px;margin-right:6px"></i>'+cpair[0];
-      b.onclick=function(){ L.color=cpair[1]; edPush(); edRender(); edFillControls(); };
+      b.className="chip"+((L.color||"").toUpperCase()===cp[1].toUpperCase()?" active":"");
+      b.innerHTML='<i style="display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid #ccc;background:'+cp[1]+';vertical-align:-1px;margin-right:6px"></i>'+cp[0];
+      b.onclick=function(){ L.color=cp[1]; edPush(); edRender(); edFillControls(); };
       $("edColRow").appendChild(b);
     });
+    var pick=document.createElement("input");
+    pick.type="color"; pick.value=(L.color||"#FFFFFF"); pick.className="ed-pick";
+    pick.addEventListener("input", function(){ L.color=this.value; edRender(); });
+    pick.addEventListener("change", edPush);
+    $("edColRow").appendChild(pick);
+
     ["left","center","right"].forEach(function(a){
       var b=document.createElement("button"); b.type="button";
       b.className="chip"+(L.align===a?" active":""); b.textContent=a;
       b.onclick=function(){ L.align=a; edPush(); edRender(); edFillControls(); };
       $("edAlignRow").appendChild(b);
     });
+  }
+  function edSetVal(id, txt){
+    var el=$(id); if(!el || el.__missing) return;
+    var lab=el.previousElementSibling;
+    if(lab){ var s=lab.querySelector(".ed-val"); if(s) s.textContent=txt; }
+  }
+
+  /* ---------- background replacement ---------- */
+  function edReplaceBg(file){
+    if(!ED||!file) return;
+    var r=new FileReader();
+    r.onload=function(){
+      loadImg(r.result).then(function(img){
+        ED.art=img;                       // keep canvas size, cover-fit on render
+        edPush(); edRender();
+      }).catch(function(){});
+    };
+    r.readAsDataURL(file);
+  }
+
+  /* ---------- PDF export (single page, no external library) ---------- */
+  function edExportPdf(){
+    var cv=$("edCanvas");
+    var sel=ED.sel; ED.sel=null; ED.guides=[]; edRender();
+    var jpg=cv.toDataURL("image/jpeg",0.92);
+    ED.sel=sel; edRender();
+
+    var b64=jpg.split(",")[1];
+    var bin=atob(b64), bytes=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+
+    var W=ED.W, H=ED.H;
+    var pw=(W/ W)*595.28, ph=595.28*(H/W);      // A-width page, proportional height
+    pw=595.28; ph=595.28*(H/W);
+
+    var enc=new TextEncoder();
+    var parts=[], offsets=[], len=0;
+    function push(str){ var b=enc.encode(str); parts.push(b); len+=b.length; }
+    function pushBytes(b){ parts.push(b); len+=b.length; }
+
+    push("%PDF-1.4\n");
+    offsets[1]=len; push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+    offsets[2]=len; push("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+    offsets[3]=len; push("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+pw.toFixed(2)+" "+ph.toFixed(2)+"] "+
+                         "/Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n");
+    offsets[4]=len;
+    push("4 0 obj\n<< /Type /XObject /Subtype /Image /Width "+W+" /Height "+H+
+         " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+bytes.length+" >>\nstream\n");
+    pushBytes(bytes);
+    push("\nendstream\nendobj\n");
+    var content="q "+pw.toFixed(2)+" 0 0 "+ph.toFixed(2)+" 0 0 cm /Im0 Do Q";
+    offsets[5]=len; push("5 0 obj\n<< /Length "+content.length+" >>\nstream\n"+content+"\nendstream\nendobj\n");
+    var xref=len;
+    var x="xref\n0 6\n0000000000 65535 f \n";
+    for(var o=1;o<=5;o++) x += String(offsets[o]).padStart(10,"0")+" 00000 n \n";
+    push(x);
+    push("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n"+xref+"\n%%EOF");
+
+    var out=new Uint8Array(len), p=0;
+    parts.forEach(function(b){ out.set(b,p); p+=b.length; });
+    var blob=new Blob([out], {type:"application/pdf"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=(($("brand").value||"postkit").trim().toLowerCase().replace(/\s+/g,"-"))+"-design.pdf";
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
   }
 
   /* ---------- open / close / export ---------- */
@@ -5296,10 +5673,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ED.sel=sel; edRender();
     return uri;
   }
-  function openEditor(imgUri, c){
+  function openEditor(imgUri, c, bakedIn){
     var ov=$("edOverlay"); ov.style.display="flex";
     document.body.style.overflow="hidden";
-    edInit(imgUri, c).then(function(){ edRender(); edFillControls(); edSyncUndo(); }).catch(function(){});
+    edInit(imgUri, c, bakedIn).then(function(){ edRender(); edFillControls(); edSyncUndo(); }).catch(function(){});
   }
   function closeEditor(){
     var ov=$("edOverlay"); ov.style.display="none";
@@ -5560,6 +5937,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         } else if(tl){ tl.textContent = "Your plan: "+data.usage.plan+". "+data.usage.used+" of "+data.usage.limit+" used this month."; }
       }
       if(lock){
+        c.__raw = data.image;            // artwork with NO text, used by the editor
         try{ return await brandCompose(data.image, c, ($("brand").value||"").trim(), c.__tpl||0); }
         catch(e){ return data.image; }   // if compositing fails, still show the art
       }
@@ -5610,11 +5988,16 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   function showConceptImage(slot, c, img){
       slot.innerHTML='<img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
         '<span class="cc-label">'+esc2(c.label||"")+'</span>'+
-        '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="edit" title="Edit">✎</button><button data-a="tpl" title="Save as brand template">★</button><button data-a="save" title="Download">⤓</button><button data-a="share" title="Share">Share</button></div>';
+        '<div class="cc-actions">'+
+          '<button data-a="edit" class="cc-primary">✎ Edit design</button>'+
+          '<button data-a="regen" title="Regenerate">↻</button>'+
+          '<button data-a="save" title="Download">⤓</button>'+
+        '</div>';
       slot.classList.add("loaded"); slot._loaded=true;
-      slot.querySelector('[data-a="regen"]').onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
+      var rgBtn=slot.querySelector('[data-a="regen"]');
+      if(rgBtn) rgBtn.onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
       var edBtn=slot.querySelector('[data-a="edit"]');
-      if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(img, c); };
+      if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(c.__raw || img, c, !c.__raw); };
       var tplBtn=slot.querySelector('[data-a="tpl"]');
       if(tplBtn) tplBtn.onclick=function(e){
         e.stopPropagation();
@@ -5627,8 +6010,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         if(typeof buildTplPicker==="function") buildTplPicker();
         tplBtn.textContent="★ Saved";
       };
-      slot.querySelector('[data-a="save"]').onclick=function(e){ e.stopPropagation(); saveDataUri(img,c.label); };
-      slot.querySelector('[data-a="share"]').onclick=function(e){
+      var svBtn=slot.querySelector('[data-a="save"]');
+      if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img,c.label); };
+      var shBtn=slot.querySelector('[data-a="share"]');
+      if(shBtn) shBtn.onclick=function(e){
         e.stopPropagation();
         if(c.caption && navigator.clipboard){
           navigator.clipboard.writeText(c.caption+"\n\n"+((c.hashtags||[]).map(function(h){return "#"+h;}).join(" ")));
@@ -5945,8 +6330,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         '<div class="ed-actions">'+
           '<button class="gen-btn" id="edSave">Save PNG</button>'+
           '<button class="miniai" id="edSaveJpg">JPG</button>'+
+          '<button class="miniai" id="edPdf">PDF</button>'+
           '<button class="miniai" id="edShare">Share</button>'+
         '</div>'+
+      '</div>'+
+        '<input type="file" id="edBgFile" accept="image/*" style="display:none">'+
       '</div>'+
     '</div>';
     document.body.insertAdjacentHTML("beforeend", html);
@@ -5957,10 +6345,26 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     $("edSave").onclick=function(){ saveDataUri(edExport("png"), "edited"); };
     $("edSaveJpg").onclick=function(){ saveDataUri(edExport("jpg"), "edited"); };
     $("edShare").onclick=function(){ shareDataUri(edExport("png")); };
+    if($("edPdf")) $("edPdf").onclick=function(){ try{ edExportPdf(); }catch(e){} };
+    if($("edBgFile")) $("edBgFile").addEventListener("change", function(e){ edReplaceBg(e.target.files&&e.target.files[0]); });
     document.addEventListener("keydown", function(e){
       if(!ED) return;
       if(e.key==="Escape") closeEditor();
       if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==="z"){ e.preventDefault(); e.shiftKey?edRedo():edUndo(); }
+      if(/^Arrow/.test(e.key)){
+        var L=edSelected(); if(!L) return;
+        if(document.activeElement && document.activeElement.tagName==="TEXTAREA") return;
+        var step=e.shiftKey?Math.round(ED.W*0.02):Math.round(ED.W*0.004);
+        if(e.key==="ArrowLeft") L.x-=step;
+        if(e.key==="ArrowRight") L.x+=step;
+        if(e.key==="ArrowUp") L.y-=step;
+        if(e.key==="ArrowDown") L.y+=step;
+        e.preventDefault(); edRender(); edPush();
+      }
+      if(e.key==="Delete" || e.key==="Backspace"){
+        if(document.activeElement && document.activeElement.tagName==="TEXTAREA") return;
+        if(edSelected()){ e.preventDefault(); edDelete(); }
+      }
     });
   })();
 

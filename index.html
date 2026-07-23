@@ -410,21 +410,22 @@
 
   /* multi-model concepts grid */
   #conceptsCard{display:none}
-  .cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .cc-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:14px}
   .cc-slot{border:1px solid #EDEBE4;border-radius:16px;overflow:hidden;background:#FBFAF7;position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer}
   /* once an image is in, the tile grows to fit the design + its own action bar */
   .cc-slot.loaded{aspect-ratio:auto;display:block;cursor:default}
   .cc-slot img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
-  .cc-label{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 10px 0;text-align:center}
+  .cc-label{display:block;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:12px 12px 0;text-align:center}
   .cc-hint{color:var(--muted);font-size:13px;font-weight:600;padding:0 10px}
-  .cc-actions{display:none;gap:4px;justify-content:space-between;padding:7px 8px;background:#fff;border-top:1px solid #EDEBE4}
+  .cc-actions{display:none;gap:8px;justify-content:stretch;padding:10px 12px 12px;background:#fff}
   .cc-slot.loaded .cc-actions{display:flex}
-  .cc-actions button{background:transparent;color:var(--text);border:1px solid #E6E4DD;border-radius:10px;padding:9px 6px;font-size:12px;font-weight:700;line-height:1.1;min-width:40px}
+  .cc-actions button{background:transparent;color:var(--text);border:1px solid #E6E4DD;border-radius:12px;padding:12px 10px;font-size:13px;font-weight:700;line-height:1.1;white-space:nowrap}
   .cc-actions button:active{background:#F2F1EC;transform:scale(.97)}
   .cc-actions .cc-primary{
-    flex:1;background:var(--lime);color:#fff;border:none;font-size:13px;padding:10px 8px;
-    box-shadow:0 6px 16px -6px rgba(43,68,222,.55);letter-spacing:.01em;
+    flex:1.6;background:var(--lime);color:#fff;border:none;font-size:14px;padding:13px 10px;
+    box-shadow:0 8px 20px -8px rgba(43,68,222,.6);letter-spacing:.01em;
   }
+  .cc-actions button:not(.cc-primary){flex:1}
   .cc-actions .cc-primary:active{background:#243BC4}
   .cc-spin{width:34px;height:34px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
   @keyframes ccspin{to{transform:rotate(360deg)}}
@@ -5841,7 +5842,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function renderSlides(r, restoring){
     lastConcepts={brand:r.brand, shared:r.shared};
-    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
     if(r.shared){
       var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
       $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+
@@ -5873,7 +5874,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function renderPack(r, restoring){
     lastConcepts={brand:r.brand, shared:null};
-    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
     $("ccShared").innerHTML='<div class="std-sub" style="margin:0">Tap any post to generate its design. Each one uses the same brand system.</div>';
     (r.posts||[]).forEach(function(p,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
@@ -5989,9 +5990,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       slot.innerHTML='<img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
         '<span class="cc-label">'+esc2(c.label||"")+'</span>'+
         '<div class="cc-actions">'+
-          '<button data-a="edit" class="cc-primary">✎ Edit design</button>'+
-          '<button data-a="regen" title="Regenerate">↻</button>'+
-          '<button data-a="save" title="Download">⤓</button>'+
+          '<button data-a="edit" class="cc-primary">\u270e  Edit design</button>'+
+          '<button data-a="regen" title="Regenerate">\u21bb  New</button>'+
+          '<button data-a="save" title="Download">\u2913  Save</button>'+
         '</div>';
       slot.classList.add("loaded"); slot._loaded=true;
       var rgBtn=slot.querySelector('[data-a="regen"]');
@@ -6056,7 +6057,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     lastConcepts=r;
     limit = limit || 4;
     var grid=$("ccGrid"); grid.innerHTML="";
-    grid.style.gridTemplateColumns = limit===1 ? "1fr" : "1fr 1fr";
+    grid.style.gridTemplateColumns="1fr";
     if(r.shared){
       var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
       $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+

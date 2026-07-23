@@ -3241,6 +3241,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
      BRAND KIT (Phase 2) — colours from the logo, saved once
      Declared early: templates, gallery and generation all use it.
      ========================================================= */
+  var refreshKitUI = function(){};   // set once the brand row is built
   var brandKit = { primary:"", accent:"", bg:"", text:"", font:"", template:"",
                    personality:"", audience:"", designLanguage:"", website:"", instagram:"", fontOverride:"" };
   try { var _bk = localStorage.getItem("postkit_brandkit"); if(_bk){ brandKit = Object.assign(brandKit, JSON.parse(_bk)||{}); } } catch(e){}
@@ -5145,13 +5146,19 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         brandKit.personality=r.personality||""; brandKit.audience=r.audience||"";
         brandKit.designLanguage=r.designLanguage||""; brandKit.font=r.fontPersonality||brandKit.font;
         if(r.tone) state.tone=r.tone;
+        var usedAiPalette=false;
         if(r.palette && !brandKit.primary){
+          usedAiPalette=true;
           brandKit.primary=r.palette.primary||""; brandKit.accent=r.palette.accent||"";
           brandKit.bg=r.palette.bg||""; brandKit.text=r.palette.text||"";
         }
         if(r.audience && !$("audience").value.trim()) $("audience").value=r.audience;
         saveKit(); applyKitUI();
-        note.innerHTML="<b>"+esc2(brandKit.personality)+"</b><br>"+esc2(brandKit.designLanguage);
+        try{ refreshKitUI(); }catch(e){}
+        var colourNote = usedAiPalette
+          ? '<br><span style="color:var(--dim)">Colours chosen by the analysis. Upload a logo to use your real brand colours, or reset the kit to clear them.</span>'
+          : "";
+        note.innerHTML="<b>"+esc2(brandKit.personality)+"</b><br>"+esc2(brandKit.designLanguage)+colourNote;
       } else { note.textContent=d.message||"Could not analyse the brand."; }
     }catch(e){ note.textContent="Could not analyse the brand."; }
   }
@@ -5441,6 +5448,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         var has = !!(brandLogo || brandKit.primary || brandKit.personality || brandKit.designLanguage);
         $("removeLogo").style.display = has ? "" : "none";
       }
+      refreshKitUI = refreshKitControls;   // let brand analysis refresh it too
       idbGet("logo").then(function(uri){
         if(!uri){ refreshKitControls(); return; }
         loadImg(uri).then(function(img){

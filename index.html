@@ -408,27 +408,55 @@
   /* Phase 8: minimal homepage */
   #personaCard,#aiCopyCard,#studioCard,#batchCard,#kitCard,#coachCard,#historyCard{display:none!important}
 
-  /* multi-model concepts grid */
-  #conceptsCard{display:none}
-  .cc-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:14px}
-  .cc-slot{border:1px solid #EDEBE4;border-radius:16px;overflow:hidden;background:#FBFAF7;position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;cursor:pointer}
-  /* once an image is in, the tile grows to fit the design + its own action bar */
-  .cc-slot.loaded{aspect-ratio:auto;display:block;cursor:default}
-  .cc-slot img{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
-  .cc-label{display:block;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:12px 12px 0;text-align:center}
-  .cc-hint{color:var(--muted);font-size:13px;font-weight:600;padding:0 10px}
-  .cc-actions{display:none;gap:8px;justify-content:stretch;padding:10px 12px 12px;background:#fff}
-  .cc-slot.loaded .cc-actions{display:flex}
-  .cc-actions button{background:transparent;color:var(--text);border:1px solid #E6E4DD;border-radius:12px;padding:12px 10px;font-size:13px;font-weight:700;line-height:1.1;white-space:nowrap}
-  .cc-actions button:active{background:#F2F1EC;transform:scale(.97)}
-  .cc-actions .cc-primary{
-    flex:1.6;background:var(--lime);color:#fff;border:none;font-size:14px;padding:13px 10px;
-    box-shadow:0 8px 20px -8px rgba(43,68,222,.6);letter-spacing:.01em;
+  /* ===== premium results gallery ===== */
+  .cc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .cc-slot{
+    position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;cursor:pointer;
+    background:#F2F1EC;box-shadow:0 2px 6px rgba(25,26,23,.05), 0 18px 40px -22px rgba(25,26,23,.35);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+    animation:ccIn .5s cubic-bezier(.2,.8,.2,1) both;
   }
-  .cc-actions button:not(.cc-primary){flex:1}
-  .cc-actions .cc-primary:active{background:#243BC4}
-  .cc-spin{width:34px;height:34px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
+  .cc-slot:active{transform:scale(.985)}
+  .cc-slot.loaded{aspect-ratio:1/1}
+  .cc-slot img{width:100%;height:100%;object-fit:cover;display:block;animation:ccFade .6s ease both}
+  @keyframes ccIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes ccFade{from{opacity:0}to{opacity:1}}
+  .cc-label{display:none}
+  .cc-hint{color:var(--muted);font-size:12px;font-weight:600;padding:0 14px;line-height:1.5}
+  /* glass controls, only on a finished design, sitting over the artwork */
+  .cc-actions{
+    display:none;position:absolute;left:8px;right:8px;bottom:8px;gap:6px;justify-content:center;
+    padding:6px;border-radius:14px;
+    background:rgba(20,21,18,.42);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s;
+  }
+  .cc-slot.loaded .cc-actions{display:flex;opacity:1;transform:none}
+  .cc-actions button{
+    flex:1;background:transparent;border:none;color:#fff;border-radius:10px;
+    padding:8px 2px;font-size:10px;font-weight:600;line-height:1.35;letter-spacing:.01em;
+  }
+  .cc-actions button b{display:block;font-size:15px;font-weight:400;margin-bottom:1px}
+  .cc-actions button:active{background:rgba(255,255,255,.16)}
+  .cc-spin{width:30px;height:30px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
   @keyframes ccspin{to{transform:rotate(360deg)}}
+
+  /* ===== fullscreen design viewer ===== */
+  #cvOverlay{position:fixed;inset:0;z-index:350;display:none;flex-direction:column;background:rgba(14,15,12,.92);backdrop-filter:blur(18px)}
+  #cvOverlay.on{display:flex;animation:ccFade .25s ease both}
+  .cv-top{display:flex;align-items:center;gap:10px;padding:14px 16px;color:#fff}
+  .cv-top .cv-x{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;width:36px;height:36px;border-radius:50%}
+  .cv-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:0 16px;overflow:hidden}
+  .cv-stage img{max-width:100%;max-height:100%;border-radius:18px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8);animation:cvPop .4s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes cvPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+  .cv-sheet{background:var(--card);border-radius:22px 22px 0 0;margin-top:14px;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:52vh;overflow:auto}
+  .cv-bar{display:flex;gap:8px;margin-bottom:14px}
+  .cv-bar button{flex:1;border:1px solid var(--border);background:var(--card);border-radius:14px;padding:11px 4px;font-size:11px;font-weight:700;color:var(--text)}
+  .cv-bar button b{display:block;font-size:17px;font-weight:400;margin-bottom:2px}
+  .cv-bar .cv-main{background:var(--lime);color:#fff;border-color:transparent;box-shadow:0 8px 20px -8px rgba(43,68,222,.6)}
+  .cv-cap{white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--text)}
+  .cv-tags{color:var(--muted);font-size:13px;margin-top:8px;line-height:1.6}
+  .cv-sec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
 
   /* ===== Phase 1: premium concepts-only homepage ===== */
   #modeToggle,#genBtn,#starterRow,#customizeAcc{display:none!important}
@@ -3628,7 +3656,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     // persist this too, so it survives leaving the app
     savePlan("concepts", { brand:lastConcepts.brand, shared:null, concepts:[c] }, 1);
     c.__idx=0; c.__tpl=0;
-    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
     var slot=document.createElement("div"); slot.className="cc-slot"; grid.appendChild(slot);
     slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,c); };
     card.scrollIntoView({behavior:"smooth",block:"start"});
@@ -4843,6 +4871,84 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     return s;
   }
   // Composite: AI art + brand text + logo -> data URI
+  /* =========================================================
+     LAYOUT ENGINE
+     Rules, not guesses. Everything is solved inside a safe area
+     with a fixed spacing scale, so text can never overflow,
+     collide with the brand mark, or leave the frame.
+     ========================================================= */
+  function LE_safe(W,H,T){
+    var m = Math.round(W*(T.pad||0.075));
+    return { x:m, y:m, w:W-m*2, h:H-m*2, m:m };
+  }
+  function LE_markHeight(W,H){
+    if(brandLogo){
+      var lw=Math.min(W*0.26, brandLogo.naturalWidth);
+      var lh=lw*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+      return Math.min(H*0.10, lh);
+    }
+    return Math.round(W*0.030);
+  }
+  // shrink a headline until it fits the safe width in at most maxLines
+  function LE_fitHeadline(ctx, text, safeW, startSize, weight, fam, maxLines, minSize){
+    var size=startSize;
+    while(size>minSize){
+      ctx.font=weight+" "+size+"px "+fam;
+      var lines=wrapLines(ctx, text, safeW);
+      if(lines.length<=maxLines){
+        var widest=0;
+        lines.forEach(function(l){ widest=Math.max(widest, ctx.measureText(l).width); });
+        if(widest<=safeW) return { size:size, lines:lines };
+      }
+      size-=Math.max(2, Math.round(size*0.04));
+    }
+    ctx.font=weight+" "+minSize+"px "+fam;
+    return { size:minSize, lines:wrapLines(ctx, text, safeW) };
+  }
+  // solve the whole text block: sizes, line breaks, gaps and final y positions
+  function LE_solve(ctx, opts){
+    var S=opts.safe, gap=Math.round(opts.W*0.022);      // one spacing unit
+    var head=LE_fitHeadline(ctx, opts.head, S.w, opts.headSize, "800", opts.fam, 3, Math.round(opts.W*0.045));
+    var headLH=Math.round(head.size*1.1);
+    var headH=head.lines.length*headLH;
+
+    var supSize=Math.round(opts.W*0.032), supLines=[], supH=0, supLH=Math.round(supSize*1.35);
+    if(opts.sup){
+      ctx.font="500 "+supSize+"px "+opts.fam;
+      supLines=wrapLines(ctx, opts.sup, S.w).slice(0,2);
+      supH=supLines.length*supLH;
+    }
+    var ctaSize=Math.round(opts.W*0.030), ctaH=0, ctaPill=ctaSize*2.3;
+    if(opts.cta) ctaH=ctaPill;
+
+    var blockH = headH + (supH? gap*0.6 + supH : 0) + (ctaH? gap + ctaH : 0);
+
+    // the vertical band the block may occupy, never under the brand mark
+    var markH = LE_markHeight(opts.W, opts.H);
+    var topLimit = S.y + markH + gap*1.4;
+    var botLimit = S.y + S.h;
+    var avail = botLimit - topLimit;
+
+    // if it still cannot fit, tighten the headline further
+    if(blockH > avail){
+      var shrink = Math.max(0.55, avail/blockH);
+      head = LE_fitHeadline(ctx, opts.head, S.w, Math.round(head.size*shrink), "800", opts.fam, 3, Math.round(opts.W*0.038));
+      headLH=Math.round(head.size*1.1); headH=head.lines.length*headLH;
+      blockH = headH + (supH? gap*0.6 + supH : 0) + (ctaH? gap + ctaH : 0);
+    }
+
+    var yTop;
+    if(opts.vpos==="top") yTop = topLimit;
+    else if(opts.vpos==="center") yTop = topLimit + Math.max(0,(avail-blockH)/2);
+    else yTop = botLimit - blockH;
+    yTop = Math.max(topLimit, Math.min(yTop, botLimit - blockH));
+
+    return { head:head, headLH:headLH, headH:headH,
+             supLines:supLines, supSize:supSize, supLH:supLH, supH:supH,
+             ctaSize:ctaSize, ctaPill:ctaPill, gap:gap,
+             yTop:yTop, blockH:blockH, safe:S };
+  }
+
   async function brandCompose(imgUri, c, brand, tplIdx){
     var art=await loadImg(imgUri);
     var W=art.naturalWidth||1024, H=art.naturalHeight||1024;
@@ -4867,32 +4973,22 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var sup=(c.support||"").trim();
     var cta=(c.cta||"").trim();
 
-    // measure the text block so we can place it top / center / bottom
-    var hs=fitFont(ctx,head,maxW,Math.round(W*(T.headScale||0.095)),"800",fam,Math.round(W*0.045));
-    ctx.font="800 "+hs+"px "+fam;
-    var hl=wrapLines(ctx,head,maxW), hlh=Math.round(hs*1.12);
-    ctx.font="500 "+Math.round(W*0.032)+"px "+fam;
-    var sl=sup?wrapLines(ctx,sup,maxW):[], slh=Math.round(W*0.045);
-    var ctaFs = Math.round(W*0.030), ctaPh = ctaFs*2.3;
-    var ctaH = cta ? (ctaPh + Math.round(H*0.02)) : 0;
-    /* measure EXACTLY the way we draw: the first headline baseline sits hs below
-       the block top, so that hs must be counted or the CTA overflows the frame. */
-    var blockH = hs + hl.length*hlh
-               + (sl.length ? (Math.round(H*0.006) + sl.length*slh) : 0)
-               + ctaH
-               + Math.round(hs*0.18);            // descender breathing room
+    // solve the layout with rules instead of guesses
+    var SOL = LE_solve(ctx, {
+      W:W, H:H, fam:fam, safe:LE_safe(W,H,T),
+      head:head, sup:sup, cta:cta,
+      headSize:Math.round(W*(T.headScale||0.095)),
+      vpos:T.vpos
+    });
+    var hs=SOL.head.size, hl=SOL.head.lines, hlh=SOL.headLH;
+    var sl=SOL.supLines, slh=SOL.supLH;
+    var ctaFs=SOL.ctaSize, ctaPh=SOL.ctaPill;
+    var blockH=SOL.blockH;
+    var yTop=SOL.yTop;
+    pad=SOL.safe.m;
+    ax = alignLeft ? SOL.safe.x : W/2;
 
-    var yTop;
-    // reserve room for the brand mark so text can never collide with it
-    var markH = brandLogo
-      ? Math.min(H*0.10, Math.min(W*0.26, brandLogo.naturalWidth)*(brandLogo.naturalHeight/brandLogo.naturalWidth))
-      : Math.round(W*0.030);
-    if(T.vpos==="top") yTop = pad + markH + Math.round(H*0.055);
-    else if(T.vpos==="center") yTop = (H-blockH)/2;
-    else yTop = H - pad - blockH;
-    // never let the block leave the frame
-    yTop = Math.max(pad*0.6, Math.min(yTop, H - pad - blockH));
-
+    var markH = LE_markHeight(W,H);
     /* ---- guarantee readability ----
        Look at the actual artwork behind the text block, then pick a scrim
        and a text colour that are certain to contrast with it. */
@@ -4949,7 +5045,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
     // support
     if(sl.length){
-      y += Math.round(H*0.006);
+      y += Math.round(SOL.gap*0.6);
       ctx.font="500 "+Math.round(W*0.032)+"px "+fam;
       if(c.__layout) c.__layout.sup.y = y;
       ctx.fillStyle = darkText ? "rgba(17,18,20,0.88)" : "rgba(255,255,255,0.94)";
@@ -4958,7 +5054,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
     // CTA in the template's style
     if(cta){
-      y += Math.round(H*0.02);
+      y += SOL.gap;
       if(c.__layout) c.__layout.cta.y = y;
       var fs=ctaFs;
       ctx.font="700 "+fs+"px "+fam;
@@ -5124,6 +5220,15 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var ax = alignL?pad:W/2;
       var head=(c.headline||"").trim(), sup=(c.support||"").trim(), cta=(c.cta||"").trim();
       var brandTxt=($("brand").value||"").trim();
+
+      // the layout recorded when this design was generated, so the editor matches it exactly
+      var LO = c.__layout;
+      if(LO && LO.W===W){
+        fam = LO.fam || fam;
+        pad = LO.pad || pad;
+        ax  = (typeof LO.ax==="number") ? LO.ax : ax;
+        alignL = LO.align!=="center";
+      } else { LO = null; }
 
       var layers=[];
       var markGap = brandLogo
@@ -5719,7 +5824,15 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   function openEditor(imgUri, c, bakedIn){
     var ov=$("edOverlay"); ov.style.display="flex";
     document.body.style.overflow="hidden";
-    edInit(imgUri, c, bakedIn).then(function(){ edRender(); edFillControls(); edSyncUndo(); }).catch(function(){});
+    edInit(imgUri, c, bakedIn)
+      .then(function(){ edRender(); edFillControls(); edSyncUndo(); })
+      .catch(function(err){
+        var box=$("edProps");
+        if(box && !box.__missing){
+          box.innerHTML='<div class="ed-hint">Could not open this design in the editor.<br>'+
+            esc2((err&&err.message)||"Please generate a new design and try again.")+'</div>';
+        }
+      });
   }
   function closeEditor(){
     var ov=$("edOverlay"); ov.style.display="none";
@@ -5894,13 +6007,13 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function renderSlides(r, restoring){
     lastConcepts={brand:r.brand, shared:r.shared};
-    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
     if(r.shared){
       var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
-      $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+
-        '<div style="white-space:pre-wrap;font-size:14px;line-height:1.6;margin-bottom:8px">'+esc2(full)+'</div>'+
-        '<button class="miniai" id="ccCopy" style="width:100%">Copy caption + hashtags</button>';
-      var cc=$("ccCopy"); cc.onclick=function(){ if(navigator.clipboard) navigator.clipboard.writeText(full); };
+      $("ccShared").innerHTML='<details class="acc" style="margin-top:4px"><summary>Caption &amp; hashtags</summary>'+
+        '<div class="adv-body"><div style="white-space:pre-wrap;font-size:14px;line-height:1.7">'+esc2(full)+'</div>'+
+        '<button class="miniai" id="ccCopy" style="width:100%;margin-top:10px">Copy caption + hashtags</button></div></details>';
+      var cc=$("ccCopy"); if(cc) cc.onclick=function(){ if(navigator.clipboard) navigator.clipboard.writeText(full); };
     }
     (r.slides||[]).forEach(function(s,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
@@ -5926,7 +6039,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function renderPack(r, restoring){
     lastConcepts={brand:r.brand, shared:null};
-    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
+    var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
     $("ccShared").innerHTML='<div class="std-sub" style="margin:0">Tap any post to generate its design. Each one uses the same brand system.</div>';
     (r.posts||[]).forEach(function(p,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
@@ -6041,41 +6154,89 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   function showConceptImage(slot, c, img){
-      slot.innerHTML='<img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
-        '<span class="cc-label">'+esc2(c.label||"")+'</span>'+
+      slot.innerHTML='<img src="'+img+'" alt="">'+
         '<div class="cc-actions">'+
-          '<button data-a="edit" class="cc-primary">\u270e  Edit design</button>'+
-          '<button data-a="regen" title="Regenerate">\u21bb  New</button>'+
-          '<button data-a="save" title="Download">\u2913  Save</button>'+
+          '<button data-a="edit"><b>\u270e</b>Edit</button>'+
+          '<button data-a="save"><b>\u2913</b>Save</button>'+
+          '<button data-a="fav"><b>\u2661</b>Favourite</button>'+
+          '<button data-a="regen"><b>\u21bb</b>New</button>'+
         '</div>';
-      slot.classList.add("loaded"); slot._loaded=true;
+      slot.classList.add("loaded"); slot._loaded=true; slot._img=img; slot._c=c;
+
+      // tapping the artwork opens the full screen viewer
+      slot.onclick=function(e){
+        if(e.target.closest(".cc-actions")) return;
+        openViewer(img, c);
+      };
       var rgBtn=slot.querySelector('[data-a="regen"]');
       if(rgBtn) rgBtn.onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
       var edBtn=slot.querySelector('[data-a="edit"]');
       if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(c.__raw || img, c, !c.__raw); };
-      var tplBtn=slot.querySelector('[data-a="tpl"]');
-      if(tplBtn) tplBtn.onclick=function(e){
+      var svBtn=slot.querySelector('[data-a="save"]');
+      if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img, c.label||"design"); };
+      var fvBtn=slot.querySelector('[data-a="fav"]');
+      if(fvBtn) fvBtn.onclick=function(e){
         e.stopPropagation();
         var base=templateFor(c.__tpl||0);
-        var name=prompt("Name this brand template:", (c.label||"My Style"));
-        if(!name) return;
+        var name=(c.label||"Saved")+" "+new Date().toLocaleDateString();
         savedTemplates[name]=JSON.parse(JSON.stringify(base));
         try{ localStorage.setItem("postkit_templates", JSON.stringify(savedTemplates)); }catch(err){}
-        // saved to your library; layouts keep rotating unless you pick one in Advanced options
         if(typeof buildTplPicker==="function") buildTplPicker();
-        tplBtn.textContent="★ Saved";
-      };
-      var svBtn=slot.querySelector('[data-a="save"]');
-      if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img,c.label); };
-      var shBtn=slot.querySelector('[data-a="share"]');
-      if(shBtn) shBtn.onclick=function(e){
-        e.stopPropagation();
-        if(c.caption && navigator.clipboard){
-          navigator.clipboard.writeText(c.caption+"\n\n"+((c.hashtags||[]).map(function(h){return "#"+h;}).join(" ")));
-        }
-        shareDataUri(img);
+        fvBtn.innerHTML='<b>\u2665</b>Saved';
       };
   }
+
+  /* ---------- full screen design viewer ---------- */
+  var CV = null;
+  function openViewer(img, c){
+    CV={img:img, c:c};
+    var ov=$("cvOverlay");
+    var shared=(lastConcepts&&lastConcepts.shared)||null;
+    var cap=(c.caption || (shared&&shared.caption) || "").trim();
+    var tags=(c.hashtags || (shared&&shared.hashtags) || []);
+    $("cvImg").src=img;
+    $("cvBody").innerHTML =
+      '<div class="cv-bar">'+
+        '<button class="cv-main" id="cvEdit"><b>\u270e</b>Edit</button>'+
+        '<button id="cvSave"><b>\u2913</b>Save</button>'+
+        '<button id="cvShare"><b>\u21ea</b>Share</button>'+
+        '<button id="cvRegen"><b>\u21bb</b>New</button>'+
+      '</div>'+
+      (cap? '<p class="cv-sec">Caption</p><div class="cv-cap">'+esc2(cap)+'</div>' : '')+
+      (tags.length? '<div class="cv-tags">'+esc2(tags.map(function(t){return "#"+t;}).join(" "))+'</div>' : '')+
+      (cap? '<button class="miniai" id="cvCopy" style="width:100%;margin-top:14px">Copy caption + hashtags</button>' : '');
+    ov.classList.add("on");
+    document.body.style.overflow="hidden";
+
+    $("cvEdit").onclick=function(){ closeViewer(); openEditor(c.__raw || img, c, !c.__raw); };
+    $("cvSave").onclick=function(){ saveDataUri(img, c.label||"design"); };
+    $("cvShare").onclick=function(){ shareDataUri(img); };
+    $("cvRegen").onclick=function(){
+      closeViewer();
+      var slots=$("ccGrid").querySelectorAll(".cc-slot");
+      var i=(typeof c.__idx==="number")?c.__idx:0;
+      if(slots[i]) loadConceptImage(slots[i], c);
+    };
+    if($("cvCopy")) $("cvCopy").onclick=function(){
+      if(navigator.clipboard) navigator.clipboard.writeText(cap+"\n\n"+tags.map(function(t){return "#"+t;}).join(" "));
+      $("cvCopy").textContent="Copied \u2713";
+    };
+  }
+  function closeViewer(){
+    var ov=$("cvOverlay"); ov.classList.remove("on");
+    document.body.style.overflow=""; CV=null;
+  }
+  (function(){
+    document.body.insertAdjacentHTML("beforeend",
+      '<div id="cvOverlay">'+
+        '<div class="cv-top"><button class="cv-x" id="cvClose">\u2715</button></div>'+
+        '<div class="cv-stage"><img id="cvImg" alt=""></div>'+
+        '<div class="cv-sheet" id="cvBody"></div>'+
+      '</div>');
+    $("cvClose").onclick=closeViewer;
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && CV) closeViewer(); });
+  })();
+
   async function loadConceptImage(slot, c){
     slot._busy=true; slot.classList.remove("loaded");
     slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-spin"></div>';
@@ -6111,7 +6272,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     lastConcepts=r;
     limit = limit || 4;
     var grid=$("ccGrid"); grid.innerHTML="";
-    grid.style.gridTemplateColumns="1fr";
+    grid.style.gridTemplateColumns="1fr 1fr";
     if(r.shared){
       var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
       $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+

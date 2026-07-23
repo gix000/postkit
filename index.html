@@ -3539,8 +3539,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var card=$("conceptsCard"); card.style.display="block";
     card.querySelector(".std-sub").textContent="Built from an inspiration style, using your brand.";
     $("ccShared").innerHTML=""; $("ccErr").textContent="";
+    // persist this too, so it survives leaving the app
+    savePlan("concepts", { brand:lastConcepts.brand, shared:null, concepts:[c] }, 1);
+    c.__idx=0; c.__tpl=0;
     var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
     var slot=document.createElement("div"); slot.className="cc-slot"; grid.appendChild(slot);
+    slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,c); };
     card.scrollIntoView({behavior:"smooth",block:"start"});
     loadConceptImage(slot,c);
   }
@@ -4862,6 +4866,62 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     return cv.toDataURL("image/png");
   }
 
+  /* =========================================================
+     SESSION PERSISTENCE
+     Your work survives leaving the app, a reload, or a crash.
+     Plans go in localStorage; images go in IndexedDB (much bigger).
+     ========================================================= */
+  var lastPlan=null;                    // { kind, data, limit }
+  var sessionImages={};                 // { slotIndex: dataURI }
+
+  function idb(){
+    return new Promise(function(res,rej){
+      var r=indexedDB.open("postkit",1);
+      r.onupgradeneeded=function(){ r.result.createObjectStore("imgs"); };
+      r.onsuccess=function(){ res(r.result); };
+      r.onerror=function(){ rej(r.error); };
+    });
+  }
+  async function idbSet(k,v){ try{ var db=await idb(); return new Promise(function(res){ var t=db.transaction("imgs","readwrite"); t.objectStore("imgs").put(v,k); t.oncomplete=function(){res();}; t.onerror=function(){res();}; }); }catch(e){} }
+  async function idbGet(k){ try{ var db=await idb(); return await new Promise(function(res){ var t=db.transaction("imgs","readonly"); var q=t.objectStore("imgs").get(k); q.onsuccess=function(){res(q.result||null);}; q.onerror=function(){res(null);}; }); }catch(e){ return null; } }
+
+  function savePlan(kind, data, limit){
+    lastPlan={kind:kind, data:data, limit:limit||4};
+    sessionImages={};
+    try{ localStorage.setItem("postkit_session", JSON.stringify(lastPlan)); }catch(e){}
+    idbSet("images", {});
+  }
+  function rememberImage(c, img){
+    if(!lastPlan) return;
+    var i=(typeof c.__idx==="number")?c.__idx:0;
+    sessionImages[i]=img;
+    idbSet("images", sessionImages);
+  }
+  async function restoreSession(){
+    var raw=null;
+    try{ raw=localStorage.getItem("postkit_session"); }catch(e){}
+    if(!raw) return;
+    var plan; try{ plan=JSON.parse(raw); }catch(e){ return; }
+    if(!plan || !plan.data) return;
+    lastPlan=plan;
+    var card=$("conceptsCard"); if(card.__missing) return;
+    card.style.display="block";
+    card.querySelector(".std-sub").textContent="Your last designs, restored.";
+    if(plan.kind==="pack") renderPack(plan.data, true);
+    else if(plan.kind==="slides") renderSlides(plan.data, true);
+    else renderConcepts(plan.data, plan.limit, true);
+
+    var imgs=await idbGet("images");
+    if(!imgs) return;
+    sessionImages=imgs;
+    var slots=$("ccGrid").querySelectorAll(".cc-slot");
+    var items=(plan.data.concepts||plan.data.posts||plan.data.slides||[]);
+    Object.keys(imgs).forEach(function(k){
+      var i=parseInt(k,10);
+      if(slots[i] && items[i]){ items[i].__idx=i; showConceptImage(slots[i], items[i], imgs[k]); slots[i]._loaded=true; }
+    });
+  }
+
   /* ---------- Advanced: layout preference, typography override, alt palette ---------- */
   function buildTplPicker(){
     var box=$("advExtras"); if(!box || box.__missing) return;
@@ -4938,7 +4998,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(data.ok && data.result) return data.result;
     throw new Error(data.message||"Couldn't build the carousel.");
   }
-  function renderSlides(r){
+  function renderSlides(r, restoring){
     lastConcepts={brand:r.brand, shared:r.shared};
     var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
     if(r.shared){
@@ -4952,10 +5012,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var slot=document.createElement("div"); slot.className="cc-slot";
       slot.innerHTML='<span class="cc-label">'+esc2(s.label||("Slide "+(i+1)))+'</span>'+
                      (i===0?'<div class="cc-spin"></div>':'<div class="cc-hint"><b>'+esc2(s.headline||"")+'</b><br>Tap to generate</div>');
-      s.__tpl=0;
+      s.__tpl=0; s.__idx=i;
       slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,s); };
       grid.appendChild(slot);
-      if(i===0) loadConceptImage(slot,s);
+      if(i===0 && !restoring) loadConceptImage(slot,s);
     });
   }
 
@@ -4970,7 +5030,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(data.ok && data.result) return data.result;
     throw new Error(data.message||"Couldn't plan the month. Try again.");
   }
-  function renderPack(r){
+  function renderPack(r, restoring){
     lastConcepts={brand:r.brand, shared:null};
     var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr 1fr";
     $("ccShared").innerHTML='<div class="std-sub" style="margin:0">Tap any post to generate its design. Each one uses the same brand system.</div>';
@@ -4978,7 +5038,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var slot=document.createElement("div"); slot.className="cc-slot";
       slot.innerHTML='<span class="cc-label">'+esc2(p.label||("Post "+(i+1)))+'</span>'+
                      '<div class="cc-hint"><b>'+esc2(p.headline||"")+'</b><br>Tap to generate</div>';
-      p.__tpl=i;
+      p.__tpl=i; p.__idx=i;
       slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,p); };
       grid.appendChild(slot);
     });
@@ -5024,11 +5084,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       else { saveDataUri(uri,"post"); }
     }catch(e){}
   }
-  async function loadConceptImage(slot, c){
-    slot._busy=true; slot.classList.remove("loaded");
-    slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-spin"></div>';
-    try{
-      var img=await callImage(c);
+  function showConceptImage(slot, c, img){
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><img src="'+img+'" alt="'+esc2(c.label||"")+'">'+
         '<div class="cc-actions"><button data-a="regen" title="Regenerate">↻</button><button data-a="tpl" title="Save as brand template">★</button><button data-a="save" title="Download">⤓</button><button data-a="share" title="Share">Share</button></div>';
       slot.classList.add("loaded"); slot._loaded=true;
@@ -5053,13 +5109,21 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         }
         shareDataUri(img);
       };
+  }
+  async function loadConceptImage(slot, c){
+    slot._busy=true; slot.classList.remove("loaded");
+    slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-spin"></div>';
+    try{
+      var img=await callImage(c);
+      showConceptImage(slot, c, img);
+      rememberImage(c, img);
     }catch(e){
       slot._loaded=false;
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-hint">'+esc2(e.message||"Failed")+'<br>tap to retry</div>';
     }
     slot._busy=false;
   }
-  function renderConcepts(r, limit){
+  function renderConcepts(r, limit, restoring){
     lastConcepts=r;
     limit = limit || 4;
     var grid=$("ccGrid"); grid.innerHTML="";
@@ -5074,10 +5138,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     (r.concepts||[]).slice(0,limit).forEach(function(c,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
       slot.innerHTML='<span class="cc-label">'+esc2(c.label||("Concept "+(i+1)))+'</span>'+(i===0?'<div class="cc-spin"></div>':'<div class="cc-hint">Tap to reveal</div>');
-      c.__tpl=i;
+      c.__tpl=i; c.__idx=i;
       slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,c); };
       grid.appendChild(slot);
-      if(i===0) loadConceptImage(slot,c);   // first one is free & auto
+      if(i===0 && !restoring) loadConceptImage(slot,c);   // first one is free & auto
     });
   }
 
@@ -5176,7 +5240,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       if($("removeLogo")) $("removeLogo").onclick=function(){
         brandLogo=null;
         if($("brandLogoFile")) $("brandLogoFile").value="";
-        $("logoNote").textContent="Logo removed. Your business name will be used instead.";
+        // colours were detected from the logo, so clear them with it
+        brandKit.primary=""; brandKit.accent=""; brandKit.bg=""; brandKit.text="";
+        saveKit(); applyKitUI();
+        $("logoNote").textContent="Logo and brand colours removed.";
         this.style.display="none";
       };
       if($("kitSite")) $("kitSite").value = brandKit.website||"";
@@ -5243,7 +5310,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var btns=[$("act4"),$("act1"),$("actM")]; btns.forEach(function(b){b.disabled=true;});
       var a=(limit===1?$("act1"):$("act4")); var old=a.textContent; a.textContent="Creating…";
       card.scrollIntoView({behavior:"smooth",block:"start"});
-      try{ var r=await callConcepts(); renderConcepts(r, limit); }
+      try{ var r=await callConcepts(); savePlan("concepts", r, limit); renderConcepts(r, limit); }
       catch(e){ $("ccErr").textContent=e.message; }
       finally{ btns.forEach(function(b){b.disabled=false;}); a.textContent=old; }
     }
@@ -5258,7 +5325,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var all=[$("act4"),$("act1"),$("actM"),$("act3"),$("act5")]; all.forEach(function(b){ if(b) b.disabled=true; });
       var btn=(n===3?$("act3"):$("act5")); var old=btn.textContent; btn.textContent="Creating…";
       card.scrollIntoView({behavior:"smooth",block:"start"});
-      try{ var r=await callSlides(n); card.querySelector(".std-sub").textContent=n+" slides, one brand, one story. Tap each to generate."; renderSlides(r); }
+      try{ var r=await callSlides(n); savePlan("slides", r, n); card.querySelector(".std-sub").textContent=n+" slides, one brand, one story. Tap each to generate."; renderSlides(r); }
       catch(e){ $("ccErr").textContent=e.message; }
       finally{ all.forEach(function(b){ if(b) b.disabled=false; }); btn.textContent=old; }
     }
@@ -5273,6 +5340,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       card.scrollIntoView({behavior:"smooth",block:"start"});
       try{
         var r=await callPack();
+        savePlan("pack", r, 8);
         card.querySelector(".std-sub").textContent="Your month of content, all in one brand system.";
         renderPack(r);
       }
@@ -5280,6 +5348,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       finally{ btns.forEach(function(b){b.disabled=false;}); $("actM").textContent=old; }
     };
   })();
+
+  try{ restoreSession(); }catch(e){}
 
   /* ---------- 7/8: tidy homepage — gallery + extras live in Advanced options ---------- */
   (function(){

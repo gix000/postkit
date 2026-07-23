@@ -5168,7 +5168,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ code:state.code, mode:"slides", clientId:pkClientId(), email:pkEmail(), slideCount:n, brandKit:brandKit,
         photoRef:window.__pkPhotoRef,
-        topic:($("topic").value||"").trim(), brand:($("brand").value||"").trim(),
+        topic:($("topic").value||"").trim().slice(0,1400), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
         audience:($("audience").value||"").trim() })});
     var data=await res.json();
@@ -5200,7 +5200,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   async function callPack(){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ code:state.code, mode:"pack", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit, photoRef:window.__pkPhotoRef,
-        topic:($("topic").value||"").trim()||"a balanced month of content",
+        topic:(($("topic").value||"").trim().slice(0,1400)||"a balanced month of content"),
         brand:($("brand").value||"").trim(), bizType:$("bizType").value,
         lang:state.lang, tone:state.tone, audience:($("audience").value||"").trim() })});
     var data=await res.json();
@@ -5224,7 +5224,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   async function callConcepts(){
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ code:state.code, mode:"concepts", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit, photoRef:window.__pkPhotoRef,
-        topic:($("topic").value||"").trim(), brand:($("brand").value||"").trim(),
+        topic:($("topic").value||"").trim().slice(0,1400), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
         audience:($("audience").value||"").trim() })});
     var data=await res.json();

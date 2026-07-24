@@ -6019,7 +6019,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   function openEditor(imgUri, c, bakedIn){
     var ov=$("edOverlay"); ov.style.display="flex";
     pkLockScroll();
-    edInit(imgUri, c, bakedIn)
+    // A design restored from a previous session can arrive without its recorded
+    // layout. brandCompose writes c.__layout as a side effect, so re-run it on the
+    // same artwork to rebuild the exact layout before the editor reads it.
+    var prep;
+    if(!bakedIn && c.__raw && !c.__layout){
+      prep = brandCompose(c.__raw, c, ($("brand").value||"").trim(), c.__tpl||0)
+               .catch(function(){ return null; });
+    } else {
+      prep = Promise.resolve(null);
+    }
+    prep.then(function(){ return edInit(imgUri, c, bakedIn); })
       .then(function(){ edRender(); edFillControls(); edSyncUndo(); })
       .catch(function(err){
         var box=$("edProps");
@@ -6055,12 +6065,24 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   async function idbSet(k,v){ try{ var db=await idb(); return new Promise(function(res){ var t=db.transaction("imgs","readwrite"); t.objectStore("imgs").put(v,k); t.oncomplete=function(){res();}; t.onerror=function(){res();}; }); }catch(e){} }
   async function idbGet(k){ try{ var db=await idb(); return await new Promise(function(res){ var t=db.transaction("imgs","readonly"); var q=t.objectStore("imgs").get(k); q.onsuccess=function(){res(q.result||null);}; q.onerror=function(){res(null);}; }); }catch(e){ return null; } }
 
+  // localStorage is ~5MB. c.__raw is a multi-MB base64 data URI and lives in the
+  // same object as c.__layout, so stringifying the whole plan blows the quota and
+  // the write silently fails - taking the recorded layout down with it. The art is
+  // already stored separately in IndexedDB, so leave it out here.
+  function saveSessionPlan(){
+    if(!lastPlan) return;
+    try{
+      localStorage.setItem("postkit_session",
+        JSON.stringify(lastPlan, function(k,v){ return (k==="__raw") ? undefined : v; }));
+    }catch(e){}
+  }
+
   function savePlan(kind, data, limit){
     window.__pkTplOffset = Math.floor(Math.random()*99);   // new layout rotation each generation
     designHashes = {};
     lastPlan={kind:kind, data:data, limit:limit||4};
     sessionImages={}; sessionRaws={};
-    try{ localStorage.setItem("postkit_session", JSON.stringify(lastPlan)); }catch(e){}
+    saveSessionPlan();
     idbSet("images", {}); idbSet("raws", {});
   }
   function rememberImage(c, img){
@@ -6072,7 +6094,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     idbSet("raws", sessionRaws);
     // the recorded layout is created while drawing, so re-save the plan now
     // otherwise a restored design opens in the editor with the wrong layout
-    try{ localStorage.setItem("postkit_session", JSON.stringify(lastPlan)); }catch(e){}
+    saveSessionPlan();
   }
   async function restoreSession(){
     var raw=null;

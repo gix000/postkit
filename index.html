@@ -341,7 +341,10 @@
   #modeToggle button.active{background:#fff;color:var(--accent);box-shadow:0 2px 8px -2px rgba(25,26,23,.18)}
   #modeToggle .mode-hint{align-self:center;font-size:12px;color:var(--dim);padding-left:6px;font-weight:400}
   body.basic-mode .pro-only{display:none!important}
-  body.pk-overlay .wa-float,body.pk-overlay #waFloat{display:none!important}
+  body.pk-overlay .wa-float,body.pk-overlay #waFloat,body.pk-overlay .whatsapp-float{display:none!important}
+  /* hide everything behind an overlay so nothing can show through */
+  body.pk-overlay > *:not(#cvOverlay):not(#edOverlay){display:none!important}
+  body.pk-overlay{overflow:hidden;height:100dvh}
   .fmt-ico{display:inline-block;border:1.6px solid currentColor;border-radius:2.5px;vertical-align:-1px;margin-right:7px;opacity:.75}
   #emailGate{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(25,26,23,.45);backdrop-filter:blur(3px);padding:20px}
   #emailGate .eg-box{background:var(--card);border-radius:22px;padding:26px 22px;max-width:340px;width:100%;box-shadow:0 24px 60px -20px rgba(25,26,23,.35)}
@@ -386,15 +389,21 @@
   .ed-top .chip{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff;padding:6px 12px}
   .ed-top .chip:disabled{opacity:.35}
   .ed-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:12px;overflow:auto;background:#14150F}
-  #edCanvas{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);touch-action:none}
+  #edCanvas{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5);touch-action:none;display:block}
   .ed-panel{background:var(--card);border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:44vh;overflow:auto}
   .ed-hint{color:var(--muted);font-size:13px;text-align:center;padding:10px 0}
   .ed-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
   .ed-panel textarea{width:100%;min-height:56px}
   .ed-panel input[type=range]{width:100%;accent-color:var(--lime)}
   .ed-actions{display:flex;gap:8px;margin-top:14px}
-  .ed-actions .gen-btn{margin:0;flex:2}
-  .ed-actions .miniai{flex:1}
+  .ed-actions button{
+    flex:1;margin:0;background:var(--card);color:var(--text);
+    border:1px solid var(--border);border-radius:14px;padding:13px 6px;
+    font-size:13px;font-weight:700;box-shadow:none;
+    transition:transform .12s, background .15s, border-color .15s;
+  }
+  .ed-actions button:active{transform:scale(.95);background:#F2F1EC;border-color:#D8D5CC}
+  .ed-actions button.done{background:#EAF7EE;border-color:#CFEBD8;color:#1F7A44}
   .ed-tools{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
   .ed-tools .chip{padding:7px 12px;font-size:12px}
   .ed-tools .chip:disabled{opacity:.4}
@@ -406,6 +415,17 @@
   .ed-val{color:var(--lime);font-weight:700}
   .ed-sw{width:34px;height:34px;border-radius:10px;border:2px solid #E6E4DD;padding:0}
   .ed-sw.on{border-color:var(--lime);box-shadow:0 0 0 3px var(--accent-soft)}
+  .ed-mix{background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red);position:relative}
+  .ed-mix::after{content:"+";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+  #edMix{position:fixed;inset:0;z-index:1300;display:flex;align-items:center;justify-content:center;background:rgba(14,15,12,.6);backdrop-filter:blur(6px);padding:20px}
+  .edmix-box{background:var(--card);border-radius:22px;padding:20px;max-width:340px;width:100%;box-shadow:0 24px 60px -20px rgba(0,0,0,.5)}
+  .edmix-prev{height:64px;border-radius:14px;border:1px solid var(--border);margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .edmix-box label{display:flex;justify-content:space-between;margin:10px 0 4px;font-size:12px;color:var(--muted)}
+  .edmix-box label b{color:var(--lime)}
+  .edmix-box input[type=range]{width:100%;accent-color:var(--lime)}
+  .edmix-row{display:flex;gap:8px;margin-top:16px}
+  .edmix-row .miniai{flex:1}
+  .edmix-row .gen-btn{flex:1.4}
   .ed-panel label{margin:12px 0 4px;display:flex;justify-content:space-between}
   /* Phase 8: minimal homepage */
   #personaCard,#aiCopyCard,#studioCard,#batchCard,#kitCard,#coachCard,#historyCard{display:none!important}
@@ -455,7 +475,10 @@
   @keyframes cvPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
   .cv-sheet{background:var(--card);border-radius:22px 22px 0 0;margin-top:14px;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:52vh;overflow:auto}
   .cv-bar{display:flex;gap:8px;margin-bottom:14px}
-  .cv-bar button{flex:1;border:1px solid var(--border);background:var(--card);border-radius:14px;padding:11px 4px;font-size:11px;font-weight:700;color:var(--text)}
+  .cv-bar button{flex:1;border:1px solid var(--border);background:var(--card);border-radius:14px;padding:11px 4px;font-size:11px;font-weight:700;color:var(--text);
+    transition:transform .12s, background .15s}
+  .cv-bar button:active{transform:scale(.95);background:#F2F1EC}
+  .cv-bar button.done{background:#EAF7EE;border-color:#CFEBD8;color:#1F7A44}
   .cv-bar button b{display:block;font-size:17px;font-weight:400;margin-bottom:2px}
   .cv-bar .cv-main{background:var(--lime);color:#fff;border-color:transparent;box-shadow:0 8px 20px -8px rgba(43,68,222,.6)}
   .cv-cap{white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--text)}
@@ -5626,6 +5649,56 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         || (L.type==="shape" ? (L.shape==='circle'?'Circle':(L.shape==='line'?'Line':'Rectangle')) : (L.type==="text" ? ((L.text||"Text").slice(0,16)) : L.id));
   }
 
+  /* ---------- custom colour mixer, hue / saturation / lightness ---------- */
+  function edHexToHsl(hex){
+    var r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+    var mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,hh=0,s=0,l=(mx+mn)/2;
+    if(d){ s=d/(1-Math.abs(2*l-1));
+      if(mx===r) hh=60*(((g-b)/d)%6);
+      else if(mx===g) hh=60*((b-r)/d+2);
+      else hh=60*((r-g)/d+4);
+    }
+    if(hh<0) hh+=360;
+    return [Math.round(hh),Math.round(s*100),Math.round(l*100)];
+  }
+  function edHslToHex(hh,s,l){
+    s/=100; l/=100;
+    var c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((hh/60)%2-1)), m=l-c/2, r=0,g=0,b=0;
+    if(hh<60){r=c;g=x;} else if(hh<120){r=x;g=c;} else if(hh<180){g=c;b=x;}
+    else if(hh<240){g=x;b=c;} else if(hh<300){r=x;b=c;} else {r=c;b=x;}
+    return "#"+[r,g,b].map(function(v){ return ("0"+Math.round((v+m)*255).toString(16)).slice(-2); }).join("").toUpperCase();
+  }
+  function edMixer(L){
+    var cur=(L.color&&/^#[0-9a-f]{6}$/i.test(L.color))?L.color:"#FFFFFF";
+    var hsl=edHexToHsl(cur);
+    var wrap=document.createElement("div");
+    wrap.id="edMix";
+    wrap.innerHTML=
+      '<div class="edmix-box">'+
+        '<div class="edmix-prev" id="mxPrev"></div>'+
+        '<label>Hue <b id="mxHv"></b></label><input type="range" id="mxH" min="0" max="360" value="'+hsl[0]+'">'+
+        '<label>Saturation <b id="mxSv"></b></label><input type="range" id="mxS" min="0" max="100" value="'+hsl[1]+'">'+
+        '<label>Lightness <b id="mxLv"></b></label><input type="range" id="mxL" min="0" max="100" value="'+hsl[2]+'">'+
+        '<div class="edmix-row"><button class="miniai" id="mxCancel">Cancel</button><button class="gen-btn" id="mxOk" style="margin:0">Use colour</button></div>'+
+      '</div>';
+    document.body.appendChild(wrap);
+    function val(){ return edHslToHex(+$("mxH").value, +$("mxS").value, +$("mxL").value); }
+    function paint(){
+      var hex=val();
+      $("mxPrev").style.background=hex;
+      $("mxPrev").textContent=hex;
+      $("mxHv").textContent=$("mxH").value+"\u00b0";
+      $("mxSv").textContent=$("mxS").value+"%";
+      $("mxLv").textContent=$("mxL").value+"%";
+      L.color=hex; edRender();
+    }
+    ["mxH","mxS","mxL"].forEach(function(id){ $(id).addEventListener("input", paint); });
+    paint();
+    function close(){ try{ document.body.removeChild(wrap); }catch(e){} }
+    $("mxCancel").onclick=function(){ L.color=cur; edRender(); close(); edFillControls(); };
+    $("mxOk").onclick=function(){ edPush(); close(); edFillControls(); };
+  }
+
   function edFillControls(){
     var box=$("edProps"); if(box.__missing) return;
     var L=edSelected();
@@ -5660,7 +5733,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     } else {
       html+='<div class="ed-row"><b>'+esc2(edLayerName(L))+'</b>'+
             '<button class="chip" id="edHide">'+(L.visible?"Hide":"Show")+'</button></div>'+
-        (isText?'<textarea id="edText" rows="2" placeholder="Type here, Enter makes a new line">'+esc2(L.text||"")+'</textarea>':'')+
+        (isText?'<label>Text <span style="font-weight:400;color:var(--muted);font-size:11px">type to change it</span></label>'+
+                '<textarea id="edText" rows="2" placeholder="Type here, Enter makes a new line">'+esc2(L.text||"")+'</textarea>':'')+
         (L.type==="shape"
           ? '<label>Width</label><input type="range" id="edW" min="'+Math.round(ED.W*0.05)+'" max="'+ED.W+'" value="'+L.w+'">'+
             '<label>Height</label><input type="range" id="edH" min="'+Math.round(ED.H*0.004)+'" max="'+ED.H+'" value="'+L.h+'">'+
@@ -5673,9 +5747,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
           '<label>Line height</label><input type="range" id="edLh" min="90" max="200" value="'+Math.round((L.lh||1.2)*100)+'">'+
           '<label>Font</label><div class="chip-row" id="edFontRow"></div>'+
           '<label>Colour</label><div class="chip-row" id="edColRow"></div>'+
-          '<label>Align text</label><div class="chip-row" id="edAlignRow"></div>'
+          (( (L.text||"").indexOf("\n")>-1 || (L.text||"").length>22 )
+            ? '<label>Align text <span style="font-weight:400;color:var(--muted);font-size:11px">how lines sit against each other</span></label><div class="chip-row" id="edAlignRow"></div>'
+            : '')
         :'')+
-        '<label>Position on canvas</label><div class="chip-row" id="edPosRow"></div>';
+        '<label>Snap to frame <span style="font-weight:400;color:var(--muted);font-size:11px">move the whole layer</span></label><div class="chip-row" id="edPosRow"></div>';
       box.innerHTML=html;
     }
 
@@ -5723,6 +5799,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         b.onclick=function(){ L.color=hex; edPush(); edRender(); edFillControls(); };
         $("edShapeCol").appendChild(b);
       });
+      var mixS=document.createElement("button");
+      mixS.type="button"; mixS.className="ed-sw ed-mix"; mixS.title="Custom colour";
+      mixS.onclick=function(){ edMixer(L); };
+      $("edShapeCol").appendChild(mixS);
     } else {
       $("edSize").addEventListener("input", function(){ L.size=parseInt(this.value,10); edRender(); });
       $("edSize").addEventListener("change", edPush);
@@ -5732,10 +5812,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     $("edOp").addEventListener("input", function(){ L.op=parseInt(this.value,10)/100; edRender(); edSetVal("edOp", Math.round(L.op*100)+"%"); });
     $("edOp").addEventListener("change", edPush);
 
-    ["left","cx","right","top","cy","bottom"].forEach(function(a){
-      var lbl={left:"\u2190",cx:"\u2194",right:"\u2192",top:"\u2191",cy:"\u2195",bottom:"\u2193"}[a];
-      var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=lbl;
-      b.title=a; b.onclick=function(){ edAlign(a); };
+    [["left","Left"],["cx","Centre"],["right","Right"],["top","Top"],["cy","Middle"],["bottom","Bottom"]]
+    .forEach(function(p){
+      var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=p[1];
+      b.onclick=function(){ edAlign(p[0]); };
       $("edPosRow").appendChild(b);
     });
     if(!isText || L.type==="shape") return;
@@ -5771,7 +5851,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       b.onclick=function(){ L.color=hex; edPush(); edRender(); edFillControls(); };
       $("edColRow").appendChild(b);
     });
+    var mixBtn=document.createElement("button");
+    mixBtn.type="button"; mixBtn.className="ed-sw ed-mix"; mixBtn.title="Custom colour";
+    mixBtn.onclick=function(){ edMixer(L); };
+    $("edColRow").appendChild(mixBtn);
 
+    if(!$("edAlignRow") || $("edAlignRow").__missing) return;
     ["left","center","right"].forEach(function(a){
       var b=document.createElement("button"); b.type="button";
       b.className="chip"+(L.align===a?" active":""); b.textContent=a;
@@ -5855,6 +5940,14 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   /* ---------- open / close / export ---------- */
+  function edDone(btn, label){
+    if(!btn || btn.__missing) return;
+    var old=btn.textContent;
+    btn.textContent=label||"Saved \u2713";
+    btn.classList.add("done");
+    setTimeout(function(){ btn.textContent=old; btn.classList.remove("done"); }, 1600);
+  }
+
   function edExport(type){
     var cv=$("edCanvas");
     var sel=ED.sel; ED.sel=null; ED.guides=[]; edRender();   // clean output, no selection box
@@ -5917,6 +6010,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(c.__raw) sessionRaws[i]=c.__raw;
     idbSet("images", sessionImages);
     idbSet("raws", sessionRaws);
+    // the recorded layout is created while drawing, so re-save the plan now
+    // otherwise a restored design opens in the editor with the wrong layout
+    try{ localStorage.setItem("postkit_session", JSON.stringify(lastPlan)); }catch(e){}
   }
   async function restoreSession(){
     var raw=null;
@@ -6216,7 +6312,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var edBtn=slot.querySelector('[data-a="edit"]');
       if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(c.__raw || img, c, !c.__raw); };
       var svBtn=slot.querySelector('[data-a="save"]');
-      if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img, c.label||"design"); };
+      if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img, c.label||"design"); svBtn.innerHTML="<b>\u2713</b>"; setTimeout(function(){ svBtn.innerHTML="<b>\u2913</b>"; },1400); };
       var fvBtn=slot.querySelector('[data-a="fav"]');
       if(fvBtn) fvBtn.onclick=function(e){
         e.stopPropagation();
@@ -6253,8 +6349,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     document.body.style.overflow="hidden";
 
     $("cvEdit").onclick=function(){ closeViewer(); openEditor(c.__raw || img, c, !c.__raw); };
-    $("cvSave").onclick=function(){ saveDataUri(img, c.label||"design"); };
-    $("cvShare").onclick=function(){ shareDataUri(img); };
+    $("cvSave").onclick=function(){ saveDataUri(img, c.label||"design"); edDone($("cvSave"),"\u2713"); };
+    $("cvShare").onclick=function(){ shareDataUri(img); edDone($("cvShare"),"\u2713"); };
     $("cvRegen").onclick=function(){
       closeViewer();
       var slots=$("ccGrid").querySelectorAll(".cc-slot");
@@ -6589,10 +6685,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       '<div class="ed-panel">'+
         '<div id="edProps"></div>'+
         '<div class="ed-actions">'+
-          '<button class="gen-btn" id="edSave">Save PNG</button>'+
-          '<button class="miniai" id="edSaveJpg">JPG</button>'+
-          '<button class="miniai" id="edPdf">PDF</button>'+
-          '<button class="miniai" id="edShare">Share</button>'+
+          '<button id="edSave">PNG</button>'+
+          '<button id="edSaveJpg">JPG</button>'+
+          '<button id="edPdf">PDF</button>'+
+          '<button id="edShare">Share</button>'+
         '</div>'+
       '</div>'+
         '<input type="file" id="edBgFile" accept="image/*" style="display:none">'+
@@ -6603,10 +6699,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     $("edClose").onclick=closeEditor;
     $("edUndo").onclick=edUndo;
     $("edRedo").onclick=edRedo;
-    $("edSave").onclick=function(){ saveDataUri(edExport("png"), "edited"); };
-    $("edSaveJpg").onclick=function(){ saveDataUri(edExport("jpg"), "edited"); };
-    $("edShare").onclick=function(){ shareDataUri(edExport("png")); };
-    if($("edPdf")) $("edPdf").onclick=function(){ try{ edExportPdf(); }catch(e){} };
+    $("edSave").onclick=function(){ saveDataUri(edExport("png"), "edited"); edDone($("edSave"),"Saved \u2713"); };
+    $("edSaveJpg").onclick=function(){ saveDataUri(edExport("jpg"), "edited"); edDone($("edSaveJpg"),"Saved \u2713"); };
+    $("edShare").onclick=function(){ shareDataUri(edExport("png")); edDone($("edShare"),"Shared \u2713"); };
+    if($("edPdf")) $("edPdf").onclick=function(){ try{ edExportPdf(); edDone($("edPdf"),"Saved \u2713"); }catch(e){} };
     if($("edBgFile")) $("edBgFile").addEventListener("change", function(e){ edReplaceBg(e.target.files&&e.target.files[0]); });
     document.addEventListener("keydown", function(e){
       if(!ED) return;

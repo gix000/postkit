@@ -4985,9 +4985,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     // record the layout as we draw it, so the editor reproduces it exactly
     c.__layout = {
       W:W, H:H, pad:pad, fam:fam, align:(alignLeft?"left":"center"), ax:ax,
+      // the readability veil painted over the art, so the editor can repaint it identically
+      scrim:{ veil:veil, need:need, gy0:gy0, gy1:gy1, top:(T.vpos==="top") },
       head:{ text:head, size:hs, y:(yTop+hs), color:txtCol, upper:(T.caseStyle==="upper"), lh:(hlh/hs),
              shadow:(darkText ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)"), blur:0.03 },
-      sup:{ text:sup, size:Math.round(W*0.032), y:0, color:(darkText?"#111214":"#FFFFFF") },
+      sup:{ text:sup, size:Math.round(W*0.032), y:0, color:(darkText?"rgba(17,18,20,0.88)":"rgba(255,255,255,0.94)") },
       cta:{ text:cta, size:ctaFs, y:0, color:accent, style:(T.ctaStyle||"pill"), track:0.16 },
       logo:{ pos:(T.logo||"top-left"), pad:pad }
     };
@@ -5017,6 +5019,30 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var label=cta.toUpperCase(), tw=ctx.measureText(label).width;
       var ph=ctaPh, pw=Math.min(tw+pad*0.9, W-pad*2);
       var rx = alignLeft ? pad : (W-pw)/2;
+      // record exactly how this CTA is painted, so the editor lands on the same spot
+      if(c.__layout){
+        if(T.ctaStyle==="text" || T.ctaStyle==="rule"){
+          c.__layout.cta.y = y + fs;
+          c.__layout.cta.size = Math.round(fs*0.92);
+          c.__layout.cta.color = txtCol;
+          c.__layout.cta.track = 0.16;
+          if(T.ctaStyle==="rule"){
+            c.__layout.cta.rule = accent;
+            c.__layout.cta.ruleAt = (fs*0.55)/Math.max(1, Math.round(fs*0.92));
+            c.__layout.cta.ruleW = Math.max(1.5, W*0.0025);
+          }
+        } else if(T.ctaStyle==="underline"){
+          c.__layout.cta.y = y + fs;
+          c.__layout.cta.color = txtCol;
+          c.__layout.cta.rule = accent;
+          c.__layout.cta.ruleAt = 0.35;
+          c.__layout.cta.ruleW = Math.max(2, W*0.004);
+          c.__layout.cta.track = 0;
+        } else {
+          c.__layout.cta.padX = pad*0.9;
+          c.__layout.cta.track = 0;
+        }
+      }
       if(T.ctaStyle==="text" || T.ctaStyle==="rule"){
         // no shape at all: letterspaced small caps with a quiet arrow
         var spaced = label + "   \u2192";
@@ -5068,8 +5094,15 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var maxLh=H*0.10;
       if(lh>maxLh){ lh=maxLh; lw=lh*(brandLogo.naturalWidth/brandLogo.naturalHeight); }
       var dx = T.logo==="top-right" ? (W-pad-lw) : (T.logo==="top-center" ? (W-lw)/2 : pad);
+      if(c.__layout){ c.__layout.logo.x=dx; c.__layout.logo.y=pad; c.__layout.logo.w=lw; }
       ctx.drawImage(brandLogo,dx,pad,lw,lh);
     } else if(brand){
+      if(c.__layout) c.__layout.logo.brand = {
+        size:Math.round(W*0.030), x:lx, y:pad, baseline:"top",
+        align:(T.logo==="top-right" ? "right" : (T.logo==="top-center" ? "center" : "left")),
+        color:(avg>0.55 ? "rgba(17,18,20,0.92)" : "rgba(255,255,255,0.96)"),
+        glow:(avg>0.55 ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.45)")
+      };
       ctx.font="700 "+Math.round(W*0.030)+"px "+fam;
       ctx.fillStyle = (avg>0.55 ? "rgba(17,18,20,0.92)" : "rgba(255,255,255,0.96)");
       ctx.textAlign = T.logo==="top-right" ? "right" : (T.logo==="top-center" ? "center" : "left");
@@ -5241,9 +5274,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         size:(LO&&LO.sup&&LO.sup.size) ? LO.sup.size : Math.round(W*0.032),
         color:(LO&&LO.sup&&LO.sup.color) ? LO.sup.color : "#FFFFFF",
         align:(LO?LO.align:(T.align||"left")),
-        font:fam, weight:500, upper:false, visible:true, shadow:true,
+        font:fam, weight:500, upper:false, visible:true, shadow:!LO,
         glow:(LO&&LO.head&&LO.head.shadow) ? LO.head.shadow : "rgba(0,0,0,0.45)",
-        blur:0.022, rot:0, op:1, track:0, lh:1.3});
+        blur:0.022, rot:0, op:1, track:0, lh:1.35});
       var ctaKind = (LO&&LO.cta&&LO.cta.style) || (T.ctaStyle||"pill");
       var ctaTrack = (LO&&LO.cta&&typeof LO.cta.track==="number") ? LO.cta.track : ((ctaKind==="text"||ctaKind==="rule")?0.16:0.06);
       if(cta) layers.push({id:"cta", type:(ctaKind==="solid"||ctaKind==="pill")?"pill":"text", ctaStyle:ctaKind, x:ax, text:cta,
@@ -5251,20 +5284,39 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         size:(LO&&LO.cta&&LO.cta.size) ? LO.cta.size : Math.round(W*0.030),
         color:(LO&&LO.cta&&LO.cta.color) ? LO.cta.color : (b.accent||b.primary||"#2B44DE"),
         align:(LO?LO.align:(T.align||"left")),
-        font:fam, weight:700, upper:true, visible:true, shadow:false, rot:0, op:1, track:ctaTrack, lh:1.2});
-      var lgW=Math.min(W*0.26, brandLogo?brandLogo.naturalWidth:W*0.26);
-      var lgX = lgPos==="top-right" ? (W-pad-lgW) : (lgPos==="top-center" ? (W-lgW)/2 : pad);
-      layers.push(brandLogo
-        ? {id:"logo", type:"logo", x:lgX, y:pad, size:lgW, visible:true, rot:0, op:1}
-        : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND",
-           x:(lgPos==="top-right" ? (W-pad) : (lgPos==="top-center" ? W/2 : pad)),
-           y:pad+Math.round(W*0.03),
-           size:Math.round(W*0.030), color:"#FFFFFF",
-           align:(lgPos==="top-right" ? "right" : (lgPos==="top-center" ? "center" : "left")),
-           font:fam, weight:700,
-           upper:true, visible:true, shadow:true, rot:0, op:1, track:0.08, lh:1.2});
+        font:fam, weight:700, upper:true, visible:true, shadow:false, rot:0, op:1, track:ctaTrack, lh:1.2,
+        rule:(LO&&LO.cta&&LO.cta.rule)||null,
+        ruleAt:(LO&&LO.cta&&typeof LO.cta.ruleAt==="number")?LO.cta.ruleAt:null,
+        ruleW:(LO&&LO.cta&&typeof LO.cta.ruleW==="number")?LO.cta.ruleW:null,
+        padX:(LO&&LO.cta&&typeof LO.cta.padX==="number")?LO.cta.padX:null});
 
-      ED={ art:art, W:W, H:H, pad:pad, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c };
+      // brand mark: reuse the exact geometry recorded at generation time
+      var LG = LO && LO.logo;
+      var lgW = (LG && typeof LG.w==="number") ? LG.w
+              : Math.min(W*0.26, brandLogo?brandLogo.naturalWidth:W*0.26);
+      if(brandLogo && !(LG && typeof LG.w==="number")){
+        var lgH0 = lgW*(brandLogo.naturalHeight/brandLogo.naturalWidth);
+        if(lgH0 > H*0.10) lgW = (H*0.10)*(brandLogo.naturalWidth/brandLogo.naturalHeight);
+      }
+      var lgX = (LG && typeof LG.x==="number") ? LG.x
+              : (lgPos==="top-right" ? (W-pad-lgW) : (lgPos==="top-center" ? (W-lgW)/2 : pad));
+      var BR = LG && LG.brand;
+      layers.push(brandLogo
+        ? {id:"logo", type:"logo", x:lgX, y:(LG&&typeof LG.y==="number")?LG.y:pad, size:lgW, visible:true, rot:0, op:1}
+        : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND",
+           x:(BR ? BR.x : (lgPos==="top-right" ? (W-pad) : (lgPos==="top-center" ? W/2 : pad))),
+           y:(BR ? BR.y : pad+Math.round(W*0.03)),
+           baseline:(BR ? "top" : "alphabetic"),
+           size:(BR ? BR.size : Math.round(W*0.030)),
+           color:(BR ? BR.color : "#FFFFFF"),
+           align:(BR ? BR.align : (lgPos==="top-right" ? "right" : (lgPos==="top-center" ? "center" : "left"))),
+           font:fam, weight:700,
+           upper:true, visible:true, shadow:true,
+           glow:(BR ? BR.glow : "rgba(0,0,0,0.45)"),
+           blur:0.02, rot:0, op:1, track:(BR?0:0.08), lh:1.2});
+
+      ED={ art:art, W:W, H:H, pad:pad, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c,
+           scrim:(LO && LO.scrim) || null };
       edPush();
       return ED;
     });
@@ -5281,7 +5333,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var t=L.upper?(L.text||"").toUpperCase():(L.text||"");
     var w, h;
     if(L.type==="pill"){
-      w=ctx.measureText(t).width+ED.W*0.075; h=L.size*2.3;
+      w=ctx.measureText(t).width+((typeof L.padX==="number")?L.padX:ED.W*0.075);
+      if(ED.pad) w=Math.min(w, ED.W-ED.pad*2);
+      h=L.size*2.3;
     } else {
       var mw=(ED.pad ? (ED.W - ED.pad*2) : ED.W*0.85), ls=[];
       String(t).split("\n").forEach(function(p){ wrapLines(ctx,p,mw).forEach(function(x){ ls.push(x); }); });
@@ -5307,6 +5361,23 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       ctx.drawImage(a, sx, sy, sw, sh, 0, 0, ED.W, ED.H);
     })();
 
+    // the same veil brandCompose paints over the art, so the editor is not brighter than the design
+    if(ED.scrim && ED.scrim.show!==false){
+      var S=ED.scrim;
+      var gg=ctx.createLinearGradient(0, S.gy0, 0, S.gy1);
+      if(S.top){
+        gg.addColorStop(0,"rgba("+S.veil+","+S.need+")");
+        gg.addColorStop(0.75,"rgba("+S.veil+","+(S.need*0.55)+")");
+        gg.addColorStop(1,"rgba("+S.veil+",0)");
+      } else {
+        gg.addColorStop(0,"rgba("+S.veil+",0)");
+        gg.addColorStop(0.35,"rgba("+S.veil+","+(S.need*0.75)+")");
+        gg.addColorStop(1,"rgba("+S.veil+","+S.need+")");
+      }
+      ctx.fillStyle=gg;
+      ctx.fillRect(0, S.gy0, ED.W, (S.top ? (S.gy1-S.gy0) : (ED.H-S.gy0)));
+    }
+
     ED.layers.forEach(function(L){
       if(!L.visible) return;
       if(L.type==="shape"){ edDrawShape(ctx,L); return; }
@@ -5327,9 +5398,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       ctx.font=(L.weight||700)+" "+L.size+"px "+L.font;
       if(ctx.letterSpacing!==undefined) ctx.letterSpacing=((L.track||0)*L.size).toFixed(2)+"px";
       ctx.textAlign=L.align==="center"?"center":(L.align==="right"?"right":"left");
-      ctx.textBaseline="alphabetic";
+      ctx.textBaseline=(L.baseline==="top")?"top":"alphabetic";
       if(L.type==="pill"){
-        var tw=ctx.measureText(t).width, ph=L.size*2.3, pw=tw+ED.W*0.075;
+        var tw=ctx.measureText(t).width, ph=L.size*2.3;
+        var pw=tw+((typeof L.padX==="number")?L.padX:ED.W*0.075);
+        if(ED.pad) pw=Math.min(pw, ED.W-ED.pad*2);
         var rx=L.x; if(L.align==="center") rx=L.x-pw/2; else if(L.align==="right") rx=L.x-pw;
         var rr=ph/2;
         ctx.beginPath();
@@ -5365,6 +5438,18 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       var lh=Math.round(L.size*(L.lh||1.2));
       lines.forEach(function(ln,i){ ctx.fillText(ln, L.x, L.y + i*lh); });
       ctx.shadowColor="transparent"; ctx.shadowBlur=0; ctx.shadowOffsetY=0;
+      // underline / rule under the CTA, exactly as the generated design draws it
+      if(L.rule && typeof L.ruleAt==="number" && lines.length){
+        var rwT=ctx.measureText(lines[0]).width;
+        var rx0=L.x;
+        if(L.align==="center") rx0=L.x-rwT/2; else if(L.align==="right") rx0=L.x-rwT;
+        ctx.strokeStyle=L.rule;
+        ctx.lineWidth=L.ruleW || Math.max(2, ED.W*0.004);
+        ctx.beginPath();
+        ctx.moveTo(rx0, L.y+L.size*L.ruleAt);
+        ctx.lineTo(rx0+rwT, L.y+L.size*L.ruleAt);
+        ctx.stroke();
+      }
       ctx.restore();
     });
 
@@ -5907,10 +5992,33 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ED.sel=sel; edRender();
     return uri;
   }
-  function openEditor(imgUri, c, bakedIn){
-    var ov=$("edOverlay"); ov.style.display="flex";
+  /* Overlays hide the whole page (body.pk-overlay > * { display:none }), which
+     collapses the document to zero height and throws the scroll position away.
+     Remember where the user was and put them back when the overlay closes. */
+  var __pkScrollY = 0, __pkLocks = 0, __pkUnlockAt = 0;
+  function pkLockScroll(){
+    // a re-lock right after an unlock is a hand-off (viewer -> editor): keep the old position
+    if(__pkLocks===0 && (Date.now()-__pkUnlockAt)>250) __pkScrollY = window.scrollY || window.pageYOffset || 0;
+    __pkLocks++;
     document.body.classList.add("pk-overlay");
     document.body.style.overflow="hidden";
+  }
+  function pkUnlockScroll(){
+    __pkLocks = Math.max(0, __pkLocks-1);
+    __pkUnlockAt = Date.now();
+    if(__pkLocks>0) return;
+    document.body.classList.remove("pk-overlay");
+    document.body.style.overflow="";
+    var y=__pkScrollY;
+    // the page only regains its height after this reflow, so restore more than once
+    try{ window.scrollTo(0,y); }catch(e){}
+    requestAnimationFrame(function(){ if(__pkLocks===0) window.scrollTo(0,y); });
+    setTimeout(function(){ if(__pkLocks===0) window.scrollTo(0,y); }, 60);
+  }
+
+  function openEditor(imgUri, c, bakedIn){
+    var ov=$("edOverlay"); ov.style.display="flex";
+    pkLockScroll();
     edInit(imgUri, c, bakedIn)
       .then(function(){ edRender(); edFillControls(); edSyncUndo(); })
       .catch(function(err){
@@ -5923,8 +6031,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function closeEditor(){
     var ov=$("edOverlay"); ov.style.display="none";
-    document.body.classList.remove("pk-overlay");
-    document.body.style.overflow=""; ED=null;
+    ED=null;
+    pkUnlockScroll();
   }
 
   /* =========================================================
@@ -6281,7 +6389,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   var CV = null;
   function openViewer(img, c){
     CV={img:img, c:c};
-    document.body.classList.add("pk-overlay");
+    pkLockScroll();
     var ov=$("cvOverlay");
     var shared=(lastConcepts&&lastConcepts.shared)||null;
     var cap=(c.caption || (shared&&shared.caption) || "").trim();
@@ -6298,7 +6406,6 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       (tags.length? '<div class="cv-tags">'+esc2(tags.map(function(t){return "#"+t;}).join(" "))+'</div>' : '')+
       (cap? '<button class="miniai" id="cvCopy" style="width:100%;margin-top:14px">Copy caption + hashtags</button>' : '');
     ov.classList.add("on");
-    document.body.style.overflow="hidden";
 
     $("cvEdit").onclick=function(){ closeViewer(); openEditor(c.__raw || img, c, !c.__raw); };
     $("cvSave").onclick=function(){ saveDataUri(img, c.label||"design"); edDone($("cvSave"),"\u2713"); };
@@ -6316,8 +6423,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function closeViewer(){
     var ov=$("cvOverlay"); ov.classList.remove("on");
-    document.body.classList.remove("pk-overlay");
-    document.body.style.overflow=""; CV=null;
+    CV=null;
+    pkUnlockScroll();
   }
   (function(){
     document.body.insertAdjacentHTML("beforeend",

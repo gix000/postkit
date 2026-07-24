@@ -1,12 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* Safety net: a missing element must never throw. Any legacy handler that
+   references a removed card now receives a harmless stub instead of null. */
+(function(){
+  var _noop=function(){};
+  var _stub={ style:{}, classList:{add:_noop,remove:_noop,toggle:_noop,contains:function(){return false;}},
+              addEventListener:_noop, removeEventListener:_noop, appendChild:_noop,
+              insertAdjacentElement:_noop, insertAdjacentHTML:_noop,
+              querySelector:function(){return null;}, querySelectorAll:function(){return [];},
+              scrollIntoView:_noop, focus:_noop, blur:_noop, click:_noop, remove:_noop,
+              getContext:function(){return null;},
+              value:"", textContent:"", innerHTML:"", disabled:false, files:null,
+              checked:false, dataset:{}, __missing:true };
+  Object.defineProperty(_stub,"onclick",{get:function(){return null;},set:_noop});
+  Object.defineProperty(_stub,"onchange",{get:function(){return null;},set:_noop});
+  Object.defineProperty(_stub,"oninput",{get:function(){return null;},set:_noop});
+  var real=document.getElementById.bind(document);
+  document.getElementById=function(id){ return real(id) || _stub; };
+})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PostKit, AI Instagram posts for your business</title>
 <meta name="description" content="Generate ready-to-post Instagram designs and captions with AI. For businesses in Lebanon who don't have time to design.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -788,11 +808,6 @@
           <button type="button" class="color-preview" id="textColorPrev" style="flex:1" aria-label="Pick text color">Custom text color</button>
         </div>
         <div class="swatch-grid" id="textSwatches"></div>
-        <label>📱 QR code <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(link or WhatsApp, shows bottom-left)</span></label>
-        <div style="display:flex;gap:8px">
-          <input id="qrInput" placeholder="https://your-link.com or your number" style="flex:1">
-          <button id="qrClear" type="button" style="background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:0 14px;font-size:13px">Clear</button>
-        </div>
       </div>
     </details>
 
@@ -813,28 +828,7 @@
     <p class="usage" id="usageMsg"></p>
   </div>
 
-  <div class="card" id="batchCard">
-    <label>⚡ Batch generate <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(a month of posts in one tap)</span></label>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Uses your business info, colors and logo above. AI plans the ideas and creates every post automatically.</p>
-    <div style="display:flex;gap:8px">
-      <button id="batch6Btn" style="flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700">6 posts (~7 credits)</button>
-      <button id="batch12Btn" style="flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700">12 posts (~13 credits)</button>
-    </div>
-    <p id="batchStatus" style="font-size:13px;color:var(--muted);margin-top:10px;display:none"></p>
-    <p class="error" id="batchError"></p>
-    <div id="batchGallery" style="display:none;margin-top:14px;grid-template-columns:1fr 1fr;gap:12px"></div>
-  </div>
-
   <div class="card" style="display:none"><div class="skeleton pulse" id="skel"></div></div>
-
-  <div class="card" id="kitCard">
-    <label>Brand kits <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(save your setup, reload in one tap)</span></label>
-    <div class="chip-row" id="kitRow"></div>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <input id="kitName" placeholder="Kit name, e.g. Elegance" style="flex:1">
-      <button id="kitSave" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 18px;font-weight:700;font-size:14px">Save kit</button>
-    </div>
-  </div>
 
   <div id="emptyPreview">
     <div class="ep-mark">✨</div>
@@ -850,18 +844,6 @@
     <button class="dl-btn" id="dlAllBtn" style="display:none">All slides</button>
     <button class="re-btn" id="shuffleBtn" style="display:none">🎲 Shuffle</button>
     <button class="re-btn" id="reBtn">Regenerate</button>
-  </div>
-
-  <div class="card" id="boostCard" style="display:none">
-    <label>✨ Creative Boost <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(rewrites caption, 1 credit each)</span></label>
-    <div class="chip-row" id="boostRow">
-      <button class="chip" data-boost="luxury">💎 More Premium</button>
-      <button class="chip" data-boost="eye">🔥 More Eye-Catching</button>
-      <button class="chip" data-boost="funny">😂 More Funny</button>
-      <button class="chip" data-boost="emotional">❤️ More Emotional</button>
-      <button class="chip" data-boost="sales">📢 More Sales-Focused</button>
-      <button class="chip" data-boost="genz">🧢 For Gen Z</button>
-    </div>
   </div>
 
   <div class="card" id="captionCard">
@@ -893,41 +875,6 @@
     </div>
     <button class="copy-btn" id="copyBtn">Copy caption + hashtags</button>
     <button id="recapBtn" style="width:100%;margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:12px;padding:11px;font-size:14px">↻ Rewrite caption (1 credit)</button>
-  </div>
-
-  <div class="card" id="bgCard" style="display:none">
-    <label>AI photo background <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(uses 1 credit)</span></label>
-    <textarea id="bgPrompt" style="min-height:56px" placeholder="e.g. cozy café interior with warm light"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button id="bgBtn" style="flex:1;background:var(--lime);color:#FFFFFF;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700">✦ Generate background</button>
-      <button id="bgClear" style="display:none;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:12px;padding:12px 16px;font-size:14px">Remove</button>
-    </div>
-    <p class="error" id="bgError"></p>
-    <label style="margin-top:12px">Or upload your own photo <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(free)</span></label>
-    <input type="file" id="bgUpload" accept="image/*" style="padding:9px 10px;font-size:13px">
-    <label style="margin-top:12px">📷 Product photo → ad <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(removes background, 1 credit)</span></label>
-    <input type="file" id="productUpload" accept="image/*" style="padding:9px 10px;font-size:13px">
-    <p class="error" id="productError"></p>
-  </div>
-
-  <div class="card" id="historyCard" style="display:none">
-    <label>Recent posts <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(saved on this device)</span></label>
-    <div class="chip-row" id="historyRow"></div>
-  </div>
-
-  <div class="card" id="campaignCard" style="display:none">
-    <label>Campaign</label>
-    <div id="campaignBody" style="font-size:14px;line-height:1.6"></div>
-  </div>
-
-  <div class="card" id="coachCard">
-    <label for="coachQ">🧠 Ask the marketing coach <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(1 credit)</span></label>
-    <div style="display:flex;gap:8px">
-      <input id="coachQ" placeholder='e.g. "How can I get more customers this month?"' style="flex:1">
-      <button id="coachBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Ask</button>
-    </div>
-    <div id="coachBody" style="display:none;margin-top:12px;font-size:14px;line-height:1.7"></div>
-    <p class="error" id="coachError"></p>
   </div>
 
   <!-- ACCESS CODE -->
@@ -1667,25 +1614,6 @@ document.getElementById("fxToggleRow").addEventListener("click", e => {
   b.classList.toggle("active", state.fx[k]);
   rerender();
 });
-
-/* ---------- QR code ---------- */
-function buildQR() {
-  const val = document.getElementById("qrInput").value.trim();
-  if (!val) { qrImg = null; rerender(); return; }
-  try {
-    const holder = document.createElement("div");
-    new QRCode(holder, { text: val, width: 240, height: 240, correctLevel: QRCode.CorrectLevel.M });
-    setTimeout(() => {
-      const c = holder.querySelector("canvas");
-      const img = holder.querySelector("img");
-      const src = c ? c.toDataURL("image/png") : (img ? img.src : null);
-      if (src) { const i = new Image(); i.onload = () => { qrImg = i; rerender(); }; i.src = src; }
-    }, 60);
-  } catch (e) {}
-}
-let qrTimer;
-document.getElementById("qrInput").addEventListener("input", () => { clearTimeout(qrTimer); qrTimer = setTimeout(buildQR, 500); });
-document.getElementById("qrClear").onclick = () => { document.getElementById("qrInput").value = ""; qrImg = null; rerender(); };
 
 /* ---------- text color ---------- */
 document.getElementById("textAutoBtn").onclick = () => {
@@ -5278,7 +5206,21 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         alignL = LO.align!=="center";
       } else { LO = null; }
 
+      var lgPos=(LO&&LO.logo&&LO.logo.pos) ? LO.logo.pos : (T.logo||"top-left");
       var layers=[];
+      if(bakedIn){
+        // the words are painted into the artwork, so only offer the brand mark
+        layers.push(brandLogo
+          ? {id:"logo", type:"logo", x:pad, y:pad, size:Math.round(W*0.22), visible:true, rot:0, op:1}
+          : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND",
+             x:(lgPos==="top-right" ? (W-pad) : (lgPos==="top-center" ? W/2 : pad)),
+             y:pad+Math.round(W*0.03), size:Math.round(W*0.030), color:"#FFFFFF",
+             align:(lgPos==="top-right" ? "right" : (lgPos==="top-center" ? "center" : "left")),
+             font:fam, weight:700, upper:true, visible:false, shadow:true, rot:0, op:1, track:0.08, lh:1.2});
+        ED={ art:art, W:W, H:H, pad:pad, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c, baked:true };
+        edPush();
+        return ED;
+      }
       var markGap = brandLogo
         ? (pad + Math.min(H*0.10, L_logoH(W)) + Math.round(H*0.05))
         : (pad + Math.round(W*0.09));
@@ -5310,16 +5252,19 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         color:(LO&&LO.cta&&LO.cta.color) ? LO.cta.color : (b.accent||b.primary||"#2B44DE"),
         align:(LO?LO.align:(T.align||"left")),
         font:fam, weight:700, upper:true, visible:true, shadow:false, rot:0, op:1, track:ctaTrack, lh:1.2});
-      var lgPos=(LO&&LO.logo&&LO.logo.pos) ? LO.logo.pos : (T.logo||"top-left");
       var lgW=Math.min(W*0.26, brandLogo?brandLogo.naturalWidth:W*0.26);
       var lgX = lgPos==="top-right" ? (W-pad-lgW) : (lgPos==="top-center" ? (W-lgW)/2 : pad);
       layers.push(brandLogo
         ? {id:"logo", type:"logo", x:lgX, y:pad, size:lgW, visible:true, rot:0, op:1}
-        : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND", x:pad, y:pad+Math.round(W*0.03),
-           size:Math.round(W*0.030), color:"#FFFFFF", align:"left", font:fam, weight:700,
+        : {id:"brand", type:"text", text:brandTxt||"YOUR BRAND",
+           x:(lgPos==="top-right" ? (W-pad) : (lgPos==="top-center" ? W/2 : pad)),
+           y:pad+Math.round(W*0.03),
+           size:Math.round(W*0.030), color:"#FFFFFF",
+           align:(lgPos==="top-right" ? "right" : (lgPos==="top-center" ? "center" : "left")),
+           font:fam, weight:700,
            upper:true, visible:true, shadow:true, rot:0, op:1, track:0.08, lh:1.2});
 
-      ED={ art:art, W:W, H:H, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c };
+      ED={ art:art, W:W, H:H, pad:pad, layers:layers, hist:[], hi:-1, sel:null, drag:null, concept:c };
       edPush();
       return ED;
     });
@@ -5338,7 +5283,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(L.type==="pill"){
       w=ctx.measureText(t).width+ED.W*0.075; h=L.size*2.3;
     } else {
-      var mw=ED.W*0.86, ls=[];
+      var mw=(ED.pad ? (ED.W - ED.pad*2) : ED.W*0.85), ls=[];
       String(t).split("\n").forEach(function(p){ wrapLines(ctx,p,mw).forEach(function(x){ ls.push(x); }); });
       w=0; ls.forEach(function(x){ w=Math.max(w, ctx.measureText(x).width); });
       w=Math.min(w, mw);
@@ -5407,7 +5352,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       if(L.shadow){ ctx.shadowColor = L.glow || "rgba(0,0,0,0.5)"; ctx.shadowBlur=Math.round(ED.W*(L.blur||0.025)); ctx.shadowOffsetY=1; }
       ctx.fillStyle=L.color;
       // wrap to the safe width, and shrink a single long word if it still overflows
-      var maxW=ED.W*0.86, lines=[];
+      var maxW=(ED.pad ? (ED.W - ED.pad*2) : ED.W*0.85), lines=[];
       String(t).split("\n").forEach(function(para){
         wrapLines(ctx, para, maxW).forEach(function(ln){ lines.push(ln); });
       });
@@ -6300,7 +6245,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   function showConceptImage(slot, c, img){
-      slot.innerHTML='<img src="'+img+'" alt="">'+
+      slot.innerHTML='<img src="'+img+'" alt="'+esc2((c.headline||"Generated design"))+'" loading="lazy">'+
         '<div class="cc-actions">'+
           '<button data-a="edit" title="Edit"><b>\u270e</b></button>'+
           '<button data-a="save" title="Download"><b>\u2913</b></button>'+
@@ -6376,9 +6321,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   (function(){
     document.body.insertAdjacentHTML("beforeend",
-      '<div id="cvOverlay">'+
+      '<div id="cvOverlay" role="dialog" aria-modal="true" aria-label="Design preview">'+
         '<div class="cv-top"><button class="cv-x" id="cvClose">\u2715</button></div>'+
-        '<div class="cv-stage"><img id="cvImg" alt=""></div>'+
+        '<div class="cv-stage"><img id="cvImg" alt="Generated design, full size"></div>'+
         '<div class="cv-sheet" id="cvBody"></div>'+
       '</div>');
     $("cvClose").onclick=closeViewer;
@@ -6680,7 +6625,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
   /* ---------- editor shell ---------- */
   (function(){
-    var html='<div id="edOverlay">'+
+    var html='<div id="edOverlay" role="dialog" aria-modal="true" aria-label="Design editor">'+
       '<div class="ed-top">'+
         '<button class="ed-x" id="edClose">\u2715</button>'+
         '<span class="ed-title">Edit design</span>'+

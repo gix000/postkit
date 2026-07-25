@@ -191,14 +191,13 @@
 
 
   /* ===== refined button hierarchy ===== */
-  #ideaBtn,#planBtn,#monthBtn,#offersBtn,#campaignBtn,#voiceBtn,#luckyBtn,#recapBtn,#bgBtn{
+  #ideaBtn,#planBtn,#monthBtn,#offersBtn,#campaignBtn,#voiceBtn,#recapBtn,#bgBtn{
     border:1px solid var(--border)!important;background:var(--card)!important;color:var(--text)!important;
     font-weight:600;box-shadow:0 1px 2px rgba(25,26,23,.04);
   }
-  #ideaBtn:hover,#planBtn:hover,#monthBtn:hover,#offersBtn:hover,#campaignBtn:hover,#voiceBtn:hover,#luckyBtn:hover,#recapBtn:hover,#bgBtn:hover{
+  #ideaBtn:hover,#planBtn:hover,#monthBtn:hover,#offersBtn:hover,#campaignBtn:hover,#voiceBtn:hover,#recapBtn:hover,#bgBtn:hover{
     border-color:var(--lime)!important;color:var(--lime)!important;
   }
-  #luckyBtn{background:var(--lime-bg)!important;border-color:var(--lime-dark)!important;color:var(--lime)!important;font-weight:700}
   /* refined labels */
   label{font-size:11px;letter-spacing:.09em;color:var(--muted);font-weight:600}
   .section-sub{line-height:1.5}
@@ -270,7 +269,7 @@
   }
 
   /* ===================================================================
-     PREMIUM PASS — whitespace over borders, softer cards, bigger type
+     PREMIUM PASS, whitespace over borders, softer cards, bigger type
      =================================================================== */
   :root{ --accent:#4F46E5; --accent-soft:#EEF2FF; --label:#4A4B44; }
   .card{
@@ -314,17 +313,17 @@
   #customizeAcc[open]{background:#FBFAF7!important;border-color:#F0EEE8!important}
   #customizeAcc>summary{color:var(--text)!important;font-weight:600!important}
   .chip{padding:9px 15px;font-size:13.5px;border-color:#E7E5DE;border-radius:14px}
-  /* selected state uses the light accent — cleaner than solid blue */
+  /* selected state uses the light accent, cleaner than solid blue */
   .chip.active{background:var(--accent-soft);border-color:#D3D8F7;color:var(--accent);font-weight:600}
   /* secondary helper buttons: quiet neutral so only "Generate" is blue */
-  #ideaBtn,#voiceBtn,#enhanceBtn,#planBtn,#monthBtn,#offersBtn,#campaignBtn,#recapBtn,#bgBtn,#luckyBtn{
+  #ideaBtn,#voiceBtn,#enhanceBtn,#planBtn,#monthBtn,#offersBtn,#campaignBtn,#recapBtn,#bgBtn{
     color:#6B6C64!important;
     border:1px solid #E6E4DD!important;
     border-style:solid!important;
     background:transparent!important;
     font-weight:600!important;
   }
-  #ideaBtn:active,#voiceBtn:active,#enhanceBtn:active,#luckyBtn:active{background:#F5F4EF!important}
+  #ideaBtn:active,#voiceBtn:active,#enhanceBtn:active{background:#F5F4EF!important}
 
   /* result buttons: consistent outline style + wrap so none get cut off */
   .action-row{flex-wrap:wrap}
@@ -529,6 +528,69 @@
   }catch(e){}
 })();
 </script>
+<style id="hg-css">
+#hgComposer{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:10px 12px 8px;box-shadow:0 8px 24px -16px rgba(0,0,0,.28);margin-bottom:6px;transition:border-color .15s,box-shadow .15s}
+#hgComposer:focus-within{border-color:var(--lime-dark);box-shadow:0 10px 28px -14px rgba(43,68,222,.28)}
+#hgComposer #topic{border:none!important;background:transparent!important;box-shadow:none!important;padding:6px 6px 2px!important;min-height:88px;resize:none;font-size:16px;line-height:1.5}
+#hgComposer #topic:focus{outline:none!important}
+#hgBar{display:flex;align-items:center;gap:8px;padding-top:8px;margin-top:2px;border-top:1px solid var(--line)}
+#hgSubmit{background:var(--lime);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;transition:transform .12s ease,filter .12s,opacity .12s}
+#hgSubmit:hover{transform:translateY(-1px);filter:brightness(1.06)}
+#hgSubmit:active{transform:scale(.97)}
+
+/* HeyGen-consistent panel: section labels, preset chips, action + helper buttons */
+.p1-q{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--text);margin:16px 0 9px}
+.p1-ideas{gap:8px}
+.p1-ideas .chip{background:#fff;border:1px solid var(--line);color:#54554E;border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:500;box-shadow:none;transition:background .15s,color .15s,border-color .15s,transform .12s}
+.p1-ideas .chip:hover{background:#fff;color:var(--text);border-color:var(--lime-dark)}
+.p1-ideas .chip.active{background:var(--lime-bg);border-color:#D3D8F7;color:var(--lime);font-weight:600}
+.p1-ideas .chip.active:hover{background:var(--lime-bg);color:var(--lime)}
+.p1-actions{gap:10px}
+.p1-actions .gen-btn{margin:0;border-radius:12px;padding:13px 16px;font-size:15px;font-weight:700;box-shadow:none;border:1px solid transparent}
+.p1-actions .gen-btn:not(.p1-secondary):not(.p1-ghost){background:var(--lime);color:#fff}
+.p1-actions .gen-btn:not(.p1-secondary):not(.p1-ghost):hover{filter:brightness(1.05);transform:translateY(-1px)}
+.p1-actions .p1-secondary{background:#fff!important;color:var(--lime)!important;border:1.5px solid var(--lime-dark)!important;font-weight:700!important}
+.p1-actions .p1-ghost{background:#fff!important;color:#54554E!important;border:1px solid var(--line)!important;font-weight:600!important;font-size:14px!important;padding:12px 16px!important}
+.p1-actions .p1-ghost:hover{background:#fff!important;color:var(--text)!important;border-color:var(--lime-dark)!important;transform:translateY(-1px)}
+#voiceBtn,#ideaBtn,#enhanceBtn{background:#fff!important;border:1px solid var(--line)!important;color:#54554E!important;border-radius:999px!important;font-weight:600!important;font-size:13px!important;padding:10px 14px!important;margin-top:8px!important;box-shadow:none!important}
+#voiceBtn:hover,#ideaBtn:hover,#enhanceBtn:hover{background:#fff!important;color:var(--text)!important;border-color:var(--lime-dark)!important}
+
+/* pro polish: prompt sits higher, cleaner headings + section break */
+.hero{padding-top:36px!important;padding-bottom:24px!important}
+.section-title{letter-spacing:-.02em}
+#app.section-title{margin-top:6px!important}
+#how.section-title{margin-top:44px!important;padding-top:26px;border-top:1px solid var(--line)}
+.steps{padding-top:14px}
+/* show content immediately (no hide-until-scroll) so the app never looks empty */
+.reveal{opacity:1!important;transform:none!important}
+/* compact hero so the prompt lands near the top */
+.hero{padding-top:26px!important;padding-bottom:18px!important}
+.hero h1{font-size:clamp(28px,7.2vw,42px)!important}
+.hero p{font-size:15px!important;margin:12px 0 18px!important;max-width:34ch!important}
+.hero-btns .btn-primary,.hero-btns .btn-ghost{padding:12px 20px!important;font-size:15px!important}
+#app.section-title{font-size:22px!important;margin-top:10px!important}
+.section-sub{margin-bottom:14px!important}
+/* FAQ accordion */
+#faq.section-title{margin-top:40px;padding-top:26px;border-top:1px solid var(--line)}
+.faq-item{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.faq-item summary{list-style:none;cursor:pointer;padding:15px 18px;font-weight:600;font-size:15px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";font-size:20px;line-height:1;color:var(--muted);font-weight:400}
+.faq-item[open] summary::after{content:"\2212"}
+.faq-item .faq-a{padding:0 18px 16px;color:var(--muted);font-size:14px;line-height:1.55}
+.faq-item .faq-a a{color:var(--lime);font-weight:600}
+/* declutter: hide extra helper buttons, keep "Need an idea?" */
+#voiceBtn,#enhanceBtn{display:none!important}
+/* "More ways to generate" collapsible */
+.p1-more{margin-top:2px;background:transparent;border:none}
+.p1-more>summary{color:var(--muted);font-size:13px;font-weight:600;padding:6px 2px;cursor:pointer;list-style:none}
+.p1-more>summary::-webkit-details-marker{display:none}
+.p1-more>summary::before{content:"▾ ";color:var(--dim)}
+.p1-more .acc-body{display:flex;flex-direction:column;gap:8px;padding-top:8px}
+/* accordions: clean white instead of grey */
+details.acc{background:#fff!important;border:1px solid var(--line)!important}
+details.acc[open]{background:#fff!important;border-color:var(--line)!important}
+</style>
 </head>
 <body>
 
@@ -541,18 +603,11 @@
   <!-- HERO -->
   <section class="hero">
     <h1 id="heroTitle" aria-label="Your AI social media manager."><span id="ht1"></span><em id="ht2"></em><span id="ht3"></span><span id="heroCursor">|</span></h1>
-    <p>Posts, captions, hashtags, and weekly content plans, ready in seconds. No designer, no design skills, no wasted hours.</p>
+    <p>Posts, captions and hashtags in seconds, no designer needed.</p>
     <div class="hero-btns">
       <a href="#app" class="btn-primary">Try it free</a>
       <a href="#how" class="btn-ghost">How it works</a>
     </div>
-  </section>
-
-  <!-- HOW -->
-  <section id="how" class="steps reveal">
-    <div class="step"><b>1</b><div><strong>Describe your post</strong>"30% off summer dresses this weekend" is all you type.</div></div>
-    <div class="step"><b>2</b><div><strong>Pick a template &amp; colors</strong>4 professional layouts, 6 color moods. Switch instantly.</div></div>
-    <div class="step"><b>3</b><div><strong>Download &amp; post</strong>1080×1080 design + caption + hashtags, ready for Instagram.</div></div>
   </section>
 
   <!-- APP -->
@@ -560,19 +615,17 @@
   <p class="section-sub" id="trialLine">Try 3 posts for free. Just your email, no password.</p>
 
   <div class="card reveal">
-    <label for="quickDesc">✨ Just describe it <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(AI fills the form for you)</span></label>
-    <div style="display:flex;gap:8px;margin-bottom:4px">
-      <input id="quickDesc" placeholder='e.g. "luxury post for my coffee shop about iced drinks"' style="flex:1">
-      <button id="quickBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Go</button>
+    <label for="topic" style="font-size:15px">Describe your post</label>
+    <div id="hgComposer">
+      <textarea id="topic" placeholder="Describe your post and I'll design it"></textarea>
+      <div id="hgBar"><span style="flex:1"></span><button id="hgSubmit" type="button">Generate ✦</button></div>
     </div>
-
-    <label for="topic">What's the post about?</label>
-    <textarea id="topic" placeholder="e.g. 30% off all summer dresses this weekend"></textarea>
     <button id="voiceBtn" type="button" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎤 Speak your idea</button>
     <button id="ideaBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">✦ Need an idea?</button>
 
+    <details class="acc" id="bizDetails"><summary>Business details <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">(optional)</span></summary><div class="acc-body">
     <label for="brand">Business name</label>
-    <input id="brand" placeholder="e.g. Elegance Store">
+    <input id="brand" placeholder="Your brand name">
 
     <label for="bizType">Business type</label>
     <button type="button" class="picker-btn" id="bizBtn"><span id="bizBtnLabel">Restaurant / Café</span><span class="arrow">▾</span></button>
@@ -590,13 +643,14 @@
       <option>Education / Tutoring</option><option>Services / Agency</option>
       <option>Other</option>
     </select>
+    </div></details>
     <details class="acc" id="advancedOpts">
-      <summary>⚙️ Advanced options <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">— optional, or just hit Generate</span></summary>
+      <summary>⚙️ Advanced options <span style="text-transform:none;letter-spacing:0;color:var(--dim);font-weight:400">(optional, or just hit Generate)</span></summary>
       <div class="adv-body">
     <div id="advExtras"></div>
     <div id="advGallerySlot"></div>
     <label for="audience">Target audience <span style="text-transform:none;letter-spacing:0;color:var(--dim)">(optional)</span></label>
-    <input id="audience" placeholder="e.g. young mothers in Jounieh, mid budget">
+    <input id="audience" placeholder="Who is this post for?">
     <details class="acc">
       <summary>💡 Idea tools, planning &amp; occasions</summary>
       <div class="acc-body">
@@ -653,7 +707,7 @@
       <button class="chip">Thanksgiving</button>
     </div>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <input id="customOccasion" placeholder="Add your own occasion, e.g. Store anniversary" style="flex:1">
+      <input id="customOccasion" placeholder="Add your own occasion" style="flex:1">
       <button id="occasionBtn" style="background:var(--lime);color:#FFFFFF;border:none;border-radius:10px;padding:0 16px;font-weight:700;font-size:13px">Add</button>
     </div>
 
@@ -823,18 +877,13 @@
     </details>
 
     <button class="gen-btn" id="genBtn">Generate post</button>
-    <button id="luckyBtn" type="button" style="width:100%;margin-top:10px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:12px;padding:12px;font-size:14px;font-weight:600">🍀 I'm Feeling Lucky (random everything)</button>
+    
     <p class="error" id="errorMsg"></p>
     <p class="usage" id="usageMsg"></p>
   </div>
 
   <div class="card" style="display:none"><div class="skeleton pulse" id="skel"></div></div>
 
-  <div id="emptyPreview">
-    <div class="ep-mark">✨</div>
-    <b>Your post will appear here</b>
-    <span>Describe it above and tap Generate</span>
-  </div>
   <div id="slideBar" style="display:none;margin-bottom:10px" class="chip-row"></div>
   <div class="canvas-wrap" id="canvasWrap"><canvas id="canvas" width="1080" height="1080"></canvas></div>
   <div class="action-row" id="actionRow">
@@ -881,11 +930,20 @@
   <div class="card">
     <label for="codeInput">Have an access code?</label>
     <div class="code-row">
-      <input id="codeInput" placeholder="e.g. PK-XXXX-XXXX" autocapitalize="characters">
+      <input id="codeInput" placeholder="PK-XXXX-XXXX" autocapitalize="characters">
       <button id="codeBtn">Apply</button>
     </div>
     <p class="code-status" id="codeStatus"></p>
   </div>
+
+  <!-- HOW (moved below the generator) -->
+  <h2 class="section-title" id="how">How it works</h2>
+  <p class="section-sub">Three steps, about a minute.</p>
+  <section class="steps reveal">
+    <div class="step"><b>1</b><div><strong>Describe your post</strong>Type one line describing what you want to post.</div></div>
+    <div class="step"><b>2</b><div><strong>AI designs the concepts</strong>Four on-brand directions, composed and captioned for you.</div></div>
+    <div class="step"><b>3</b><div><strong>Download &amp; post</strong>Grab the image, caption and hashtags, ready for Instagram.</div></div>
+  </section>
 
   <!-- PRICING -->
   <h2 class="section-title" id="pricing">Pricing</h2>
@@ -919,8 +977,37 @@
     </div>
   </div>
 
+  <!-- FAQ -->
+  <h2 class="section-title" id="faq">Questions</h2>
+  <p class="section-sub">Everything you might be wondering.</p>
+  <div class="reveal">
+    <details class="faq-item">
+      <summary>Do I need any design skills?</summary>
+      <div class="faq-a">None. Describe your post in one line and PostKit designs it, writes the caption and picks the hashtags, ready to post.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Is it really free to try?</summary>
+      <div class="faq-a">Yes. You get 3 free posts with just your email, no password and no card required.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Can I use my own brand colours and logo?</summary>
+      <div class="faq-a">Yes. Set your brand once and every post comes out in your colours and style, so your feed looks consistent.</div>
+    </details>
+    <details class="faq-item">
+      <summary>Do I own what I create?</summary>
+      <div class="faq-a">Yes. Everything you generate is yours to post, print and sell for your business, with no royalty owed.</div>
+    </details>
+    <details class="faq-item">
+      <summary>How do I get a paid plan?</summary>
+      <div class="faq-a">Pick a plan, message us on <a href="https://wa.me/96179106883" target="_blank" rel="noopener">WhatsApp</a>, pay by Whish or OMT, and we send your access code in minutes.</div>
+    </details>
+  </div>
+
   <footer>
     <div style="opacity:.75">PostKit • All rights reserved 2026</div>
+    <div style="margin-top:8px">
+      <a href="terms.html">Terms of Service</a> &nbsp;•&nbsp; <a href="privacy.html">Privacy Policy</a>
+    </div>
   </footer>
 </div>
 
@@ -1340,7 +1427,7 @@ document.getElementById("occasionBtn").onclick = () => {
 /* AI Freestyle is the default: the AI art-directs each post itself */
 
 /* ---------- quick describe (natural language) ---------- */
-document.getElementById("quickBtn").onclick = async () => {
+var _qb=document.getElementById("quickBtn"); if(_qb) _qb.onclick = async () => {
   const q = document.getElementById("quickDesc").value.trim();
   if (!q) return;
   const btn = document.getElementById("quickBtn");
@@ -1374,7 +1461,7 @@ document.getElementById("campaignBtn").onclick = async () => {
   const topic = document.getElementById("topic").value.trim();
   const btn = document.getElementById("campaignBtn");
   planError.textContent = "";
-  if (!topic) { planError.textContent = "Type the campaign topic first, e.g. Black Friday."; return; }
+  if (!topic) { planError.textContent = "Type the campaign topic first."; return; }
   btn.disabled = true; btn.textContent = "Building campaign… (~20s)";
   try {
     const res = await fetch(WORKER_URL, {
@@ -1637,26 +1724,7 @@ document.getElementById("tintRange").addEventListener("input", (e) => {
   rerender();
 });
 
-/* ---------- I'm Feeling Lucky ---------- */
-document.getElementById("luckyBtn").onclick = () => {
-  const pick = a => a[Math.floor(Math.random() * a.length)];
-  state.template = "freestyle";
-  [...document.querySelectorAll("#tplRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tpl === "freestyle"));
-  const pals = PALETTES.map(p => p.id);
-  state.paletteId = pick(pals); state.customActive = false;
-  [...palRow.children].forEach((c, i) => c.classList.toggle("active", PALETTES[i] && PALETTES[i].id === state.paletteId));
-  state.tone = pick(["friendly", "professional", "luxury", "funny"]);
-  state.style = pick(["creative", "luxury", "minimal", "viral", "corporate"]);
-  state.fx.mode = pick(["none", "neon", "glass", "vintage", "luxury"]);
-  [...document.querySelectorAll("#toneRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.tone === state.tone));
-  [...document.querySelectorAll("#styleRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.style === state.style));
-  [...document.querySelectorAll("#fxModeRow .chip")].forEach(c => c.classList.toggle("active", c.dataset.fx === state.fx.mode));
-  if (!document.getElementById("topic").value.trim()) {
-    const list = IDEAS[document.getElementById("bizType").value] || IDEAS["Other"];
-    document.getElementById("topic").value = pick(list);
-  }
-  generate();
-};
+
 
 /* ---------- creative boost ---------- */
 document.getElementById("boostRow").addEventListener("click", async e => {
@@ -3012,7 +3080,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     }
     if (fx.mode === "grain") {
       ctx.save();
-      // procedural film grain — deterministic-ish speckle
+      // procedural film grain, deterministic-ish speckle
       ctx.globalAlpha = 0.05;
       for (var gi = 0; gi < 2600; gi++) {
         var gx = Math.random() * S, gy = Math.random() * H, gr2 = Math.random() * 1.6 + 0.4;
@@ -3140,7 +3208,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 </script>
 
 <!-- ============================================================
-     AI STUDIO  —  16 added features (client-side, plugs into
+     AI STUDIO ,  16 added features (client-side, plugs into
      existing state / rerender / drawPost pipeline)
      ============================================================ -->
 <script>
@@ -3250,11 +3318,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     return true;
   }
 
-  /* toasts disabled — no popups on selection */
+  /* toasts disabled, no popups on selection */
   function toast(msg){ /* intentionally does nothing */ }
 
   /* =========================================================
-     BRAND KIT (Phase 2) — colours from the logo, saved once
+     BRAND KIT (Phase 2), colours from the logo, saved once
      Declared early: templates, gallery and generation all use it.
      ========================================================= */
   var refreshKitUI = function(){};   // set once the brand row is built
@@ -3390,39 +3458,39 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   var GALLERY = {
     Restaurant:[
       {biz:"Restaurant / Café",topic:"Weekend brunch special, 2-for-1 on all pancakes",pal:"sand",tpl:"promo",tone:"friendly"},
-      {biz:"Restaurant / Café",topic:"New autumn menu just dropped — cozy comfort food",pal:"stone",tpl:"editorial",tone:"friendly"},
+      {biz:"Restaurant / Café",topic:"New autumn menu just dropped, cozy comfort food",pal:"stone",tpl:"editorial",tone:"friendly"},
       {biz:"Restaurant / Café",topic:"Reserve your table for Valentine's dinner",pal:"noir",tpl:"bold",tone:"luxury"},
-      {biz:"Restaurant / Café",topic:'"Best shawarma in town" — thank you for the love',pal:"sand",tpl:"review",tone:"friendly"}
+      {biz:"Restaurant / Café",topic:'"Best shawarma in town", thank you for the love',pal:"sand",tpl:"review",tone:"friendly"}
     ],
     Coffee:[
-      {biz:"Restaurant / Café",topic:"Iced caramel latte — your summer in a cup",pal:"sand",tpl:"poster",tone:"friendly"},
+      {biz:"Restaurant / Café",topic:"Iced caramel latte, your summer in a cup",pal:"sand",tpl:"poster",tone:"friendly"},
       {biz:"Restaurant / Café",topic:"Buy 5 coffees, get the 6th free with our loyalty card",pal:"stone",tpl:"promo",tone:"friendly"},
       {biz:"Restaurant / Café",topic:"Freshly roasted single-origin beans now in store",pal:"noir",tpl:"editorial",tone:"luxury"},
       {biz:"Restaurant / Café",topic:"Morning ritual: quiet corner, warm cup, good book",pal:"ivory",tpl:"quote",tone:"friendly"}
     ],
     Fashion:[
       {biz:"Fashion / Boutique",topic:"New arrivals: the autumn collection is here",pal:"noir",tpl:"poster",tone:"luxury"},
-      {biz:"Fashion / Boutique",topic:"Up to 40% off — end of season sale this weekend",pal:"gold",tpl:"promo",tone:"professional"},
+      {biz:"Fashion / Boutique",topic:"Up to 40% off, end of season sale this weekend",pal:"gold",tpl:"promo",tone:"professional"},
       {biz:"Fashion / Boutique",topic:"Style edit: 3 ways to wear our signature blazer",pal:"stone",tpl:"editorial",tone:"luxury"},
       {biz:"Fashion / Boutique",topic:"Before / After: styled by our team",pal:"noir",tpl:"beforeafter",tone:"luxury"}
     ],
     Gym:[
       {biz:"Gym / Fitness",topic:"January challenge: 30 days, new you. Sign up now",pal:"noir",tpl:"bold",tone:"professional"},
       {biz:"Gym / Fitness",topic:"First month free for new members this week only",pal:"noir",tpl:"promo",tone:"friendly"},
-      {biz:"Gym / Fitness",topic:'"Lost 12kg in 3 months" — real member result',pal:"stone",tpl:"beforeafter",tone:"professional"},
+      {biz:"Gym / Fitness",topic:'"Lost 12kg in 3 months", real member result',pal:"stone",tpl:"beforeafter",tone:"professional"},
       {biz:"Gym / Fitness",topic:"No excuses. The only bad workout is the one you skipped",pal:"noir",tpl:"quote",tone:"professional"}
     ],
     "Real Estate":[
       {biz:"Real Estate",topic:"Just listed: 3-bedroom sea-view apartment in Jounieh",pal:"stone",tpl:"editorial",tone:"professional"},
-      {biz:"Real Estate",topic:"Open house this Sunday, 11am to 4pm — everyone welcome",pal:"ivory",tpl:"banner",tone:"friendly"},
-      {biz:"Real Estate",topic:"Sold in 9 days — thinking of selling yours?",pal:"gold",tpl:"promo",tone:"professional"},
+      {biz:"Real Estate",topic:"Open house this Sunday, 11am to 4pm, everyone welcome",pal:"ivory",tpl:"banner",tone:"friendly"},
+      {biz:"Real Estate",topic:"Sold in 9 days, thinking of selling yours?",pal:"gold",tpl:"promo",tone:"professional"},
       {biz:"Real Estate",topic:"Your dream home is closer than you think",pal:"stone",tpl:"bold",tone:"luxury"}
     ],
     Beauty:[
-      {biz:"Salon / Beauty",topic:"Bridal glow package — book before it fills up",pal:"gold",tpl:"editorial",tone:"luxury"},
+      {biz:"Salon / Beauty",topic:"Bridal glow package, book before it fills up",pal:"gold",tpl:"editorial",tone:"luxury"},
       {biz:"Salon / Beauty",topic:"20% off all facials this month for new clients",pal:"ivory",tpl:"promo",tone:"friendly"},
       {biz:"Salon / Beauty",topic:"Before / After: our signature keratin treatment",pal:"noir",tpl:"beforeafter",tone:"luxury"},
-      {biz:"Salon / Beauty",topic:'"I finally feel like myself again" — thank you',pal:"ivory",tpl:"review",tone:"friendly"}
+      {biz:"Salon / Beauty",topic:'"I finally feel like myself again", thank you',pal:"ivory",tpl:"review",tone:"friendly"}
     ],
     Bakery:[
       {biz:"Bakery / Pastry",topic:"Fresh croissants out of the oven every morning at 7am",pal:"sand",tpl:"editorial",tone:"friendly"},
@@ -3437,7 +3505,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       {biz:"Jewelry",topic:"Up to 30% off selected pieces this week",pal:"noir",tpl:"promo",tone:"professional"}
     ],
     Hotel:[
-      {biz:"Hotel / Guesthouse",topic:"Escape for the weekend — sea view rooms available",pal:"gold",tpl:"editorial",tone:"luxury"},
+      {biz:"Hotel / Guesthouse",topic:"Escape for the weekend, sea view rooms available",pal:"gold",tpl:"editorial",tone:"luxury"},
       {biz:"Hotel / Guesthouse",topic:"Book direct and save 15% on your stay",pal:"stone",tpl:"promo",tone:"professional"},
       {biz:"Hotel / Guesthouse",topic:"Your quiet getaway starts here",pal:"mint",tpl:"poster",tone:"luxury"},
       {biz:"Hotel / Guesthouse",topic:"Sunday brunch by the pool, every week",pal:"sand",tpl:"banner",tone:"friendly"}
@@ -3450,7 +3518,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ],
     Retail:[
       {biz:"Retail / Store",topic:"New arrivals just hit the shelves",pal:"stone",tpl:"editorial",tone:"friendly"},
-      {biz:"Retail / Store",topic:"Mega clearance — everything must go",pal:"noir",tpl:"promo",tone:"friendly"},
+      {biz:"Retail / Store",topic:"Mega clearance, everything must go",pal:"noir",tpl:"promo",tone:"friendly"},
       {biz:"Retail / Store",topic:"Shop online, pick up in store today",pal:"mint",tpl:"split",tone:"professional"},
       {biz:"Retail / Store",topic:"Gift ideas for everyone on your list",pal:"gold",tpl:"bold",tone:"friendly"}
     ],
@@ -3523,7 +3591,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   };
 
   /* =========================================================
-     BUILD UI  — inject Inspiration Gallery + AI Studio card
+     BUILD UI , inject Inspiration Gallery + AI Studio card
      ========================================================= */
   function palById(id){ return PALETTES.find(function(p){return p.id===id;})||PALETTES[0]; }
 
@@ -3539,7 +3607,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   if(appCard){ appCard.insertAdjacentHTML("beforebegin", galleryHTML); }
 
   /* =========================================================
-     PHASE 4 — AI INSPIRATION GALLERY
+     PHASE 4, AI INSPIRATION GALLERY
      Styles are invented by the same engine, then applied to the
      user's own brand (colours, logo, business) on tap.
      ========================================================= */
@@ -3631,7 +3699,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function enhancePrompt(){
     var t=$("topic"); var raw=(t.value||"").trim();
-    if(!raw){ toast("Type a short idea first, e.g. \"sale on shoes\""); t.focus(); return; }
+    if(!raw){ toast("Type a short idea first."); t.focus(); return; }
     var biz=$("bizType").value.split(" / ")[0];
     var aud=($("audience").value||"").trim();
     var tone=state.tone;
@@ -3663,7 +3731,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       '<button class="gen-btn" id="magicBtn" style="margin-top:0">🪄 Magic Improve this design</button>'+
     '</div>'+
 
-    // Design DNA (flagship) — sliders that drive the whole look
+    // Design DNA (flagship), sliders that drive the whole look
     '<div class="std-block">'+
       '<div class="std-title">🧬 Design DNA</div>'+
       '<div class="std-sub">Dial the personality of your design, then re-apply. No design skills needed.</div>'+
@@ -3902,7 +3970,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     state.goal=name;
     setTone(g.tone); setStyle(g.style);
     if(state.result){ setTemplate(g.tpl); rerender(); toast("Optimized for: "+name+" ✓"); }
-    else { toast("Set for "+name+" — will shape your next post ✓"); }
+    else { toast("Set for "+name+", will shape your next post ✓"); }
   }
 
   // #3 variations
@@ -4043,7 +4111,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   };
 
   /* =========================================================
-     DESIGN SCORE (#5)  — recomputed on every rerender
+     DESIGN SCORE (#5) , recomputed on every rerender
      ========================================================= */
   function relLum(hex){
     var n=parseInt(hex.slice(1),16);
@@ -4127,38 +4195,38 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     "🎨 Creative": {pal:"noir",  font:"vogue",  tpl:"poster",    tone:"friendly",     style:"creative",  fx:"mesh"}
   };
   var QUICK_POSTS = {
-    "⏳ Countdown":     {topic:"Only a few days left! Our big event is almost here — get ready.", tpl:"banner", tone:"friendly"},
+    "⏳ Countdown":     {topic:"Only a few days left! Our big event is almost here, get ready.", tpl:"banner", tone:"friendly"},
     "🔜 Coming soon":   {topic:"Coming soon: something exciting is on the way. Stay tuned.", tpl:"poster", tone:"luxury"},
-    "⚡ Flash sale":     {topic:"FLASH SALE — today only! Huge discounts for a few hours.", tpl:"promo", tone:"friendly"},
-    "🆕 New collection":{topic:"New collection just dropped — be the first to explore it.", tpl:"editorial", tone:"luxury"},
+    "⚡ Flash sale":     {topic:"FLASH SALE, today only! Huge discounts for a few hours.", tpl:"promo", tone:"friendly"},
+    "🆕 New collection":{topic:"New collection just dropped, be the first to explore it.", tpl:"editorial", tone:"luxury"},
     "📦 Limited stock": {topic:"Limited stock alert! Once it's gone, it's gone.", tpl:"promo", tone:"professional"},
     "🎂 Birthday":      {topic:"Happy birthday from all of us! Celebrate with a special treat today.", tpl:"quote", tone:"friendly"},
-    "👋 Welcome":       {topic:"Welcome! So happy to have you here — here's what we're about.", tpl:"split", tone:"friendly"},
-    "🕐 Opening hours": {topic:"Our opening hours this week — come visit us any time.", tpl:"frame", tone:"professional"},
-    "💵 Price list":    {topic:"Our price list — quality you can always count on.", tpl:"dots", tone:"professional"},
-    "🍽️ Menu":          {topic:"Today's menu — freshly made, just for you.", tpl:"editorial", tone:"friendly"},
+    "👋 Welcome":       {topic:"Welcome! So happy to have you here, here's what we're about.", tpl:"split", tone:"friendly"},
+    "🕐 Opening hours": {topic:"Our opening hours this week, come visit us any time.", tpl:"frame", tone:"professional"},
+    "💵 Price list":    {topic:"Our price list, quality you can always count on.", tpl:"dots", tone:"professional"},
+    "🍽️ Menu":          {topic:"Today's menu, freshly made, just for you.", tpl:"editorial", tone:"friendly"},
     "✉️ Event invite":  {topic:"You're invited! Join us for a special event. Save the date.", tpl:"banner", tone:"luxury"},
-    "🙏 Thank you":      {topic:"Thank you to our amazing customers — we couldn't do it without you.", tpl:"quote", tone:"friendly"},
-    "❤️ Appreciation":  {topic:"Customer appreciation week — a little something to say we care.", tpl:"promo", tone:"friendly"},
+    "🙏 Thank you":      {topic:"Thank you to our amazing customers, we couldn't do it without you.", tpl:"quote", tone:"friendly"},
+    "❤️ Appreciation":  {topic:"Customer appreciation week, a little something to say we care.", tpl:"promo", tone:"friendly"},
     "🎁 Giveaway":       {topic:"GIVEAWAY time! Follow, like and tag 2 friends to win.", tpl:"giveaway", tone:"friendly"},
     "🏆 Contest":        {topic:"Contest: share your best photo with us for a chance to win.", tpl:"banner", tone:"friendly"},
-    "🎊 Grand opening":  {topic:"Grand opening! Come celebrate with us — offers all day.", tpl:"bold", tone:"friendly"},
-    "🔓 Opening soon":   {topic:"Opening soon in your area — get ready for something great.", tpl:"poster", tone:"luxury"},
+    "🎊 Grand opening":  {topic:"Grand opening! Come celebrate with us, offers all day.", tpl:"bold", tone:"friendly"},
+    "🔓 Opening soon":   {topic:"Opening soon in your area, get ready for something great.", tpl:"poster", tone:"luxury"},
     "💡 Did you know":   {topic:"Did you know? A surprising fact about what we do.", tpl:"quote", tone:"professional"},
     "⚖️ Myth vs fact":   {topic:"Myth vs Fact: clearing up a common misconception in our field.", tpl:"split", tone:"professional"},
     "📝 Quick tips":     {topic:"3 quick tips to get the most out of our product/service.", tpl:"dots", tone:"professional"},
-    "❓ FAQ":            {topic:"Your most asked question — answered.", tpl:"editorial", tone:"friendly"},
+    "❓ FAQ":            {topic:"Your most asked question, answered.", tpl:"editorial", tone:"friendly"},
     "📊 Poll":           {topic:"We want your opinion! Vote in the comments: A or B?", tpl:"banner", tone:"friendly"},
     "🌟 New arrival":    {topic:"Just arrived! The newest addition you've been waiting for.", tpl:"editorial", tone:"luxury"}
   };
-  var OFFERS = ["Buy 2, Get 1 Free","Weekend Special — 25% off","Spend $50, get $10 off","Buy 1, Get 1 at 50% off","Free delivery this week only","First order 15% off","Bundle deal: 3 for the price of 2","Happy hour: 20% off from 4–6pm","Loyalty reward: your 5th one free","Flash 30% off — today only"];
+  var OFFERS = ["Buy 2, Get 1 Free","Weekend Special, 25% off","Spend $50, get $10 off","Buy 1, Get 1 at 50% off","Free delivery this week only","First order 15% off","Bundle deal: 3 for the price of 2","Happy hour: 20% off from 4–6pm","Loyalty reward: your 5th one free","Flash 30% off, today only"];
 
   // inject the pre-form personality / quick-post card (after the gallery)
   var galleryCardEl = $("galleryCard");
   var personaHTML =
     '<div class="card" id="personaCard">'+
       '<div class="std-title">🎭 Brand personality <span style="font-weight:400;color:var(--muted);font-size:12px">(optional)</span></div>'+
-      '<div class="std-sub">Pick a vibe — colors, font, layout, tone & caption style all adapt.</div>'+
+      '<div class="std-sub">Pick a vibe, colors, font, layout, tone & caption style all adapt.</div>'+
       '<div class="chip-row" id="personaRow"></div>'+
       '<div class="std-title" style="margin-top:18px">⚡ Quick post types</div>'+
       '<div class="std-sub">Fills a ready-made idea + layout. Add your details, then Generate.</div>'+
@@ -4222,7 +4290,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     if(pr.tpl) setTemplate(pr.tpl);
     if(pr.fx) setFx(pr.fx);
     if(state.result){ rerender(); toast(name.replace(/^[^\s]+\s/,"")+" personality ✓"); }
-    else { toast(name.replace(/^[^\s]+\s/,"")+" set — shapes your next post ✓"); }
+    else { toast(name.replace(/^[^\s]+\s/,"")+" set, shapes your next post ✓"); }
   }
 
   // build quick post chips
@@ -4235,7 +4303,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         $("topic").value=q.topic;
         setTemplate(q.tpl); setTone(q.tone);
         $("topic").focus();
-        toast("Filled — add your details, then Generate");
+        toast("Filled, add your details, then Generate");
         $("app").scrollIntoView({behavior:"smooth",block:"start"});
       };
       row.appendChild(b);
@@ -4266,7 +4334,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   // offer + spin
   $("offerBtn2").onclick=function(){
     var t=$("topic"); var o=pick(OFFERS);
-    t.value = (t.value.trim()? t.value.trim()+" — " : "") + o + "!";
+    t.value = (t.value.trim()? t.value.trim()+", " : "") + o + "!";
     t.focus(); toast("Offer added: "+o);
   };
   $("spinBtn").onclick=function(){
@@ -4281,7 +4349,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   if(_magic) _magic.onclick=function(){
     if(!needResult()) return;
     var changed=[];
-    // 1. contrast — if palette text vs bg is weak, switch to a strong one
+    // 1. contrast, if palette text vs bg is weak, switch to a strong one
     if(!state.locks.color){
       var pcur=getPalette();
       if(contrastRatio(pcur.text||"#fff", pcur.bg||"#000") < 4.5){
@@ -4430,13 +4498,13 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var uniq=[]; found.forEach(function(f){ if(uniq.indexOf(f.toLowerCase())<0) uniq.push(f.toLowerCase()); });
     body.innerHTML='<div class="std-title" style="margin-bottom:8px">✨ Keyword highlights</div>'+
       '<div style="padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);white-space:pre-wrap">'+shown+'</div>'+
-      '<div class="std-sub" style="margin-top:10px">'+(uniq.length? (uniq.length+" power word"+(uniq.length>1?"s":"")+" found — these are what stops the scroll."):"No strong power words yet — try adding an offer, number, or urgency word.")+'</div>'+
+      '<div class="std-sub" style="margin-top:10px">'+(uniq.length? (uniq.length+" power word"+(uniq.length>1?"s":"")+" found, these are what stops the scroll."):"No strong power words yet, try adding an offer, number, or urgency word.")+'</div>'+
       '<button id="hlCopy" class="miniai" style="width:100%;margin-top:6px">Copy caption with **bold** keywords</button>';
     var hc=$("hlCopy"); if(hc) hc.onclick=function(){ copyChunk(markdown); };
     $("aiCopyCard").scrollIntoView({behavior:"smooth",block:"nearest"});
   };
 
-  // If a result already exists (e.g. restored), reveal + score now.
+  // If a result already exists (restored), reveal + score now.
   if(state.result){ var c=$("studioCard"); if(c) c.style.display="block"; updateScore(); }
 
   /* =========================================================
@@ -4448,7 +4516,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     // mark the power-user cards
     ["batchCard","kitCard","coachCard","boostCard","bgCard","historyCard","campaignCard",
      "galleryCard","personaCard","aiCopyCard","studioCard",
-     "luckyBtn","enhanceBtn","ideaBtn"].forEach(function(id){
+     "enhanceBtn","ideaBtn"].forEach(function(id){
       var el=$(id); if(el) el.classList.add("pro-only");
     });
 
@@ -4476,14 +4544,14 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   })();
 
   /* =========================================================
-     AUTO color & font  — default "let AI decide by business"
+     AUTO color & font , default "let AI decide by business"
      ========================================================= */
   (function(){
     var palRow=$("palRow"), fontRow=$("fontRow");
     if(palRow){
       autoPalBtn=document.createElement("button");
       autoPalBtn.type="button"; autoPalBtn.className="chip"; autoPalBtn.id="autoPalBtn";
-      autoPalBtn.textContent="✨ Auto — best for your business";
+      autoPalBtn.textContent="✨ Auto, best for your business";
       var w=document.createElement("div"); w.className="chip-row"; w.style.marginBottom="10px"; w.appendChild(autoPalBtn);
       palRow.insertAdjacentElement("beforebegin", w);
       autoPalBtn.onclick=function(){
@@ -4540,7 +4608,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   /* =========================================================
      EASE-OF-USE: starter chips, share/WhatsApp, success line
      ========================================================= */
-  // Starter topic chips — one tap fills the "what's the post about" box
+  // Starter topic chips, one tap fills the "what's the post about" box
   (function(){
     var t=$("topic"); if(!t) return;
     var STARTERS=[
@@ -4561,14 +4629,14 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     t.insertAdjacentElement("afterend", row);
   })();
 
-  // Share / Save to phone / WhatsApp — closes the loop after generating
+  // Share / Save to phone / WhatsApp, closes the loop after generating
   (function(){
     var actionRow=$("actionRow"); if(!actionRow) return;
     // success reassurance line
     var ok=document.createElement("div");
     ok.id="okLine";
     ok.style.cssText="display:none;align-items:center;gap:8px;margin-bottom:12px;padding:11px 14px;background:#EAF7EE;border:1px solid #CFEBD8;border-radius:12px;color:#1F7A44;font-weight:600;font-size:14px";
-    ok.innerHTML="✓ Your post is ready — save it or send it to WhatsApp below";
+    ok.innerHTML="✓ Your post is ready, save it or send it to WhatsApp below";
     actionRow.parentNode.insertBefore(ok, actionRow);
 
     var share=document.createElement("button");
@@ -4590,7 +4658,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         }, "image/png");
       } else { fallback(); }
       function fallback(){
-        // no native share (e.g. desktop): save the image, copy caption, open WhatsApp
+        // no native share (desktop): save the image, copy caption, open WhatsApp
         var a=document.createElement("a");
         a.download="postkit-post.png"; a.href=cv.toDataURL("image/png"); a.click();
         if(navigator.clipboard && cap) navigator.clipboard.writeText(cap);
@@ -4727,7 +4795,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     fr.appendChild(more);
   })();
 
-  // Staged loading screen — wraps generate() so every call gets it
+  // Staged loading screen, wraps generate() so every call gets it
   (function(){
     var overlay=document.createElement("div");
     overlay.id="stageLoad";
@@ -4796,7 +4864,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   /* =========================================================
-     PHASE 3 — BRAND LOCK CANVAS LAYER
+     PHASE 3, BRAND LOCK CANVAS LAYER
      AI makes the art (no text). Canvas draws the logo, headline,
      support line and CTA perfectly, in the same brand system,
      on every concept. This is what makes posts truly consistent.
@@ -6517,7 +6585,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     var formCard=document.querySelector(".card.reveal");
     var html='<div class="card" id="conceptsCard">'+
       '<div class="std-title">🎨 AI Concepts</div>'+
-      '<div class="std-sub">Four unique directions from four different AI designers. The first is ready — tap the others to reveal them.</div>'+
+      '<div class="std-sub">Four unique directions from four different AI designers. The first is ready, tap the others to reveal them.</div>'+
       '<div class="cc-grid" id="ccGrid"></div>'+
       '<div id="ccShared" style="margin-top:14px"></div>'+
       '<div id="ccCredits" style="margin-top:10px;font-size:13px;color:var(--muted);text-align:center;font-weight:600"></div>'+
@@ -6546,8 +6614,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         ["🌟 New Collection","Our new collection just dropped, explore it now"]
       ];
       var hero=document.createElement("div"); hero.className="p1-hero";
-      hero.innerHTML='<div class="p1-q">What do you want to post today?</div><div class="p1-ideas" id="p1Ideas"></div>';
-      topic.insertAdjacentElement("beforebegin", hero);
+      hero.innerHTML='<div class="p1-q">Or start from a preset</div><div class="p1-ideas" id="p1Ideas"></div>';
+      (document.getElementById("hgComposer")||topic).insertAdjacentElement("afterend", hero);
       var ir=$("p1Ideas");
       IDEAS14.forEach(function(x){
         var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=x[0];
@@ -6562,12 +6630,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         };
         ir.appendChild(b);
       });
-      var tl=document.querySelector('label[for="topic"]'); if(tl) tl.textContent="Or describe your own idea";
+      var tl=document.querySelector('label[for="topic"]'); if(tl) tl.textContent="Describe your post";
 
       // format picker (post / story / portrait / landscape)
       var fw=document.createElement("div");
       fw.innerHTML='<div class="p1-q" style="font-size:15px;margin-top:16px">Format</div><div class="p1-ideas" id="p1Fmt"></div>';
-      topic.insertAdjacentElement("afterend", fw);
+      hero.insertAdjacentElement("afterend", fw);
       // shapes are drawn with CSS so they show true proportions and match the chip colour
       var FMTS=[["Square","square",13,13],["Portrait","portrait",11,14],["Story","story",9,16],["Landscape","landscape",18,11]];
       var fr=fw.querySelector("#p1Fmt");
@@ -6683,9 +6751,13 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     // --- Phase 1: three clear actions replace the old buttons ---
     var actions=document.createElement("div"); actions.className="p1-actions";
     actions.innerHTML=
-      '<button type="button" id="act4" class="gen-btn">🎨 Generate 4 Concepts</button>'+
-      '<button type="button" id="act1" class="gen-btn p1-secondary">⚡ Generate 1 Post</button>'+
-      '<button type="button" id="act3" class="gen-btn p1-ghost">🎞️ 3-Slide Carousel</button>'+'<button type="button" id="act5" class="gen-btn p1-ghost">🎬 5-Slide Carousel</button>'+'<button type="button" id="actM" class="gen-btn p1-ghost">📅 Generate Monthly Pack</button>';
+      '<button type="button" id="act4" class="gen-btn" style="display:none">Generate</button>'+
+      '<details class="acc p1-more"><summary>More ways to generate</summary><div class="acc-body">'+
+        '<button type="button" id="act1" class="gen-btn p1-secondary">⚡ Generate 1 Post</button>'+
+        '<button type="button" id="act3" class="gen-btn p1-ghost">🎞️ 3-Slide Carousel</button>'+
+        '<button type="button" id="act5" class="gen-btn p1-ghost">🎬 5-Slide Carousel</button>'+
+        '<button type="button" id="actM" class="gen-btn p1-ghost">📅 Generate Monthly Pack</button>'+
+      '</div></details>';
     gen.insertAdjacentElement("beforebegin", actions);
 
     async function run(limit){
@@ -6694,10 +6766,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       if(!t){ $("topic").focus(); return; }
       var card=$("conceptsCard"); card.style.display="block";
       $("conceptsCard").querySelector(".std-sub").textContent = limit===1
-        ? "One polished design for your post." : "Four unique directions. The first is ready — tap the others to reveal them.";
+        ? "One polished design for your post." : "Four unique directions. The first is ready, tap the others to reveal them.";
       $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
-      var btns=[$("act4"),$("act1"),$("actM")]; btns.forEach(function(b){b.disabled=true;});
-      var a=(limit===1?$("act1"):$("act4")); var old=a.textContent; a.textContent="Creating…";
+      var btns=[$("act4"),$("act1"),$("actM"),$("hgSubmit")].filter(Boolean); btns.forEach(function(b){b.disabled=true;});
+      var a=(limit===1?$("act1"):($("hgSubmit")||$("act4"))); var old=a.textContent; a.textContent="Creating…";
       card.scrollIntoView({behavior:"smooth",block:"start"});
       try{ var r=await callConcepts(); savePlan("concepts", r, limit); renderConcepts(r, limit); }
       catch(e){ $("ccErr").textContent=e.message; }
@@ -6742,7 +6814,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
   try{ restoreSession(); }catch(e){}
 
-  /* ---------- 7/8: tidy homepage — gallery + extras live in Advanced options ---------- */
+  /* ---------- 7/8: tidy homepage, gallery + extras live in Advanced options ---------- */
   (function(){
     try{
       var slot=$("advGallerySlot"), gal=$("galleryCard");
@@ -6809,7 +6881,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   /* ---------------------------------------------------------
      Remove the sticky focus outline left after a TAP.
      Keyboard users (Tab/Enter) never fire pointerup, so their
-     focus ring is preserved — only touch/mouse taps get cleared.
+     focus ring is preserved, only touch/mouse taps get cleared.
      --------------------------------------------------------- */
   document.addEventListener("pointerup", function(e){
     var b = e.target && e.target.closest && e.target.closest("button, summary, [tabindex]");
@@ -6822,7 +6894,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
 <!-- GoatCounter analytics: create a free account at goatcounter.com,
      then replace YOURCODE below and remove the comment markers.
-<script data-goatcounter="https://YOURCODE.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script data-goatcounter="https://postkitlb.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 -->
+<script>
+/* HeyGen-style Submit -> fire the primary generate (4 Concepts), fallback to legacy */
+document.addEventListener("click",function(e){
+  var t=e.target;
+  if(t && t.id==="hgSubmit"){
+    var b=document.getElementById("act4")||document.getElementById("genBtn");
+    if(b) b.click();
+  }
+});
+</script>
 </body>
 </html>

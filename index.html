@@ -454,14 +454,14 @@
   /* ===== premium results gallery ===== */
   .cc-grid{display:grid;grid-template-columns:1fr;gap:20px;margin-top:18px}
   .cc-slot{
-    position:relative;aspect-ratio:1/1;border-radius:24px;overflow:hidden;cursor:pointer;
+    position:relative;aspect-ratio:var(--cc-ar,1/1);border-radius:24px;overflow:hidden;cursor:pointer;
     background:#F2F1EC;box-shadow:0 2px 6px rgba(25,26,23,.05), 0 18px 40px -22px rgba(25,26,23,.35);
     display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;
     transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
     animation:ccIn .5s cubic-bezier(.2,.8,.2,1) both;
   }
   .cc-slot:active{transform:scale(.985)}
-  .cc-slot.loaded{aspect-ratio:1/1}
+  .cc-slot.loaded{aspect-ratio:var(--cc-ar,1/1)}
   .cc-slot img{width:100%;height:100%;object-fit:cover;display:block;animation:ccFade .6s ease both}
   @keyframes ccIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
   @keyframes ccFade{from{opacity:0}to{opacity:1}}
@@ -622,13 +622,13 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 #pkMenuBtn{background:#fff;border:1px solid var(--line);border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s;
   opacity:1!important;animation:none!important;visibility:visible!important}
 #pkMenuBtn:hover{border-color:var(--lime);box-shadow:0 4px 12px -6px rgba(43,68,222,.5)}
-#pkScrim{position:fixed;inset:0;height:100dvh;background:rgba(18,18,16,.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .24s ease;z-index:998}
+#pkScrim{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(18,18,16,.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .24s ease;z-index:998}
 #pkScrim.open{opacity:1;pointer-events:auto}
-#pkPanel{position:fixed;top:0;right:0;height:100dvh;width:min(90vw,372px);background:var(--bg);
-  border-radius:22px 0 0 22px;transform:translateX(104%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+#pkPanel{position:fixed;top:0;bottom:0;right:-420px;width:min(90vw,372px);background:var(--bg);overscroll-behavior:contain;
+  border-radius:22px 0 0 22px;transition:right .3s cubic-bezier(.32,.72,0,1);
   z-index:999;overflow-y:auto;-webkit-overflow-scrolling:touch;
   box-shadow:-28px 0 60px -30px rgba(0,0,0,.45);padding:0 0 34px}
-#pkPanel.open{transform:translateX(0)}
+#pkPanel.open{right:0}
 .pkp-top{position:sticky;top:0;background:rgba(247,246,242,.92);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);
   display:flex;align-items:center;justify-content:space-between;padding:16px 18px;z-index:3;border-bottom:1px solid rgba(0,0,0,.05)}
 .pkp-brand{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:.15em;font-size:14px}
@@ -639,6 +639,12 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 .pkp-h{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:11px}
 .pkp-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:8px 0 0}
 .pkp-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px}
+#pkGoogleBtn{display:flex;justify-content:center}
+#pkGoogleBtn > div{margin:0 auto}
+#pkSignedIn{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+#pkGoogleFallback{display:block;width:100%;margin-top:8px;background:#fff;border:1px solid var(--line);
+  border-radius:999px;padding:11px 14px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;text-align:center}
+#pkGoogleFallback:hover{border-color:var(--lime-dark);color:var(--lime)}
 
 /* account */
 .pkp-user{display:flex;align-items:center;gap:11px}
@@ -682,15 +688,22 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 body.pk-panel-open .wa-float{display:none!important}
 @media (prefers-reduced-motion: reduce){ #pkPanel{transition:none} }
 @media (min-width: 900px) {
-  .wrap { max-width: 1040px; padding: 0 24px; }
+  .wrap { max-width: 1180px; padding: 0 28px; }
 
-  /* forms/tools read best as a centered column, not stretched full width */
   .card { max-width: 680px; margin-left: auto; margin-right: auto; }
 
-  /* hero gets room and presence */
-  .hero { max-width: 840px; margin-left: auto; margin-right: auto; text-align: center;
-          padding-top: 60px !important; padding-bottom: 40px !important; }
-  .hero h1 { font-size: clamp(46px, 5vw, 62px) !important; }
+  /* the studio: prompt on the left, results on the right */
+  #pkStudio { display: grid; grid-template-columns: minmax(0, 430px) minmax(0, 1fr);
+              gap: 22px; align-items: start; }
+  #pkStudio > .card { max-width: none; margin: 0; }
+  #pkStudio > #conceptsCard { position: sticky; top: 22px; min-height: 460px; }
+  #pkStudio .cc-grid { grid-template-columns: 1fr 1fr; }
+  #codeCard { max-width: 430px; margin-left: 0; }
+
+  /* hero: tighter, so the tool is what fills the screen */
+  .hero { max-width: 760px; margin-left: auto; margin-right: auto; text-align: center;
+          padding-top: 44px !important; padding-bottom: 26px !important; }
+  .hero h1 { font-size: clamp(40px, 4.2vw, 54px) !important; }
   .hero p { font-size: 18px !important; max-width: 48ch !important; margin-left: auto; margin-right: auto; }
   .hero-btns { justify-content: center; }
 
@@ -749,11 +762,12 @@ body.pk-panel-open .wa-float{display:none!important}
 
     <div class="pkp-sec" id="pkAcctSec" style="padding-top:0">
       <div class="pkp-h">Account</div>
-      <div class="pkp-card" id="pkAcct">
+      <div id="pkAcct">
         <div id="pkSignedOut">
-          <p class="pkp-note" style="margin:0 0 10px">Sign in to keep your credits on any device.</p>
+          <p class="pkp-note" style="margin:0 0 10px;text-align:center">Keep your credits on any device</p>
           <div id="pkGoogleBtn"></div>
-          <p id="pkAuthNote" class="pkp-note"></p>
+          <button type="button" id="pkGoogleFallback">Continue with Google</button>
+          <p id="pkAuthNote" class="pkp-note" style="text-align:center"></p>
         </div>
         <div id="pkSignedIn" style="display:none">
           <div class="pkp-user"><img id="pkAvatar" alt=""><div><b id="pkName"></b><span id="pkEmailTxt"></span></div></div>
@@ -766,8 +780,8 @@ body.pk-panel-open .wa-float{display:none!important}
       <div class="pkp-h">What you can do</div>
       <ul class="pkp-feats">
         <li><button type="button" data-pk="write"><i>🎨</i><b>4 AI concepts</b><span>Start writing your post</span></button></li>
-        <li><button type="button" data-pk="logo"><i>🔒</i><b>Your real logo</b><span>Use my logo &amp; upload it</span></button></li>
-        <li><button type="button" data-pk="poster"><i>🖼️</i><b>AI poster mode</b><span>Switch to AI poster</span></button></li>
+        <li><button type="button" data-pk="logo"><i>🏷️</i><b>My logo &amp; my text</b><span>Upload your logo</span></button></li>
+        <li><button type="button" data-pk="poster"><i>✨</i><b>Let AI design it all</b><span>Prettier, but no logo</span></button></li>
         <li><button type="button" data-pk="carousel"><i>🎞️</i><b>Carousels</b><span>Open 3 or 5 slides</span></button></li>
         <li><button type="button" data-pk="monthly"><i>📅</i><b>Monthly pack</b><span>Plan a whole month</span></button></li>
         <li><button type="button" data-pk="lang"><i>✍️</i><b>Captions</b><span>Language, tone &amp; style</span></button></li>
@@ -6552,6 +6566,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         if(cr) cr.textContent = data.usage.plan==="trial"
           ? (left>0 ? ("Free posts left: "+left+" of "+data.usage.limit) : "Free posts used up. Enter a code to continue.")
           : (data.usage.plan+": "+data.usage.used+" / "+data.usage.limit+" this month");
+        try{ if(window.pkSaveNudge) window.pkSaveNudge(data.usage, left); }catch(e){}
         var tl=$("trialLine");
         if(tl && data.usage.plan==="trial"){
           tl.textContent = left>0
@@ -6746,6 +6761,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     });
   }
 
+  // preview tiles should show the shape the user picked, not always a square
+  window.pkSetPreviewRatio = function(fmt){
+    var ar = fmt==="portrait" ? "4/5"
+           : (fmt==="story"||fmt==="portrait9") ? "9/16"
+           : fmt==="landscape" ? "5/4" : "1/1";
+    var g=document.getElementById("ccGrid");
+    if(g) g.style.setProperty("--cc-ar", ar);
+    var c=document.getElementById("conceptsCard");
+    if(c) c.style.setProperty("--cc-ar", ar);
+  };
+
   // build the concepts card (after the main form card) + the Phase 1 homepage
   (function(){
     var formCard=document.querySelector(".card.reveal");
@@ -6755,9 +6781,20 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       '<div class="cc-grid" id="ccGrid"></div>'+
       '<div id="ccShared" style="margin-top:14px"></div>'+
       '<div id="ccCredits" style="margin-top:10px;font-size:13px;color:var(--muted);text-align:center;font-weight:600"></div>'+
+      '<div id="ccSaveNudge" style="display:none"></div>'+
       '<p class="error" id="ccErr" style="margin-top:8px"></p>'+
     '</div>';
     if(formCard){ formCard.insertAdjacentHTML("afterend", html); }
+    // group form + output so desktop can show them side by side
+    try{
+      var ccard=document.getElementById("conceptsCard");
+      if(formCard && ccard && formCard.parentNode){
+        var studio=document.createElement("div"); studio.id="pkStudio";
+        formCard.parentNode.insertBefore(studio, formCard);
+        studio.appendChild(formCard);
+        studio.appendChild(ccard);
+      }
+    }catch(e){}
 
     var gen=$("genBtn"); if(!gen) return;
 
@@ -6821,10 +6858,15 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       FMTS.forEach(function(f,i){
         var b=document.createElement("button"); b.type="button"; b.className="chip"+(i===0?" active":"");
         b.innerHTML='<i class="fmt-ico" style="width:'+f[2]+'px;height:'+f[3]+'px"></i>'+f[0];
-        b.onclick=function(){ fr.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");}); b.classList.add("active"); window.__pkFormat=f[1]; };
+        b.onclick=function(){
+          fr.querySelectorAll(".chip").forEach(function(c){c.classList.remove("active");});
+          b.classList.add("active"); window.__pkFormat=f[1];
+          pkSetPreviewRatio(f[1]);          // previews match the chosen shape
+        };
         fr.appendChild(b);
       });
       window.__pkFormat="square";
+      pkSetPreviewRatio("square");
       brandKit.font = fontForBiz($("bizType").value);
       $("bizType").addEventListener("change", function(){ brandKit.font = fontForBiz(this.value); saveKit(); });
 
@@ -6833,8 +6875,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       bw.innerHTML=
         '<div class="p1-q" style="font-size:15px;margin-top:16px">Your brand</div>'+
         '<div class="p1-ideas">'+
-          '<button type="button" class="chip active" id="lockChip">🔒 Use my real logo</button>'+
-          '<button type="button" class="chip" id="aiPosterChip">🎨 AI poster (no logo)</button>'+
+          '<button type="button" class="chip active" id="lockChip">🏷️ My logo &amp; my text</button>'+
+          '<button type="button" class="chip" id="aiPosterChip">✨ Let AI design it all</button>'+
           '<label class="chip" id="uploadLogoChip" for="brandLogoFile" style="cursor:pointer">🖼️ Upload logo (PNG)</label>'+
           '<button type="button" class="chip" id="removeLogo" style="display:none">✕ Reset brand kit</button>'+'<label class="chip" for="refPhotos" style="cursor:pointer">📷 Inspire with my photos</label>'+
         '</div>'+
@@ -7107,13 +7149,19 @@ document.addEventListener("click",function(e){
   var panel=$$("pkPanel"), scrim=$$("pkScrim");
   if(!panel) return;
 
-  var lastFocus=null;
+  var lastFocus=null, lockY=0;
   function openPanel(){
     lastFocus=document.activeElement;
+    lockY = window.scrollY || window.pageYOffset || 0;
     panel.classList.add("open"); scrim.classList.add("open");
     panel.setAttribute("aria-hidden","false");
     if(mb) mb.setAttribute("aria-expanded","true");
-    document.body.classList.add("pk-panel-open"); document.body.style.overflow="hidden";
+    document.body.classList.add("pk-panel-open");
+    document.body.style.position="fixed";
+    document.body.style.top = (-lockY)+"px";
+    document.body.style.left="0"; document.body.style.right="0";
+    document.body.style.width="100%";
+    document.body.style.overflow="hidden";
     var c=$$("pkClose"); if(c) setTimeout(function(){ c.focus(); },80);
     refreshUsage();
   }
@@ -7121,7 +7169,11 @@ document.addEventListener("click",function(e){
     panel.classList.remove("open"); scrim.classList.remove("open");
     panel.setAttribute("aria-hidden","true");
     if(mb) mb.setAttribute("aria-expanded","false");
-    document.body.classList.remove("pk-panel-open"); document.body.style.overflow="";
+    document.body.classList.remove("pk-panel-open");
+    document.body.style.position=""; document.body.style.top="";
+    document.body.style.left=""; document.body.style.right="";
+    document.body.style.width=""; document.body.style.overflow="";
+    window.scrollTo(0, lockY);
     if(lastFocus && lastFocus.focus) { try{ lastFocus.focus(); }catch(e){} }
   }
   // keep focus inside the panel while it is open
@@ -7172,6 +7224,38 @@ document.addEventListener("click",function(e){
     if(fn){ e.preventDefault(); fn(); }
   });
 
+  /* Quiet sign in nudge, shown only after something has been generated.
+     Never a popup: it sits under the results and can be dismissed. */
+  window.pkSaveNudge = function(usage, left){
+    var box=document.getElementById("ccSaveNudge");
+    if(!box) return;
+    var signedIn=false;
+    try{ signedIn = !!JSON.parse(localStorage.getItem("postkit_user")||"null"); }catch(e){}
+    var dismissed=false;
+    try{ dismissed = sessionStorage.getItem("pk_nudge_off")==="1"; }catch(e){}
+    var paid = usage && usage.plan && usage.plan!=="trial" && usage.plan!=="none";
+    if(signedIn || paid || dismissed || !GOOGLE_CLIENT_ID){ box.style.display="none"; return; }
+
+    var out = (usage && usage.plan==="trial" && left<=0);
+    box.style.display="block";
+    box.innerHTML =
+      '<div style="margin-top:12px;background:'+(out?"var(--lime-bg)":"#fff")+';border:1px solid '+(out?"#D3D8F7":"var(--line)")+';border-radius:14px;padding:13px 14px;text-align:center">'
+      + '<div style="font-size:13.5px;font-weight:600;color:var(--text)">'
+      + (out ? "Free posts used up" : "Keep these posts")
+      + '</div>'
+      + '<div style="font-size:12.5px;color:var(--muted);margin:4px 0 10px;line-height:1.5">'
+      + (out ? "Sign in and message us to add credits to your account."
+             : "Sign in so your credits and designs follow you on any device.")
+      + '</div>'
+      + '<button type="button" id="ccNudgeBtn" style="background:var(--lime);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer">Sign in with Google</button>'
+      + '<button type="button" id="ccNudgeNo" style="display:block;margin:8px auto 0;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer">Not now</button>'
+      + '</div>';
+    var go=document.getElementById("ccNudgeBtn");
+    if(go) go.onclick=function(){ pkGoogleRedirect(); };
+    var no=document.getElementById("ccNudgeNo");
+    if(no) no.onclick=function(){ try{ sessionStorage.setItem("pk_nudge_off","1"); }catch(e){} box.style.display="none"; };
+  };
+
   var tu=$$("pkTopUp");
   if(tu) tu.href="https://wa.me/"+WA+"?text="+encodeURIComponent("Hi! I'd like more PostKit credits 🙌");
 
@@ -7217,7 +7301,9 @@ document.addEventListener("click",function(e){
     try{
       document.documentElement.classList.remove("pk-intro");
       document.body.classList.remove("pk-panel-open");
-      document.body.style.overflow="";
+      document.body.style.position=""; document.body.style.top="";
+      document.body.style.left=""; document.body.style.right="";
+      document.body.style.width=""; document.body.style.overflow="";
       panel.classList.remove("open");
       scrim.classList.remove("open");
     }catch(e){}
@@ -7269,6 +7355,33 @@ document.addEventListener("click",function(e){
     }catch(e){ note.textContent="Sign in failed. Please try again."; }
   }
 
+  /* Redirect sign in. Works where the popup is blocked, e.g. in app browsers. */
+  function pkGoogleRedirect(){
+    if(!GOOGLE_CLIENT_ID){ $$("pkAuthNote").textContent="Sign in is not set up yet."; return; }
+    var nonce = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try{ sessionStorage.setItem("pk_nonce", nonce); }catch(e){}
+    var redirect = location.origin + location.pathname;
+    location.href = "https://accounts.google.com/o/oauth2/v2/auth"
+      + "?client_id=" + encodeURIComponent(GOOGLE_CLIENT_ID)
+      + "&redirect_uri=" + encodeURIComponent(redirect)
+      + "&response_type=id_token"
+      + "&scope=" + encodeURIComponent("openid email profile")
+      + "&nonce=" + encodeURIComponent(nonce)
+      + "&prompt=select_account";
+  }
+  var fb=$$("pkGoogleFallback"); if(fb) fb.onclick=pkGoogleRedirect;
+
+  // returning from the redirect: Google puts the token in the URL hash
+  (function(){
+    if(location.hash.indexOf("id_token=") === -1) return;
+    try{
+      var p=new URLSearchParams(location.hash.replace(/^#/,""));
+      var tok=p.get("id_token");
+      history.replaceState(null,"",location.pathname+location.search);
+      if(tok) onGoogle({ credential: tok });
+    }catch(e){}
+  })();
+
   if(GOOGLE_CLIENT_ID){
     var s=document.createElement("script");
     s.src="https://accounts.google.com/gsi/client"; s.async=true; s.defer=true;
@@ -7283,8 +7396,9 @@ document.addEventListener("click",function(e){
           itp_support: true,
           cancel_on_tap_outside: true
         });
+        var w = Math.min(320, Math.max(220, (panel.clientWidth || 340) - 44));
         google.accounts.id.renderButton($$("pkGoogleBtn"), {
-          theme:"outline", size:"large", width:280, text:"signin_with", shape:"pill", logo_alignment:"left"
+          theme:"outline", size:"large", width:w, text:"signin_with", shape:"pill", logo_alignment:"center"
         });
       }catch(e){
         $$("pkAuthNote").textContent="Google sign in is not set up for this site yet.";

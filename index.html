@@ -25,6 +25,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PostKit, AI Instagram posts for your business</title>
+<link rel="canonical" href="https://postkitlb.com/">
 <meta name="description" content="Generate ready-to-post Instagram designs and captions with AI. For businesses in Lebanon who don't have time to design.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
@@ -58,6 +59,7 @@
   .logo{display:flex;align-items:center;gap:10px}
   .logo-mark{width:22px;height:22px;background:var(--lime);border-radius:6px;transform:rotate(45deg)}
   .logo-text{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px;letter-spacing:.12em}
+  .logo-text em{font-style:normal;color:var(--lime)}
   .nav-cta{background:transparent;border:1px solid var(--lime-dark);color:var(--lime);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none}
 
   /* ---------- hero ---------- */
@@ -534,8 +536,33 @@
 #hgComposer #topic{border:none!important;background:transparent!important;box-shadow:none!important;padding:6px 6px 2px!important;min-height:88px;resize:none;font-size:16px;line-height:1.5}
 #hgComposer #topic:focus{outline:none!important}
 #hgBar{display:flex;align-items:center;gap:8px;padding-top:8px;margin-top:2px;border-top:1px solid var(--line)}
-#hgSubmit{background:var(--lime);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;transition:transform .12s ease,filter .12s,opacity .12s}
-#hgSubmit:hover{transform:translateY(-1px);filter:brightness(1.06)}
+/* Generate button: a light that travels around the border */
+.hg-neon{position:relative;display:inline-block;padding:2.5px;border-radius:999px;overflow:hidden;
+  background:transparent}
+.hg-neon::before{content:"";position:absolute;top:50%;left:50%;width:260%;padding-bottom:260%;
+  transform:translate(-50%,-50%);
+  background:conic-gradient(from 0deg,
+    transparent 0deg 96deg,
+    rgba(150,166,255,.35) 118deg,
+    rgba(190,200,255,.85) 140deg,
+    #ffffff 152deg,
+    rgba(190,200,255,.85) 164deg,
+    rgba(150,166,255,.35) 186deg,
+    transparent 208deg 276deg,
+    rgba(150,166,255,.35) 298deg,
+    rgba(190,200,255,.85) 320deg,
+    #ffffff 332deg,
+    rgba(190,200,255,.85) 344deg,
+    rgba(150,166,255,.35) 356deg,
+    transparent 360deg);
+  animation:hgSpin 1.3s linear infinite}
+.hg-neon>#hgSubmit{position:relative;z-index:1;display:block}
+@keyframes hgSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+#hgSubmit{background:var(--lime);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14px;cursor:pointer;transition:filter .12s}
+#hgSubmit:hover{filter:brightness(1.08)}
+.hg-neon:active{transform:scale(.98)}
+.p1-ideas .pk-more-chip{color:var(--lime)!important;font-weight:600!important;border-style:dashed!important;border-color:var(--lime-dark)!important}
+@media (prefers-reduced-motion: reduce){ .hg-neon::before{animation:none} }
 #hgSubmit:active{transform:scale(.97)}
 
 /* HeyGen-consistent panel: section labels, preset chips, action + helper buttons */
@@ -590,15 +617,171 @@
 /* accordions: clean white instead of grey */
 details.acc{background:#fff!important;border:1px solid var(--line)!important}
 details.acc[open]{background:#fff!important;border-color:var(--line)!important}
+
+/* ===== side panel ===== */
+#pkMenuBtn{background:#fff;border:1px solid var(--line);border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s}
+#pkMenuBtn:hover{border-color:var(--lime);box-shadow:0 4px 12px -6px rgba(43,68,222,.5)}
+#pkScrim{position:fixed;inset:0;background:rgba(18,18,16,.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .24s ease;z-index:998}
+#pkScrim.open{opacity:1;pointer-events:auto}
+#pkPanel{position:fixed;top:0;right:0;height:100%;width:min(90vw,372px);background:var(--bg);
+  border-radius:22px 0 0 22px;transform:translateX(104%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+  z-index:999;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  box-shadow:-28px 0 60px -30px rgba(0,0,0,.45);padding:0 0 34px}
+#pkPanel.open{transform:translateX(0)}
+.pkp-top{position:sticky;top:0;background:rgba(247,246,242,.92);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);
+  display:flex;align-items:center;justify-content:space-between;padding:16px 18px;z-index:3;border-bottom:1px solid rgba(0,0,0,.05)}
+.pkp-brand{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:.15em;font-size:14px}
+.pkp-brand em{font-style:normal;color:var(--lime)}
+#pkClose{background:#fff;border:1px solid var(--line);border-radius:9px;width:30px;height:30px;font-size:13px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
+#pkClose:hover{color:var(--text);border-color:var(--lime-dark)}
+.pkp-sec{padding:18px}
+.pkp-h{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:11px}
+.pkp-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:8px 0 0}
+.pkp-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px}
+
+/* account */
+.pkp-user{display:flex;align-items:center;gap:11px}
+.pkp-user img{width:40px;height:40px;border-radius:50%;background:var(--lime-bg);object-fit:cover;flex:none}
+.pkp-user b{display:block;font-size:14px;letter-spacing:-.01em}
+.pkp-user span{display:block;font-size:11.5px;color:var(--muted);word-break:break-all;margin-top:1px}
+.pkp-link{background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;padding:10px 0 0}
+.pkp-link:hover{color:var(--lime)}
+
+/* credits */
+.pkp-credits{background:linear-gradient(150deg,#2B44DE 0%,#1E31B4 100%);color:#fff;border-radius:18px;padding:17px 17px 15px;
+  box-shadow:0 14px 30px -18px rgba(43,68,222,.85)}
+.pkp-plan{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.pkp-plan span{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.82;font-weight:600}
+.pkp-plan b{font-family:'Archivo',sans-serif;font-size:24px;letter-spacing:-.02em;line-height:1}
+.pkp-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.24);overflow:hidden;margin:13px 0 9px}
+.pkp-bar i{display:block;height:100%;width:0%;background:#fff;border-radius:99px;transition:width .5s cubic-bezier(.32,.72,0,1)}
+.pkp-credits .pkp-note{color:rgba(255,255,255,.82);margin:0}
+.pkp-cta{display:block;text-align:center;margin-top:14px;background:#fff;color:var(--lime);border-radius:11px;padding:11px;
+  font-size:13.5px;font-weight:700;text-decoration:none;transition:transform .14s}
+.pkp-cta:hover{transform:translateY(-1px)}
+
+/* features */
+.pkp-feats{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pkp-feats li{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 11px 12px;transition:border-color .15s,transform .14s}
+.pkp-feats li:hover{border-color:var(--lime-dark);transform:translateY(-1px)}
+.pkp-feats i{font-style:normal;font-size:15px;display:block;margin-bottom:5px}
+.pkp-feats b{display:block;font-size:12.5px;letter-spacing:-.01em;line-height:1.25}
+.pkp-feats span{display:block;font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+
+/* help */
+.pkp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:12px 13px;margin-bottom:7px;font-size:13.5px;color:var(--text);text-decoration:none;transition:border-color .15s}
+.pkp-row:last-child{margin-bottom:0}
+.pkp-row:hover{border-color:var(--lime-dark);color:var(--lime)}
+.pkp-row::after{content:"›";color:var(--dim);font-size:17px;line-height:1}
+.pkp-foot{padding:4px 18px 0;font-size:11px;color:var(--dim);text-align:center}
+@media (prefers-reduced-motion: reduce){ #pkPanel{transition:none} }
+@media (min-width: 900px) {
+  .wrap { max-width: 1040px; padding: 0 24px; }
+
+  /* forms/tools read best as a centered column, not stretched full width */
+  .card { max-width: 680px; margin-left: auto; margin-right: auto; }
+
+  /* hero gets room and presence */
+  .hero { max-width: 840px; margin-left: auto; margin-right: auto; text-align: center;
+          padding-top: 60px !important; padding-bottom: 40px !important; }
+  .hero h1 { font-size: clamp(46px, 5vw, 62px) !important; }
+  .hero p { font-size: 18px !important; max-width: 48ch !important; margin-left: auto; margin-right: auto; }
+  .hero-btns { justify-content: center; }
+
+  /* centered marketing headings */
+  .section-title, .section-sub { text-align: center; }
+
+  /* how-it-works: 3 across */
+  .steps { grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 920px;
+           margin-left: auto; margin-right: auto; }
+
+  /* pricing: 4 across */
+  .plans { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* AI Concepts render two-up on wide screens */
+  .cc-grid { grid-template-columns: 1fr 1fr; }
+
+  /* FAQ centered and readable */
+  .faq-item { max-width: 760px; margin-left: auto; margin-right: auto; }
+
+  /* footer links row */
+  footer { text-align: center; }
+}
+@media (min-width: 1180px) {
+  .wrap { max-width: 1120px; }
+}
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
-    <div class="logo"><div class="logo-mark"></div><span class="logo-text">POSTKIT</span></div>
-    <a href="#pricing" class="nav-cta">Pricing</a>
+    <div class="logo"><div class="logo-mark"></div><span class="logo-text">POST<em>KIT</em></span></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <a href="#pricing" class="nav-cta">Pricing</a>
+      <button type="button" id="pkMenuBtn" aria-label="Open menu">☰</button>
+    </div>
   </header>
+
+  <!-- SIDE PANEL -->
+  <div id="pkScrim"></div>
+  <aside id="pkPanel" aria-label="Menu">
+    <div class="pkp-top">
+      <span class="pkp-brand">POST<em>KIT</em></span>
+      <button type="button" id="pkClose" aria-label="Close menu">✕</button>
+    </div>
+
+    <div class="pkp-sec">
+      <div class="pkp-h">Credits</div>
+      <div class="pkp-credits">
+        <div class="pkp-plan"><span id="pkPlan">Free trial</span><b id="pkLeft">–</b></div>
+        <div class="pkp-bar"><i id="pkBar"></i></div>
+        <div class="pkp-note" id="pkUsage">Checking your usage…</div>
+        <a class="pkp-cta" id="pkTopUp" target="_blank" rel="noopener" href="#">Get more credits</a>
+      </div>
+    </div>
+
+    <div class="pkp-sec" id="pkAcctSec" style="padding-top:0">
+      <div class="pkp-h">Account</div>
+      <div class="pkp-card" id="pkAcct">
+        <div id="pkSignedOut">
+          <p class="pkp-note" style="margin:0 0 10px">Sign in to keep your credits on any device.</p>
+          <div id="pkGoogleBtn"></div>
+          <p id="pkAuthNote" class="pkp-note"></p>
+        </div>
+        <div id="pkSignedIn" style="display:none">
+          <div class="pkp-user"><img id="pkAvatar" alt=""><div><b id="pkName"></b><span id="pkEmailTxt"></span></div></div>
+          <button type="button" id="pkSignOut" class="pkp-link">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pkp-sec" style="padding-top:0">
+      <div class="pkp-h">What you can do</div>
+      <ul class="pkp-feats">
+        <li><i>🎨</i><b>4 AI concepts</b><span>Four designs from one line</span></li>
+        <li><i>🔒</i><b>Your real logo</b><span>Exact logo, editable text</span></li>
+        <li><i>🖼️</i><b>AI poster mode</b><span>AI designs the whole post</span></li>
+        <li><i>🎞️</i><b>Carousels</b><span>3 or 5 slides, one story</span></li>
+        <li><i>📅</i><b>Monthly pack</b><span>A month in one tap</span></li>
+        <li><i>✍️</i><b>Captions</b><span>English or Arabic</span></li>
+        <li><i>✏️</i><b>Design editor</b><span>Move, resize, retype</span></li>
+        <li><i>🌈</i><b>Brand kit</b><span>Set colours once</span></li>
+      </ul>
+    </div>
+
+    <div class="pkp-sec" style="padding-top:0">
+      <div class="pkp-h">Help</div>
+      <a class="pkp-row" href="https://wa.me/96179106883" target="_blank" rel="noopener">Message us on WhatsApp</a>
+      <a class="pkp-row" href="#pricing" id="pkPricingLink">Pricing</a>
+      <a class="pkp-row" href="#faq" id="pkFaqLink">Questions</a>
+      <a class="pkp-row" href="terms.html">Terms of Service</a>
+      <a class="pkp-row" href="privacy.html">Privacy Policy</a>
+    </div>
+
+    <div class="pkp-foot">© 2026 PostKit · Beirut, Lebanon</div>
+  </aside>
 
   <!-- HERO -->
   <section class="hero">
@@ -618,7 +801,7 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
     <label for="topic" style="font-size:15px">Describe your post</label>
     <div id="hgComposer">
       <textarea id="topic" placeholder="Describe your post and I'll design it"></textarea>
-      <div id="hgBar"><span style="flex:1"></span><button id="hgSubmit" type="button">Generate ✦</button></div>
+      <div id="hgBar"><span style="flex:1"></span><span class="hg-neon"><button id="hgSubmit" type="button">Generate ✦</button></span></div>
     </div>
     <button id="voiceBtn" type="button" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎤 Speak your idea</button>
     <button id="ideaBtn" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">✦ Need an idea?</button>
@@ -790,6 +973,7 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
     </div>
     <p id="tplDesc" style="font-size:12px;color:var(--muted);margin-top:6px">AI chooses the best layout for your content</p>
 
+    <div id="colorMoodWrap">
     <label>Color mood</label>
     <div class="chip-row" id="palRow"></div>
     <div id="customPanel" style="display:none;margin-top:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px">
@@ -809,6 +993,7 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
       </div>
       <div class="swatch-grid" id="bgSwatches"></div>
       <div class="swatch-grid" id="primarySwatches"></div>
+    </div>
     </div>
 
     <label>Typography</label>
@@ -927,7 +1112,7 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
   </div>
 
   <!-- ACCESS CODE -->
-  <div class="card">
+  <div class="card" id="codeCard">
     <label for="codeInput">Have an access code?</label>
     <div class="code-row">
       <input id="codeInput" placeholder="PK-XXXX-XXXX" autocapitalize="characters">
@@ -6196,13 +6381,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     });
   }
 
-  /* ---------- Advanced: layout preference, typography override, alt palette ---------- */
+  /* ---------- Advanced: layout preference, typography override ---------- */
   function buildTplPicker(){
     var box=$("advExtras"); if(!box || box.__missing) return;
     var all=allTemplates();
     box.innerHTML='<label>Layout preference</label><div class="chip-row" id="tplPick"></div>'+
-      '<label style="margin-top:14px">Typography override</label><div class="chip-row" id="typePick"></div>'+
-      '<label style="margin-top:14px">Colours</label><div class="chip-row" id="palPick"></div>';
+      '<label style="margin-top:14px">Typography override</label><div class="chip-row" id="typePick"></div>';
     var tp=$("tplPick");
     var mk=function(name,val){
       var b=document.createElement("button"); b.type="button";
@@ -6223,31 +6407,6 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       b.onclick=function(){ brandKit.fontOverride=f[1]; if(f[1]) brandKit.font=f[1]; saveKit(); buildTplPicker(); };
       typ.appendChild(b);
     });
-    var pp=$("palPick");
-    var alt=document.createElement("button"); alt.type="button"; alt.className="chip";
-    alt.textContent="\ud83c\udfa8 Try alternative palette";
-    var ALT_PALETTES=[
-      {primary:"#1F3A5F",accent:"#C9A227",bg:"#F7F6F2",text:"#111214"},
-      {primary:"#0E4D45",accent:"#E4B363",bg:"#F5F3ED",text:"#111214"},
-      {primary:"#2B2B2B",accent:"#D96C4F",bg:"#FAF8F5",text:"#111214"},
-      {primary:"#4A2E5A",accent:"#F2C14E",bg:"#111214",text:"#FFFFFF"},
-      {primary:"#8C1C13",accent:"#E6C79C",bg:"#F7F2EC",text:"#111214"},
-      {primary:"#14213D",accent:"#4CC9B0",bg:"#FFFFFF",text:"#111214"}
-    ];
-    alt.onclick=function(){
-      if(brandKit.primary && brandKit.accent && !brandKit.__altIdx){
-        // first tap with real brand colours: just swap them
-        var t=brandKit.primary; brandKit.primary=brandKit.accent; brandKit.accent=t;
-        brandKit.__altIdx=1;
-      } else {
-        var i=(brandKit.__altIdx||0) % ALT_PALETTES.length;
-        var p=ALT_PALETTES[i];
-        brandKit.primary=p.primary; brandKit.accent=p.accent; brandKit.bg=p.bg; brandKit.text=p.text;
-        brandKit.__altIdx=i+1;
-      }
-      saveKit(); applyKitUI(); buildTplPicker();
-    };
-    pp.appendChild(alt);
   }
 
   /* ---------- automatic brand analysis ---------- */
@@ -6289,6 +6448,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         photoRef:window.__pkPhotoRef,
         topic:($("topic").value||"").trim().slice(0,1400), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
+        emoji:state.emoji, style:state.style,
         audience:($("audience").value||"").trim() })});
     var data=await res.json();
     if(data.ok && data.result) return data.result;
@@ -6321,7 +6481,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       body:JSON.stringify({ code:state.code, mode:"pack", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit, photoRef:window.__pkPhotoRef,
         topic:(($("topic").value||"").trim().slice(0,1400)||"a balanced month of content"),
         brand:($("brand").value||"").trim(), bizType:$("bizType").value,
-        lang:state.lang, tone:state.tone, audience:($("audience").value||"").trim() })});
+        lang:state.lang, tone:state.tone, emoji:state.emoji, style:state.style, audience:($("audience").value||"").trim() })});
     var data=await res.json();
     if(data.ok && data.result) return data.result;
     throw new Error(data.message||"Couldn't plan the month. Try again.");
@@ -6345,6 +6505,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       body:JSON.stringify({ code:state.code, mode:"concepts", clientId:pkClientId(), email:pkEmail(), brandKit:brandKit, photoRef:window.__pkPhotoRef,
         topic:($("topic").value||"").trim().slice(0,1400), brand:($("brand").value||"").trim(),
         bizType:$("bizType").value, lang:state.lang, tone:state.tone,
+        emoji:state.emoji, style:state.style,
         audience:($("audience").value||"").trim() })});
     var data=await res.json();
     if(data.ok && data.result) return data.result;
@@ -6377,7 +6538,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         "on packaging, cups, walls, menus, napkins or any surface, every surface must be blank and unbranded.";
     }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", bizType:$("bizType").value, size:(window.__pkFormat||"square") })});
+      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", bakedText:!lock, bizType:$("bizType").value, size:(window.__pkFormat||"square") })});
     var data=await res.json();
     if(data.ok && data.image){
       if(data.usage){
@@ -6617,8 +6778,10 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       hero.innerHTML='<div class="p1-q">Or start from a preset</div><div class="p1-ideas" id="p1Ideas"></div>';
       (document.getElementById("hgComposer")||topic).insertAdjacentElement("afterend", hero);
       var ir=$("p1Ideas");
-      IDEAS14.forEach(function(x){
+      var PRESET_VISIBLE=6;
+      IDEAS14.forEach(function(x,i){
         var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=x[0];
+        if(i>=PRESET_VISIBLE){ b.classList.add("pk-extra"); b.style.display="none"; }
         b.onclick=function(){
           if(b.classList.contains("active")){            // tap again to deselect
             b.classList.remove("active");
@@ -6630,6 +6793,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         };
         ir.appendChild(b);
       });
+      if(IDEAS14.length>PRESET_VISIBLE){
+        var moreBtn=document.createElement("button");
+        moreBtn.type="button"; moreBtn.className="chip pk-more-chip";
+        moreBtn.textContent="+ More";
+        moreBtn.onclick=function(){
+          var hidden=moreBtn.textContent.indexOf("More")>-1;
+          ir.querySelectorAll(".pk-extra").forEach(function(c){ c.style.display = hidden ? "" : "none"; });
+          moreBtn.textContent = hidden ? "− Less" : "+ More";
+        };
+        ir.appendChild(moreBtn);
+      }
       var tl=document.querySelector('label[for="topic"]'); if(tl) tl.textContent="Describe your post";
 
       // format picker (post / story / portrait / landscape)
@@ -6654,8 +6828,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       bw.innerHTML=
         '<div class="p1-q" style="font-size:15px;margin-top:16px">Your brand</div>'+
         '<div class="p1-ideas">'+
-          '<button type="button" class="chip active" id="lockChip">🔒 Perfect text &amp; logo</button>'+
-          '<label class="chip" for="brandLogoFile" style="cursor:pointer">🖼️ Upload logo (PNG)</label>'+
+          '<button type="button" class="chip active" id="lockChip">🔒 Use my real logo</button>'+
+          '<button type="button" class="chip" id="aiPosterChip">🎨 AI poster (no logo)</button>'+
+          '<label class="chip" id="uploadLogoChip" for="brandLogoFile" style="cursor:pointer">🖼️ Upload logo (PNG)</label>'+
           '<button type="button" class="chip" id="removeLogo" style="display:none">✕ Reset brand kit</button>'+'<label class="chip" for="refPhotos" style="cursor:pointer">📷 Inspire with my photos</label>'+
         '</div>'+
         '<input type="file" id="brandLogoFile" accept="image/png,image/*" style="display:none">'+'<input type="file" id="refPhotos" accept="image/*" multiple style="display:none">'+'<div id="photoNote" style="font-size:12px;color:var(--muted);margin-top:4px"></div>'+
@@ -6666,11 +6841,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         '<div id="kitNote" style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5"></div>';
       fw.insertAdjacentElement("afterend", bw);
 
-      if($("lockChip")) $("lockChip").onclick=function(){
-        window.__pkBrandLock=!window.__pkBrandLock;
-        this.classList.toggle("active", window.__pkBrandLock);
-        this.textContent = window.__pkBrandLock ? "🔒 Perfect text & logo" : "🔓 Let AI draw the text";
-      };
+      function setBrandMode(useLogo){
+        window.__pkBrandLock = useLogo;
+        var a=$("lockChip"), b=$("aiPosterChip"), u=$("uploadLogoChip"), cm=$("colorMoodWrap"), ax=$("advExtras");
+        if(a) a.classList.toggle("active", useLogo);
+        if(b) b.classList.toggle("active", !useLogo);
+        if(u) u.style.display = useLogo ? "" : "none";   // logo is unusable in AI poster mode
+        if(cm) cm.style.display = useLogo ? "" : "none"; // the model picks its own colours in AI poster mode
+        if(ax) ax.style.display = useLogo ? "" : "none"; // layout + typography only affect text we draw ourselves
+      }
+      if($("lockChip")) $("lockChip").onclick=function(){ setBrandMode(true); };
+      if($("aiPosterChip")) $("aiPosterChip").onclick=function(){ setBrandMode(false); };
       applyKitUI();
       // the reset control is available whenever ANY brand data exists,
       // so colours can never get stranded without a way to clear them
@@ -6694,7 +6875,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         if($("brandLogoFile")) $("brandLogoFile").value="";
         brandKit.primary=""; brandKit.accent=""; brandKit.bg=""; brandKit.text="";
         brandKit.personality=""; brandKit.audience=""; brandKit.designLanguage="";
-        brandKit.template=""; brandKit.fontOverride=""; brandKit.__altIdx=0;
+        brandKit.template=""; brandKit.fontOverride="";
         window.__pkTemplate="";
         saveKit(); applyKitUI();
         if($("kitNote")) $("kitNote").textContent="";
@@ -6819,6 +7000,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     try{
       var slot=$("advGallerySlot"), gal=$("galleryCard");
       if(slot && gal){ slot.appendChild(gal); gal.style.margin="14px 0 0"; gal.style.boxShadow="none"; gal.style.border="1px solid #EDEBE4"; }
+      if(gal){ gal.style.display="none"; }   // presets already cover this; keeps the tool simpler
       buildTplPicker();
     }catch(e){}
   })();
@@ -6900,11 +7082,130 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 /* HeyGen-style Submit -> fire the primary generate (4 Concepts), fallback to legacy */
 document.addEventListener("click",function(e){
   var t=e.target;
-  if(t && t.id==="hgSubmit"){
+  if(t && t.closest && t.closest("#hgSubmit")){
     var b=document.getElementById("act4")||document.getElementById("genBtn");
     if(b) b.click();
   }
 });
+</script>
+<script>
+/* ================= side panel: account, credits, features ================= */
+(function(){
+  /* 1) Put your Google OAuth Client ID here to enable Google sign in.
+        Create it at console.cloud.google.com -> Credentials -> OAuth client ID
+        (Web application) and add your site URL to "Authorized JavaScript origins".
+        Leave it empty and the sign in block simply stays hidden. */
+  var GOOGLE_CLIENT_ID = "960194070939-ted97rh83uqv0i4oh9nqhlgb03mv32u4.apps.googleusercontent.com";
+
+  var WA = "96179106883";
+  var $$ = function(id){ return document.getElementById(id); };
+  var panel=$$("pkPanel"), scrim=$$("pkScrim");
+  if(!panel) return;
+
+  function openPanel(){ panel.classList.add("open"); scrim.classList.add("open"); document.body.style.overflow="hidden"; refreshUsage(); }
+  function closePanel(){ panel.classList.remove("open"); scrim.classList.remove("open"); document.body.style.overflow=""; }
+  var mb=$$("pkMenuBtn"); if(mb) mb.onclick=openPanel;
+  var cb=$$("pkClose");   if(cb) cb.onclick=closePanel;
+  if(scrim) scrim.onclick=closePanel;
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closePanel(); });
+  ["pkPricingLink","pkFaqLink"].forEach(function(id){ var el=$$(id); if(el) el.addEventListener("click",closePanel); });
+
+  var tu=$$("pkTopUp");
+  if(tu) tu.href="https://wa.me/"+WA+"?text="+encodeURIComponent("Hi! I'd like more PostKit credits 🙌");
+
+  /* ---------- credits ---------- */
+  function readEmail(){ try{ return localStorage.getItem("postkit_email")||""; }catch(e){ return ""; } }
+  function readCode(){
+    try{
+      if(window.state && state.code) return state.code;
+      return localStorage.getItem("postkit_code")||"";
+    }catch(e){ return ""; }
+  }
+  function readCid(){ try{ return localStorage.getItem("postkit_cid")||""; }catch(e){ return ""; } }
+
+  async function refreshUsage(){
+    var planEl=$$("pkPlan"), leftEl=$$("pkLeft"), barEl=$$("pkBar"), noteEl=$$("pkUsage");
+    if(!planEl) return;
+    try{
+      var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ mode:"usage", code:readCode(), email:readEmail(), clientId:readCid() })});
+      var d=await res.json();
+      var u=(d && d.usage) || null;
+      if(!u){ noteEl.textContent="Could not load your usage."; return; }
+      if(u.plan==="none"){
+        planEl.textContent="Not started";
+        leftEl.textContent="3 free";
+        barEl.style.width="0%";
+        noteEl.textContent="Enter your email in the form to start your 3 free posts.";
+        return;
+      }
+      var used=u.used||0, limit=u.limit||0, left=Math.max(0,limit-used);
+      planEl.textContent = u.plan==="trial" ? "Free trial" : (u.plan.charAt(0).toUpperCase()+u.plan.slice(1));
+      leftEl.textContent = left+" left";
+      barEl.style.width = limit ? Math.min(100,Math.round(used/limit*100))+"%" : "0%";
+      noteEl.textContent = used+" of "+limit+" used"+(u.plan==="trial"?" on your free trial.":" this month.");
+      // a paid plan follows the email, so the access code box is not needed
+      var cc=document.getElementById("codeCard");
+      if(cc) cc.style.display = (u.plan && u.plan!=="trial" && u.plan!=="none") ? "none" : "";
+    }catch(e){ noteEl.textContent="Could not load your usage."; }
+  }
+  window.pkRefreshUsage = refreshUsage;
+  // check once on load so paid users never see the access code box
+  setTimeout(refreshUsage, 800);
+
+  /* ---------- Google sign in ---------- */
+  function showUser(u){
+    try{ localStorage.setItem("postkit_user", JSON.stringify(u)); }catch(e){}
+    try{ if(u.email) localStorage.setItem("postkit_email", u.email); }catch(e){}
+    $$("pkSignedOut").style.display="none";
+    $$("pkSignedIn").style.display="";
+    $$("pkName").textContent=u.name||"Signed in";
+    $$("pkEmailTxt").textContent=u.email||"";
+    var av=$$("pkAvatar"); if(u.picture) av.src=u.picture; else av.removeAttribute("src");
+    var ef=document.getElementById("email");
+    if(ef && !ef.value && u.email) ef.value=u.email;
+    refreshUsage();
+  }
+  function signOut(){
+    try{ localStorage.removeItem("postkit_user"); }catch(e){}
+    $$("pkSignedIn").style.display="none";
+    $$("pkSignedOut").style.display="";
+    refreshUsage();
+  }
+  var so=$$("pkSignOut"); if(so) so.onclick=signOut;
+
+  try{
+    var saved=JSON.parse(localStorage.getItem("postkit_user")||"null");
+    if(saved && saved.email) showUser(saved);
+  }catch(e){}
+
+  async function onGoogle(resp){
+    var note=$$("pkAuthNote");
+    note.textContent="Signing you in…";
+    try{
+      var r=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ mode:"googleauth", idToken:resp.credential })});
+      var d=await r.json();
+      if(d.ok && d.user){ note.textContent=""; showUser(d.user); }
+      else note.textContent=(d && d.message) || "Sign in failed.";
+    }catch(e){ note.textContent="Sign in failed. Please try again."; }
+  }
+
+  if(GOOGLE_CLIENT_ID){
+    var s=document.createElement("script");
+    s.src="https://accounts.google.com/gsi/client"; s.async=true; s.defer=true;
+    s.onload=function(){
+      try{
+        google.accounts.id.initialize({ client_id:GOOGLE_CLIENT_ID, callback:onGoogle });
+        google.accounts.id.renderButton($$("pkGoogleBtn"), { theme:"outline", size:"large", width:280, text:"signin_with" });
+      }catch(e){ $$("pkAuthNote").textContent="Google sign in unavailable."; }
+    };
+    document.head.appendChild(s);
+  } else {
+    var sec=$$("pkAcctSec");
+    if(sec) sec.style.display="none";   // no sign in configured yet, hide the empty section
+  }
+})();
 </script>
 </body>
 </html>

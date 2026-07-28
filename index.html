@@ -619,11 +619,12 @@ details.acc{background:#fff!important;border:1px solid var(--line)!important}
 details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 
 /* ===== side panel ===== */
-#pkMenuBtn{background:#fff;border:1px solid var(--line);border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s}
+#pkMenuBtn{background:#fff;border:1px solid var(--line);border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s;
+  opacity:1!important;animation:none!important;visibility:visible!important}
 #pkMenuBtn:hover{border-color:var(--lime);box-shadow:0 4px 12px -6px rgba(43,68,222,.5)}
-#pkScrim{position:fixed;inset:0;background:rgba(18,18,16,.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .24s ease;z-index:998}
+#pkScrim{position:fixed;inset:0;height:100dvh;background:rgba(18,18,16,.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .24s ease;z-index:998}
 #pkScrim.open{opacity:1;pointer-events:auto}
-#pkPanel{position:fixed;top:0;right:0;height:100%;width:min(90vw,372px);background:var(--bg);
+#pkPanel{position:fixed;top:0;right:0;height:100dvh;width:min(90vw,372px);background:var(--bg);
   border-radius:22px 0 0 22px;transform:translateX(104%);transition:transform .3s cubic-bezier(.32,.72,0,1);
   z-index:999;overflow-y:auto;-webkit-overflow-scrolling:touch;
   box-shadow:-28px 0 60px -30px rgba(0,0,0,.45);padding:0 0 34px}
@@ -662,8 +663,11 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 
 /* features */
 .pkp-feats{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pkp-feats li{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 11px 12px;transition:border-color .15s,transform .14s}
-.pkp-feats li:hover{border-color:var(--lime-dark);transform:translateY(-1px)}
+.pkp-feats li{list-style:none}
+.pkp-feats li button{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;
+  background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 11px 12px;transition:border-color .15s,transform .14s}
+.pkp-feats li button:hover{border-color:var(--lime-dark);transform:translateY(-1px)}
+.pkp-feats li button:active{transform:scale(.98)}
 .pkp-feats i{font-style:normal;font-size:15px;display:block;margin-bottom:5px}
 .pkp-feats b{display:block;font-size:12.5px;letter-spacing:-.01em;line-height:1.25}
 .pkp-feats span{display:block;font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
@@ -675,6 +679,7 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 .pkp-row:hover{border-color:var(--lime-dark);color:var(--lime)}
 .pkp-row::after{content:"›";color:var(--dim);font-size:17px;line-height:1}
 .pkp-foot{padding:4px 18px 0;font-size:11px;color:var(--dim);text-align:center}
+body.pk-panel-open .wa-float{display:none!important}
 @media (prefers-reduced-motion: reduce){ #pkPanel{transition:none} }
 @media (min-width: 900px) {
   .wrap { max-width: 1040px; padding: 0 24px; }
@@ -720,13 +725,13 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
     <div class="logo"><div class="logo-mark"></div><span class="logo-text">POST<em>KIT</em></span></div>
     <div style="display:flex;align-items:center;gap:8px">
       <a href="#pricing" class="nav-cta">Pricing</a>
-      <button type="button" id="pkMenuBtn" aria-label="Open menu">☰</button>
+      <button type="button" id="pkMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="pkPanel">☰</button>
     </div>
   </header>
 
   <!-- SIDE PANEL -->
   <div id="pkScrim"></div>
-  <aside id="pkPanel" aria-label="Menu">
+  <aside id="pkPanel" aria-label="Menu" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
     <div class="pkp-top">
       <span class="pkp-brand">POST<em>KIT</em></span>
       <button type="button" id="pkClose" aria-label="Close menu">✕</button>
@@ -760,14 +765,14 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
     <div class="pkp-sec" style="padding-top:0">
       <div class="pkp-h">What you can do</div>
       <ul class="pkp-feats">
-        <li><i>🎨</i><b>4 AI concepts</b><span>Four designs from one line</span></li>
-        <li><i>🔒</i><b>Your real logo</b><span>Exact logo, editable text</span></li>
-        <li><i>🖼️</i><b>AI poster mode</b><span>AI designs the whole post</span></li>
-        <li><i>🎞️</i><b>Carousels</b><span>3 or 5 slides, one story</span></li>
-        <li><i>📅</i><b>Monthly pack</b><span>A month in one tap</span></li>
-        <li><i>✍️</i><b>Captions</b><span>English or Arabic</span></li>
-        <li><i>✏️</i><b>Design editor</b><span>Move, resize, retype</span></li>
-        <li><i>🌈</i><b>Brand kit</b><span>Set colours once</span></li>
+        <li><button type="button" data-pk="write"><i>🎨</i><b>4 AI concepts</b><span>Start writing your post</span></button></li>
+        <li><button type="button" data-pk="logo"><i>🔒</i><b>Your real logo</b><span>Use my logo &amp; upload it</span></button></li>
+        <li><button type="button" data-pk="poster"><i>🖼️</i><b>AI poster mode</b><span>Switch to AI poster</span></button></li>
+        <li><button type="button" data-pk="carousel"><i>🎞️</i><b>Carousels</b><span>Open 3 or 5 slides</span></button></li>
+        <li><button type="button" data-pk="monthly"><i>📅</i><b>Monthly pack</b><span>Plan a whole month</span></button></li>
+        <li><button type="button" data-pk="lang"><i>✍️</i><b>Captions</b><span>Language, tone &amp; style</span></button></li>
+        <li><button type="button" data-pk="brandkit"><i>🌈</i><b>Brand kit</b><span>Set your colours</span></button></li>
+        <li><button type="button" data-pk="pricing"><i>💳</i><b>Plans</b><span>See pricing</span></button></li>
       </ul>
     </div>
 
@@ -7102,13 +7107,70 @@ document.addEventListener("click",function(e){
   var panel=$$("pkPanel"), scrim=$$("pkScrim");
   if(!panel) return;
 
-  function openPanel(){ panel.classList.add("open"); scrim.classList.add("open"); document.body.style.overflow="hidden"; refreshUsage(); }
-  function closePanel(){ panel.classList.remove("open"); scrim.classList.remove("open"); document.body.style.overflow=""; }
+  var lastFocus=null;
+  function openPanel(){
+    lastFocus=document.activeElement;
+    panel.classList.add("open"); scrim.classList.add("open");
+    panel.setAttribute("aria-hidden","false");
+    if(mb) mb.setAttribute("aria-expanded","true");
+    document.body.classList.add("pk-panel-open"); document.body.style.overflow="hidden";
+    var c=$$("pkClose"); if(c) setTimeout(function(){ c.focus(); },80);
+    refreshUsage();
+  }
+  function closePanel(){
+    panel.classList.remove("open"); scrim.classList.remove("open");
+    panel.setAttribute("aria-hidden","true");
+    if(mb) mb.setAttribute("aria-expanded","false");
+    document.body.classList.remove("pk-panel-open"); document.body.style.overflow="";
+    if(lastFocus && lastFocus.focus) { try{ lastFocus.focus(); }catch(e){} }
+  }
+  // keep focus inside the panel while it is open
+  panel.addEventListener("keydown", function(e){
+    if(e.key!=="Tab" || !panel.classList.contains("open")) return;
+    var f=panel.querySelectorAll('a[href],button:not([disabled]),input,[tabindex]:not([tabindex="-1"])');
+    if(!f.length) return;
+    var first=f[0], last=f[f.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  });
   var mb=$$("pkMenuBtn"); if(mb) mb.onclick=openPanel;
   var cb=$$("pkClose");   if(cb) cb.onclick=closePanel;
   if(scrim) scrim.onclick=closePanel;
   document.addEventListener("keydown",function(e){ if(e.key==="Escape") closePanel(); });
   ["pkPricingLink","pkFaqLink"].forEach(function(id){ var el=$$(id); if(el) el.addEventListener("click",closePanel); });
+
+  /* feature tiles act as shortcuts into the app */
+  function pkScrollTo(el, focusEl){
+    if(!el) return;
+    closePanel();
+    setTimeout(function(){
+      try{ el.scrollIntoView({behavior:"smooth", block:"center"}); }catch(e){ el.scrollIntoView(); }
+      if(focusEl && focusEl.focus) setTimeout(function(){ try{ focusEl.focus({preventScroll:true}); }catch(e){} }, 420);
+    }, 240);
+  }
+  function pkOpenDetails(el){
+    var d = el && el.closest ? el.closest("details") : null;
+    while(d){ d.open = true; d = d.parentElement ? d.parentElement.closest("details") : null; }
+  }
+  var PK_ACTIONS = {
+    write: function(){ var t=$$("topic"); pkScrollTo($$("hgComposer")||t, t); },
+    logo: function(){ var c=$$("lockChip"); if(c) c.click(); pkScrollTo($$("uploadLogoChip")||c); },
+    poster: function(){ var c=$$("aiPosterChip"); if(c) c.click(); pkScrollTo(c); },
+    carousel: function(){ var b=$$("act3"); pkOpenDetails(b); pkScrollTo(b); },
+    monthly: function(){ var b=$$("actM"); pkOpenDetails(b); pkScrollTo(b); },
+    lang: function(){
+      var el=document.getElementById("langRow")||document.getElementById("toneRow");
+      pkOpenDetails(el); pkScrollTo(el);
+    },
+    brandkit: function(){ var el=$$("colorMoodWrap")||$$("lockChip"); pkOpenDetails(el); pkScrollTo(el); },
+    pricing: function(){ closePanel(); setTimeout(function(){ location.hash="#pricing"; }, 200); }
+  };
+  document.addEventListener("click", function(e){
+    var b=e.target.closest ? e.target.closest("[data-pk]") : null;
+    if(!b) return;
+    var fn=PK_ACTIONS[b.getAttribute("data-pk")];
+    if(fn){ e.preventDefault(); fn(); }
+  });
 
   var tu=$$("pkTopUp");
   if(tu) tu.href="https://wa.me/"+WA+"?text="+encodeURIComponent("Hi! I'd like more PostKit credits 🙌");
@@ -7149,6 +7211,22 @@ document.addEventListener("click",function(e){
       if(cc) cc.style.display = (u.plan && u.plan!=="trial" && u.plan!=="none") ? "none" : "";
     }catch(e){ noteEl.textContent="Could not load your usage."; }
   }
+  // Coming back from the Google popup or another app can restore the page from
+  // cache with a stale UI state. Reset everything so nothing stays hidden.
+  function pkResetShell(){
+    try{
+      document.documentElement.classList.remove("pk-intro");
+      document.body.classList.remove("pk-panel-open");
+      document.body.style.overflow="";
+      panel.classList.remove("open");
+      scrim.classList.remove("open");
+    }catch(e){}
+  }
+  window.addEventListener("pageshow", function(e){ if(e.persisted) pkResetShell(); });
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState==="visible") document.documentElement.classList.remove("pk-intro");
+  });
+
   window.pkRefreshUsage = refreshUsage;
   // check once on load so paid users never see the access code box
   setTimeout(refreshUsage, 800);
@@ -7194,11 +7272,23 @@ document.addEventListener("click",function(e){
   if(GOOGLE_CLIENT_ID){
     var s=document.createElement("script");
     s.src="https://accounts.google.com/gsi/client"; s.async=true; s.defer=true;
+    s.onerror=function(){ $$("pkAuthNote").textContent="Could not reach Google. Check your connection."; };
     s.onload=function(){
       try{
-        google.accounts.id.initialize({ client_id:GOOGLE_CLIENT_ID, callback:onGoogle });
-        google.accounts.id.renderButton($$("pkGoogleBtn"), { theme:"outline", size:"large", width:280, text:"signin_with" });
-      }catch(e){ $$("pkAuthNote").textContent="Google sign in unavailable."; }
+        google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: onGoogle,
+          ux_mode: "popup",
+          auto_select: false,
+          itp_support: true,
+          cancel_on_tap_outside: true
+        });
+        google.accounts.id.renderButton($$("pkGoogleBtn"), {
+          theme:"outline", size:"large", width:280, text:"signin_with", shape:"pill", logo_alignment:"left"
+        });
+      }catch(e){
+        $$("pkAuthNote").textContent="Google sign in is not set up for this site yet.";
+      }
     };
     document.head.appendChild(s);
   } else {

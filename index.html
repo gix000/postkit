@@ -7540,6 +7540,17 @@ document.addEventListener("click",function(e){
   function signOut(){
     try{ localStorage.removeItem("postkit_user"); }catch(e){}
     try{ localStorage.removeItem("postkit_email"); }catch(e){}
+    try{ localStorage.removeItem("postkit_code"); localStorage.removeItem("pk_code"); }catch(e){}
+    try{ if(window.state) state.code = ""; }catch(e){}
+    // reset the card straight away: never show a signed out person someone else's plan
+    var _p=$$("pkPlan"), _l=$$("pkLeft"), _b=$$("pkBar"), _n=$$("pkUsage");
+    if(_p) _p.textContent="Not started";
+    if(_l) _l.textContent="3 free";
+    if(_b) _b.style.width="0%";
+    if(_n) _n.textContent="Sign in or enter your email to start.";
+    var _cc=document.getElementById("codeCard"); if(_cc) _cc.style.display="";
+    var _tl=document.getElementById("trialLine");
+    if(_tl) _tl.textContent="Try 3 posts for free. Just your email, no password.";
     // tell Google to forget the session too, otherwise it keeps offering the same account
     try{ if(window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); }catch(e){}
     $$("pkSignedIn").style.display="none";

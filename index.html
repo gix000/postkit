@@ -26,9 +26,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PostKit, AI Instagram posts for your business</title>
 <link rel="canonical" href="https://postkitlb.com/">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2B44DE">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PostKit">
 <meta name="description" content="Generate ready-to-post Instagram designs and captions with AI. For businesses in Lebanon who don't have time to design.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&family=Tajawal:wght@500;700&family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#FFFFFF; --card:#FFFFFF; --border:#E6E4DD; --line:#DFDDD5;
@@ -472,6 +480,7 @@
   @keyframes ccIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
   @keyframes ccFade{from{opacity:0}to{opacity:1}}
   .cc-label{display:none}
+  .cc-hint small{display:block;font-size:10.5px;font-weight:500;color:var(--dim);margin-top:4px;letter-spacing:.01em}
   .cc-hint{color:var(--muted);font-size:12px;font-weight:600;padding:0 14px;line-height:1.5}
   /* glass controls, only on a finished design, sitting over the artwork */
   /* toolbar sits under the design so the artwork is never covered */
@@ -528,14 +537,33 @@
     background:linear-gradient(105deg,transparent 20%,rgba(43,68,222,.10) 45%,rgba(255,255,255,.55) 50%,rgba(43,68,222,.10) 55%,transparent 80%);
     background-size:280% 100%;animation:ccShimmer 1.9s ease-in-out infinite}
   @keyframes ccShimmer{0%{background-position:180% 0}100%{background-position:-80% 0}}
-  .cc-stage{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px;text-align:center}
-  .cc-stage .cc-step{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;min-height:18px}
-  .cc-stage .cc-sub{font-size:11.5px;color:var(--muted);line-height:1.4;max-width:22ch}
-  .cc-stage .cc-time{font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;color:var(--lime);letter-spacing:.02em}
-  .cc-bar{width:74%;max-width:190px;height:4px;border-radius:99px;background:var(--lime-bg);overflow:hidden;margin-top:2px}
-  .cc-bar i{display:block;height:100%;width:8%;border-radius:99px;background:var(--lime);
-    animation:ccCrawl 2.4s cubic-bezier(.4,0,.2,1) infinite}
-  @keyframes ccCrawl{0%{width:6%;margin-left:0}50%{width:56%}100%{width:8%;margin-left:92%}}
+  /* skeleton of the post being made: reads as the design assembling itself */
+  .cc-stage{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;
+    justify-content:flex-end;gap:0;padding:18px}
+  .sk{background:#EDEBE5;border-radius:6px;position:relative;overflow:hidden}
+  .sk::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 24%,rgba(255,255,255,.9) 46%,rgba(43,68,222,.10) 54%,transparent 76%);
+    background-size:260% 100%;animation:ccShimmer 1.8s cubic-bezier(.4,0,.2,1) infinite}
+  .sk-logo{width:34px;height:34px;border-radius:9px;position:absolute;top:18px;left:18px;
+    background:#E7E4DC;animation:ccBreathe 2.6s ease-in-out infinite}
+  .sk-h1{height:19px;width:82%;margin-bottom:9px}
+  .sk-h2{height:19px;width:58%;margin-bottom:14px}
+  .sk-p {height:9px;width:70%;margin-bottom:7px;opacity:.75}
+  .sk-p2{height:9px;width:48%;margin-bottom:16px;opacity:.55}
+  .sk-cta{height:30px;width:112px;border-radius:99px;opacity:.9}
+  @keyframes ccBreathe{0%,100%{opacity:.55}50%{opacity:1}}
+
+  /* quiet status strip along the bottom */
+  .cc-status{position:absolute;left:0;right:0;bottom:0;z-index:3;
+    display:flex;align-items:center;gap:9px;padding:11px 14px;
+    background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.94) 42%)}
+  .cc-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);flex:none;
+    animation:ccPulse 1.3s ease-in-out infinite}
+  @keyframes ccPulse{0%,100%{transform:scale(.7);opacity:.45}50%{transform:scale(1.15);opacity:1}}
+  .cc-step{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cc-time{font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+  .cc-sub{display:none}
   @media (prefers-reduced-motion: reduce){
     .cc-slot.working::after,.cc-bar i{animation:none}
   }
@@ -545,20 +573,30 @@
   #cvOverlay.on{display:flex;animation:ccFade .25s ease both}
   .cv-top{display:flex;align-items:center;gap:10px;padding:14px 16px;color:#fff}
   .cv-top .cv-x{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;width:36px;height:36px;border-radius:50%}
-  .cv-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:0 16px;overflow:hidden}
-  .cv-stage img{max-width:100%;max-height:100%;border-radius:18px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8);animation:cvPop .4s cubic-bezier(.2,.8,.2,1) both}
+  .cv-stage{flex:1;display:flex;align-items:center;justify-content:center;padding:0 14px 6px;overflow:hidden;min-height:0}
+  .cv-stage img{max-width:100%;max-height:100%;border-radius:20px;box-shadow:0 40px 90px -34px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.06);animation:cvPop .4s cubic-bezier(.2,.8,.2,1) both}
   @keyframes cvPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
-  .cv-sheet{background:var(--card);border-radius:22px 22px 0 0;margin-top:14px;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:52vh;overflow:auto}
-  .cv-bar{display:flex;gap:8px;margin-bottom:14px}
-  .cv-bar button{flex:1;border:1px solid var(--border);background:var(--card);border-radius:14px;padding:11px 4px;font-size:11px;font-weight:700;color:var(--text);
+  .cv-sheet{background:var(--card);border-radius:26px 26px 0 0;margin-top:10px;
+    padding:8px 18px calc(18px + env(safe-area-inset-bottom));max-height:46vh;overflow:auto;
+    box-shadow:0 -18px 44px -26px rgba(0,0,0,.65);position:relative}
+  /* the grab handle every native sheet has */
+  .cv-sheet::before{content:"";display:block;width:38px;height:4px;border-radius:99px;
+    background:#E2DFD7;margin:0 auto 14px}
+  .cv-bar{display:flex;gap:7px;margin-bottom:16px}
+  .cv-bar button{flex:1;border:1px solid var(--border);background:#FCFBF9;border-radius:13px;padding:9px 4px 8px;font-size:10.5px;font-weight:600;letter-spacing:.01em;color:var(--muted);transition:border-color .15s,color .15s,transform .12s;
     transition:transform .12s, background .15s}
   .cv-bar button:active{transform:scale(.95);background:#F2F1EC}
   .cv-bar button.done{background:#EAF7EE;border-color:#CFEBD8;color:#1F7A44}
-  .cv-bar button b{display:block;font-size:17px;font-weight:400;margin-bottom:2px}
-  .cv-bar .cv-main{background:var(--lime);color:#fff;border-color:transparent;box-shadow:0 8px 20px -8px rgba(43,68,222,.6)}
-  .cv-cap{white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--text)}
-  .cv-tags{color:var(--muted);font-size:13px;margin-top:8px;line-height:1.6}
-  .cv-sec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  .cv-bar button b{display:block;font-size:16px;font-weight:400;margin-bottom:3px;color:var(--text)}
+  .cv-bar button:hover{border-color:var(--lime-dark);color:var(--lime)}
+  .cv-bar button:hover b{color:var(--lime)}
+  .cv-bar .cv-main{background:var(--lime);color:#fff;border-color:transparent;box-shadow:0 8px 20px -10px rgba(43,68,222,.7)}
+  .cv-bar .cv-main b{color:#fff}
+  .cv-bar .cv-main:hover{color:#fff;filter:brightness(1.05)}
+  .cv-bar .cv-main:hover b{color:#fff}
+  .cv-cap{white-space:pre-wrap;font-size:14px;line-height:1.62;color:var(--text);letter-spacing:-.005em}
+  .cv-tags{color:var(--lime);font-size:12.5px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);line-height:1.65;word-break:break-word;opacity:.85}
+  .cv-sec{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0 0 7px}
 
   /* ===== Phase 1: premium concepts-only homepage ===== */
   #modeToggle,#genBtn,#starterRow,#customizeAcc{display:none!important}
@@ -828,6 +866,83 @@ header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid var(--
 #pkPanel{background:#FCFBF9!important}
 .pkp-card,#pkSignedIn,.pkp-feats li button,.pkp-row{background:#fff!important;border-color:var(--border)!important}
 .cc-ghost{background:linear-gradient(180deg,#FFFFFF,#FAF9F6)!important;border-color:var(--line)!important}
+
+/* ---- install prompt ---- */
+#pkInstall{position:fixed;left:12px;right:12px;bottom:12px;z-index:1400;
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px 12px 12px 14px;
+  box-shadow:0 18px 44px -20px rgba(25,26,23,.5);
+  transform:translateY(120%);opacity:0;transition:transform .34s cubic-bezier(.32,.72,0,1),opacity .34s}
+#pkInstall.in{transform:translateY(0);opacity:1}
+#pkInstall img{width:42px;height:42px;border-radius:11px;flex:none}
+#pkInstall .pki-txt{flex:1;min-width:0}
+#pkInstall .pki-txt b{display:block;font-size:14px;letter-spacing:-.01em}
+#pkInstall .pki-txt span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+#pkInstallGo{background:var(--lime);color:#fff;border:none;border-radius:999px;
+  padding:10px 18px;font-size:13.5px;font-weight:700;cursor:pointer;flex:none}
+#pkInstallNo{background:none;border:none;color:var(--dim);font-size:15px;cursor:pointer;padding:6px;flex:none}
+@media (min-width:900px){ #pkInstall{left:auto;right:20px;bottom:20px;width:380px} }
+
+/* installed app: respect the notch and home bar */
+@media (display-mode: standalone){
+  header{padding-top:calc(13px + env(safe-area-inset-top))!important}
+  body{padding-bottom:env(safe-area-inset-bottom)}
+  .wa-float{bottom:calc(20px + env(safe-area-inset-bottom))}
+}
+
+/* ---- empty prompt feedback ---- */
+@keyframes pkShake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-7px)} 30%{transform:translateX(6px)}
+  45%{transform:translateX(-4px)} 60%{transform:translateX(3px)} 75%{transform:translateX(-2px)}
+}
+.pk-shake{animation:pkShake .42s cubic-bezier(.36,.07,.19,.97);border-color:var(--lime)!important}
+#pkPromptHint{max-height:0;opacity:0;overflow:hidden;
+  font-size:12.5px;font-weight:600;color:var(--lime);padding:0 4px;
+  transition:max-height .25s ease,opacity .25s ease,margin .25s ease}
+#pkPromptHint.show{max-height:40px;opacity:1;margin:6px 0 2px}
+
+@media (prefers-reduced-motion: reduce){ .pk-shake{animation:none} }
+
+/* ---- email gate: google option + divider ---- */
+#egGoogle{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  background:#fff;border:1px solid var(--line);border-radius:999px;padding:12px 16px;
+  font-size:14.5px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit;
+  transition:border-color .15s,box-shadow .15s}
+#egGoogle svg{width:19px;height:19px;flex:none}
+#egGoogle:hover{border-color:var(--lime-dark);box-shadow:0 4px 14px -8px rgba(25,26,23,.35)}
+#egGoogle:active{transform:scale(.985)}
+.eg-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;
+  font-size:11.5px;color:var(--dim);letter-spacing:.02em}
+.eg-or::before,.eg-or::after{content:"";flex:1;height:1px;background:var(--border)}
+
+/* ---- move between designs in the viewer ---- */
+#cvNav{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:3;
+  display:flex;align-items:center;justify-content:space-between;padding:0 10px;pointer-events:none}
+#cvNav button{pointer-events:auto;width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;
+  font-size:24px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:background .15s,transform .12s}
+#cvNav button:hover{background:rgba(255,255,255,.24)}
+#cvNav button:active{transform:scale(.92)}
+#cvCount{pointer-events:none;position:absolute;left:50%;transform:translateX(-50%);
+  top:calc(50% + 132px);font-size:12px;font-weight:600;color:rgba(255,255,255,.7);
+  background:rgba(0,0,0,.35);padding:5px 12px;border-radius:999px;letter-spacing:.04em}
+@media (max-width:520px){ #cvNav button{width:40px;height:40px;font-size:21px} }
+
+/* ---- toast ---- */
+#pkToast{position:fixed;left:50%;bottom:96px;z-index:1500;pointer-events:none;
+  transform:translate(-50%,14px);opacity:0;
+  max-width:min(88vw,420px);text-align:center;
+  background:rgba(20,21,18,.94);color:#fff;
+  padding:12px 20px;border-radius:999px;
+  font-size:13.5px;font-weight:600;line-height:1.4;letter-spacing:-.005em;
+  box-shadow:0 16px 40px -16px rgba(0,0,0,.7);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  transition:transform .28s cubic-bezier(.32,.72,0,1),opacity .28s}
+#pkToast.show{transform:translate(-50%,0);opacity:1}
+@media (min-width:900px){ #pkToast{bottom:34px} }
+@media (prefers-reduced-motion: reduce){ #pkToast{transition:opacity .2s} }
 </style>
 </head>
 <body>
@@ -917,7 +1032,7 @@ header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid var(--
 
   <!-- APP -->
   <h2 class="section-title" id="app">Create your post</h2>
-  <p class="section-sub" id="trialLine">Try 3 posts for free. Just your email, no password.</p>
+  <p class="section-sub" id="trialLine">Try 5 posts for free. Just your email, no password.</p>
 
   <div class="card reveal">
     <label for="topic" style="font-size:15px">Describe your post</label>
@@ -1250,7 +1365,7 @@ header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid var(--
     <div class="plan free">
       <h3>Free</h3>
       <div class="price">$0</div>
-      <ul><li>3 free posts to try it</li><li>All templates</li><li>Caption + hashtags</li></ul>
+      <ul><li>5 free posts to try it</li><li>All templates</li><li>Caption + hashtags</li></ul>
       <a href="#app">Start now</a>
     </div>
     <div class="plan featured">
@@ -1285,7 +1400,7 @@ header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid var(--
     </details>
     <details class="faq-item">
       <summary>Is it really free to try?</summary>
-      <div class="faq-a">Yes. You get 3 free posts with just your email, no password and no card required.</div>
+      <div class="faq-a">Yes. You get 5 free posts with just your email, no password and no card required.</div>
     </details>
     <details class="faq-item">
       <summary>Can I use my own brand colours and logo?</summary>
@@ -1337,6 +1452,20 @@ const FONT_PAIRS = [
   { id:"playful", name:"Playful", display:"'Righteous', sans-serif", displayW:400, body:"'Poppins', sans-serif", serif:false },
 ];
 function getFont() { return FONT_PAIRS.find(f => f.id === state.fontId) || FONT_PAIRS[0]; }
+
+/* ---- Arabic support ----
+   None of the Latin display faces carry Arabic glyphs, so Arabic headlines
+   rendered as empty boxes. Detect the script, swap to Cairo/Tajawal, and let
+   the canvas shape and order it right to left. */
+const AR_RE = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+function isArabic(s){ return AR_RE.test(String(s||"")); }
+function arFont(spec){
+  return String(spec).replace(/'[^']+'\s*,\s*[a-z-]+/i, "'Cairo', 'Tajawal', sans-serif");
+}
+function setCtxFont(ctx, spec, text){
+  ctx.font = isArabic(text) ? arFont(spec) : spec;
+  try{ ctx.direction = isArabic(text) ? "rtl" : "ltr"; }catch(e){}
+}
 
 const PALETTES = [
   { id:"noir",   name:"Noir",   bg:"#111111", primary:"#FFFFFF", accent:"#CFCFCF", text:"#FFFFFF" },
@@ -2905,9 +3034,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   const drawHeadline = (x, y, size, color, maxW, weight = 800, font = "'Archivo', sans-serif") => {
     ctx.fillStyle = color; ctx.textAlign = "left";
     let fs = size;
-    ctx.font = `${weight} ${fs}px ${font}`;
+    setCtxFont(ctx, `${weight} ${fs}px ${font}`, headline);
     let lines = wrapText(ctx, headline, maxW);
-    while (lines.length > 4 && fs > 40) { fs -= 8; ctx.font = `${weight} ${fs}px ${font}`; lines = wrapText(ctx, headline, maxW); }
+    while (lines.length > 4 && fs > 40) { fs -= 8; setCtxFont(ctx, `${weight} ${fs}px ${font}`, headline); lines = wrapText(ctx, headline, maxW); }
     const lh = fs * 1.12;
     lines.forEach((l, i) => ctx.fillText(l, x, y + i * lh));
     return y + lines.length * lh;
@@ -3236,9 +3365,9 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     const weight = _fp ? _fp.displayW : (d.serif ? 600 : 800);
     const text = d.caseStyle === "upper" ? headline.toUpperCase() : headline;
     let fs = d.serif ? 92 : 100;
-    ctx.font = `${weight} ${fs}px ${font}`;
+    setCtxFont(ctx, `${weight} ${fs}px ${font}`, text);
     let lines = wrapText(ctx, text, S - 200);
-    while (lines.length > 4 && fs > 44) { fs -= 6; ctx.font = `${weight} ${fs}px ${font}`; lines = wrapText(ctx, text, S - 200); }
+    while (lines.length > 4 && fs > 44) { fs -= 6; setCtxFont(ctx, `${weight} ${fs}px ${font}`, text); lines = wrapText(ctx, text, S - 200); }
     const blockH = lines.length * fs * 1.12;
     let hy = anchor - blockH / 2 + fs * 0.4;
     hy = Math.max(200, Math.min(hy, H - 260 - blockH));
@@ -3505,6 +3634,35 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     ctx.fillText(wm, S - 42, H - 42);
     ctx.restore();
   }
+
+  /* ---- contact bar ----
+     Every post in a real business feed carries the phone and website in the
+     same place. That single detail is what makes a design read as an advert
+     rather than just a nice picture. */
+  try{
+    var _bkc = (typeof brandKit !== "undefined") ? brandKit : {};
+    var _phone = (_bkc.phone||"").trim();
+    var _site  = (_bkc.website||"").replace(/^https?:\/\//i,"").replace(/\/+$/,"").trim();
+    var _ig    = (_bkc.instagram||"").replace(/^@/,"").trim();
+    var _right = _site || (_ig ? ("@"+_ig) : "");
+    if (_phone || _right) {
+      ctx.save();
+      var _y = H - 56;
+      var _g = ctx.createLinearGradient(0, _y - 26, 0, H);
+      _g.addColorStop(0, "rgba(0,0,0,0)");
+      _g.addColorStop(1, "rgba(0,0,0,0.42)");
+      ctx.fillStyle = _g;
+      ctx.fillRect(0, _y - 26, S, 82);
+
+      ctx.font = "600 26px 'Space Grotesk', sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(255,255,255,0.94)";
+      var _cy = H - 30;
+      if (_phone) { ctx.textAlign = "left";  ctx.fillText("\u2706  " + _phone, 44, _cy); }
+      if (_right) { ctx.textAlign = "right"; ctx.fillText(_right, S - 44, _cy); }
+      ctx.restore();
+    }
+  }catch(e){}
 }
 
 </script>
@@ -3621,7 +3779,27 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   /* toasts disabled, no popups on selection */
-  function toast(msg){ /* intentionally does nothing */ }
+  /* Feedback for the 30+ places that confirm an action.
+     Bottom centre, auto dismissing, never blocks a tap. */
+  var _toastT=null;
+  function toast(msg){
+    if(!msg) return;
+    var el=document.getElementById("pkToast");
+    if(!el){
+      el=document.createElement("div");
+      el.id="pkToast";
+      el.setAttribute("role","status");
+      el.setAttribute("aria-live","polite");
+      document.body.appendChild(el);
+    }
+    el.textContent=String(msg);
+    el.classList.remove("show");
+    void el.offsetWidth;               // restart the animation on rapid repeats
+    el.classList.add("show");
+    clearTimeout(_toastT);
+    _toastT=setTimeout(function(){ el.classList.remove("show"); }, 2600);
+  }
+  window.pkToast = toast;
 
   /* =========================================================
      BRAND KIT (Phase 2), colours from the logo, saved once
@@ -3629,7 +3807,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
      ========================================================= */
   var refreshKitUI = function(){};   // set once the brand row is built
   var brandKit = { primary:"", accent:"", bg:"", text:"", font:"", template:"",
-                   personality:"", audience:"", designLanguage:"", website:"", instagram:"", fontOverride:"" };
+                   personality:"", audience:"", designLanguage:"", website:"", instagram:"", phone:"", fontOverride:"" };
   try { var _bk = localStorage.getItem("postkit_brandkit"); if(_bk){ brandKit = Object.assign(brandKit, JSON.parse(_bk)||{}); } } catch(e){}
   function saveKit(){ try{ localStorage.setItem("postkit_brandkit", JSON.stringify(brandKit)); }catch(e){} }
   function rgbToHex(r,g,b){ return "#"+[r,g,b].map(function(v){ return ("0"+Math.round(v).toString(16)).slice(-2); }).join("").toUpperCase(); }
@@ -5521,8 +5699,13 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       wrap.id="emailGate";
       wrap.innerHTML=
         '<div class="eg-box">'+
-          '<div class="eg-title">Start your 3 free posts</div>'+
+          '<div class="eg-title">Start your 5 free posts</div>'+
           '<div class="eg-sub">Just your email. No password, no spam.</div>'+
+          '<button type="button" id="egGoogle">'+
+            '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.6 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.1 5.3-4.5 6.9l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16.4z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.8-6.1C.9 16.7 0 20.2 0 24s.9 7.3 2.6 10.4l7.8-5.7z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.1-5.5c-2 1.3-4.5 2.1-8.8 2.1-6.3 0-11.7-3.7-13.6-9.1l-7.8 5.7C6.5 42.6 14.6 48 24 48z"/></svg>'+
+            '<span>Continue with Google</span>'+
+          '</button>'+
+          '<div class="eg-or"><span>or use your email</span></div>'+
           '<input id="egInput" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com">'+
           '<p class="error" id="egErr" style="margin:6px 0 0"></p>'+
           '<button class="gen-btn" id="egGo" style="margin-top:12px">Continue</button>'+
@@ -5541,6 +5724,18 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         close(); resolve(v);
       };
       inp.addEventListener("keydown", function(e){ if(e.key==="Enter") wrap.querySelector("#egGo").click(); });
+
+      var g=wrap.querySelector("#egGoogle");
+      if(g){
+        if(window.pkGoogleRedirect){ g.onclick=function(){ window.pkGoogleRedirect(); }; }
+        else { g.style.display="none"; }
+      }
+      // escape, and tapping the dimmed area, should close it
+      function onKey(e){ if(e.key==="Escape"){ document.removeEventListener("keydown",onKey); wrap.querySelector("#egCancel").click(); } }
+      document.addEventListener("keydown", onKey);
+      wrap.addEventListener("click", function(e){
+        if(e.target===wrap){ document.removeEventListener("keydown",onKey); wrap.querySelector("#egCancel").click(); }
+      });
     });
   }
   // restore the email if localStorage was cleared but IndexedDB survived
@@ -5559,6 +5754,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   function edClone(o){ return JSON.parse(JSON.stringify(o)); }
   function edPush(){
     if(!ED) return;
+    ED.__dirty = true;                    // something real changed, so warn before closing
     ED.hist = ED.hist.slice(0, ED.hi+1);
     ED.hist.push({ layers:edClone(ED.layers), art:ED.art });
     if(ED.hist.length>40) ED.hist.shift();
@@ -6409,11 +6605,18 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         }
       });
   }
-  function closeEditor(){
+  function closeEditor(force){
+    // Leaving used to discard every edit with no warning at all.
+    if(!force && ED && ED.__dirty){
+      var keep = window.confirm("Close the editor?\n\nYour changes to this design will be lost. Use Save or Share first if you want to keep them.");
+      if(!keep) return;
+    }
     var ov=$("edOverlay"); ov.style.display="none";
     ED=null;
     pkUnlockScroll();
   }
+  // anything that changes the design marks it unsaved
+  window.edTouched = function(){ try{ if(ED) ED.__dirty = true; }catch(e){} };
 
   /* =========================================================
      SESSION PERSISTENCE
@@ -6726,16 +6929,17 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   function showConceptImage(slot, c, img){
     try{ clearInterval(slot._tick); }catch(e){}
     slot.classList.remove("working");
+    try{ c.__img = img; }catch(e){}      // lets the full screen viewer move between concepts
       slot.innerHTML='<img src="'+img+'" alt="'+esc2((c.headline||"Generated design"))+'" loading="lazy">';
       // toolbar lives below the image so nothing is hidden behind it
       var _bar = slot.parentNode && slot.parentNode.querySelector(":scope > .cc-actions");
       if(!_bar){
         _bar=document.createElement("div"); _bar.className="cc-actions";
         _bar.innerHTML=
-          '<button data-a="edit" title="Edit"><b>\u270e</b>Edit</button>'+
-          '<button data-a="save" title="Download"><b>\u2913</b>Save</button>'+
-          '<button data-a="fav" title="Favourite"><b>\u2661</b>Save it</button>'+
-          '<button data-a="regen" title="Regenerate"><b>\u21bb</b>Redo</button>';
+          '<button data-a="edit" title="Edit this design"><b>\u270e</b>Edit</button>'+
+          '<button data-a="share" title="Share to Instagram"><b>\u21e7</b>Share</button>'+
+          '<button data-a="save" title="Download the image"><b>\u2913</b>Save</button>'+
+          '<button data-a="regen" title="Make another version, uses 1 credit"><b>\u21bb</b>Redo</button>';
         if(slot.parentNode) slot.parentNode.insertBefore(_bar, slot.nextSibling);
       }
       _bar.classList.add("on");
@@ -6752,6 +6956,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(c.__raw || img, c, !c.__raw); };
       var svBtn=_bar.querySelector('[data-a="save"]');
       if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img, c.label||"design"); svBtn.innerHTML="<b>\u2713</b>"; setTimeout(function(){ svBtn.innerHTML="<b>\u2913</b>"; },1400); };
+      var shBtn=_bar.querySelector('[data-a="share"]');
+      if(shBtn) shBtn.onclick=function(e){
+        e.stopPropagation();
+        if(navigator.share || navigator.canShare) shareDataUri(img);
+        else saveDataUri(img, c.label||"design");
+      };
       var fvBtn=_bar.querySelector('[data-a="fav"]');
       if(fvBtn) fvBtn.onclick=function(e){
         e.stopPropagation();
@@ -6786,6 +6996,48 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       (cap? '<button class="miniai" id="cvCopy" style="width:100%;margin-top:14px">Copy caption + hashtags</button>' : '');
     ov.classList.add("on");
 
+    /* ---- move between the concepts without closing ---- */
+    (function(){
+      var list=(lastConcepts && lastConcepts.concepts) ? lastConcepts.concepts : [];
+      var ready=list.filter(function(x){ return x && x.__img; });
+      var pos=ready.indexOf(c);
+      var nav=document.getElementById("cvNav");
+      if(nav) nav.remove();
+      if(ready.length<2 || pos<0) return;
+
+      nav=document.createElement("div");
+      nav.id="cvNav";
+      nav.innerHTML='<button id="cvPrev" aria-label="Previous design">‹</button>'+
+                    '<span id="cvCount">'+(pos+1)+' / '+ready.length+'</span>'+
+                    '<button id="cvNext" aria-label="Next design">›</button>';
+      ov.appendChild(nav);
+
+      function go(step){
+        var n=(pos+step+ready.length)%ready.length;
+        var t=ready[n];
+        if(t && t.__img) openViewer(t.__img, t);
+      }
+      document.getElementById("cvPrev").onclick=function(e){ e.stopPropagation(); go(-1); };
+      document.getElementById("cvNext").onclick=function(e){ e.stopPropagation(); go(1); };
+
+      // swipe
+      var x0=null;
+      ov.ontouchstart=function(e){ x0=e.touches[0].clientX; };
+      ov.ontouchend=function(e){
+        if(x0===null) return;
+        var dx=e.changedTouches[0].clientX-x0; x0=null;
+        if(Math.abs(dx)>55) go(dx<0 ? 1 : -1);
+      };
+
+      // arrow keys
+      document.onkeydown=function(e){
+        if(!ov.classList.contains("on")) return;
+        if(e.key==="ArrowRight") go(1);
+        else if(e.key==="ArrowLeft") go(-1);
+        else if(e.key==="Escape") closeViewer();
+      };
+    })();
+
     $("cvEdit").onclick=function(){ closeViewer(); openEditor(c.__raw || img, c, !c.__raw); };
     $("cvSave").onclick=function(){ saveDataUri(img, c.label||"design"); edDone($("cvSave"),"\u2713"); };
     $("cvShare").onclick=function(){ shareDataUri(img); edDone($("cvShare"),"\u2713"); };
@@ -6802,6 +7054,8 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
   function closeViewer(){
     var ov=$("cvOverlay"); ov.classList.remove("on");
+    ov.ontouchstart=null; ov.ontouchend=null; document.onkeydown=null;
+    var nav=document.getElementById("cvNav"); if(nav) nav.remove();
     CV=null;
     pkUnlockScroll();
   }
@@ -6821,23 +7075,29 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     slot.classList.add("working");
     slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span>'+
       '<div class="cc-stage">'+
-        '<div class="cc-step">Reading your brief</div>'+
-        '<div class="cc-bar"><i></i></div>'+
-        '<div class="cc-time">0s</div>'+
-        '<div class="cc-sub">The design engine is composing this one.</div>'+
+        '<div class="sk sk-logo"></div>'+
+        '<div class="sk sk-h1"></div>'+
+        '<div class="sk sk-h2"></div>'+
+        '<div class="sk sk-p"></div>'+
+        '<div class="sk sk-p2"></div>'+
+        '<div class="sk sk-cta"></div>'+
+      '</div>'+
+      '<div class="cc-status">'+
+        '<span class="cc-dot"></span>'+
+        '<span class="cc-step">Reading your brief</span>'+
+        '<span class="cc-time">0s</span>'+
       '</div>';
     (function(){
       var stepEl=slot.querySelector(".cc-step"),
-          subEl =slot.querySelector(".cc-sub"),
           timeEl=slot.querySelector(".cc-time");
       var stages=[
-        [0,   "Reading your brief",   "The design engine is composing this one."],
-        [6,   "Choosing the layout",  "Deciding where the headline and product sit."],
-        [16,  "Art directing",        "Setting the lighting, palette and mood."],
-        [32,  "Rendering the design", "This model takes its time for sharper detail."],
-        [60,  "Refining the details", "Cleaning up the type and the edges."],
-        [95,  "Finishing up",         "Almost there, adding the final polish."],
-        [140, "Nearly done",          "Bigger designs can take a little longer."]
+        [0,  "Reading your brief"],
+        [3,  "Choosing the layout"],
+        [8,  "Art directing"],
+        [15, "Rendering the design"],
+        [30, "Refining the details"],
+        [55, "Adding the final polish"],
+        [90, "Still working, this one is detailed"]
       ];
       var t0=Date.now(), idx=-1;
       try{ clearInterval(slot._tick); }catch(e){}
@@ -6850,7 +7110,6 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         if(want!==idx){
           idx=want;
           if(stepEl) stepEl.textContent=stages[want][1];
-          if(subEl)  subEl.textContent =stages[want][2];
         }
       },1000);
     })();
@@ -6908,7 +7167,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     }
     (r.concepts||[]).slice(0,limit).forEach(function(c,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
-      slot.innerHTML='<span class="cc-label">'+esc2(c.label||("Concept "+(i+1)))+'</span>'+(i===0?'<div class="cc-spin"></div>':'<div class="cc-hint">Tap to reveal</div>');
+      slot.innerHTML='<span class="cc-label">'+esc2(c.label||("Concept "+(i+1)))+'</span>'+(i===0?'<div class="cc-spin"></div>':'<div class="cc-hint">Tap to reveal<small>uses 1 credit</small></div>');
       c.__tpl=i; c.__idx=i;
       slot.onclick=function(){ if(!slot._loaded && !slot._busy) loadConceptImage(slot,c); };
       grid.appendChild(slot);
@@ -6936,6 +7195,28 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       el.classList.remove("pk-working");
       el.innerHTML = old; el.disabled = wasDisabled;
     };
+  };
+
+  // Tapping Generate with an empty box used to do nothing you could see.
+  window.pkNeedPrompt = function(){
+    var box=document.getElementById("hgComposer"), t=document.getElementById("topic");
+    if(box){
+      box.classList.remove("pk-shake");
+      void box.offsetWidth;                 // restart the animation
+      box.classList.add("pk-shake");
+      var hint=document.getElementById("pkPromptHint");
+      if(!hint){
+        hint=document.createElement("div");
+        hint.id="pkPromptHint";
+        hint.textContent="Tell me what the post is about first";
+        box.insertAdjacentElement("afterend", hint);
+      }
+      hint.classList.add("show");
+      clearTimeout(window.__pkHintT);
+      window.__pkHintT=setTimeout(function(){ hint.classList.remove("show"); }, 3200);
+      box.scrollIntoView({behavior:"smooth", block:"center"});
+    }
+    if(t) setTimeout(function(){ t.focus(); }, 320);
   };
 
   window.pkSetPreviewRatio = function(fmt){
@@ -7072,6 +7353,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         '<div id="logoNote" style="font-size:12px;color:var(--muted);margin-top:4px"></div><div id="kitSwatches" style="margin-top:6px"></div>'+
         '<input id="kitSite" placeholder="Website (optional)" style="margin-top:8px">'+
         '<input id="kitIg" placeholder="Instagram (optional)" style="margin-top:6px">'+
+        '<input id="kitPhone" placeholder="Phone (shown on your posts)" style="margin-top:6px">'+
         '<button type="button" class="miniai" id="kitAnalyze" style="width:100%;margin-top:8px">\u2728 Analyse my brand automatically</button>'+
         '<div id="kitNote" style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5"></div>';
       fw.insertAdjacentElement("afterend", bw);
@@ -7119,10 +7401,12 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       };
       if($("kitSite")) $("kitSite").value = brandKit.website||"";
       if($("kitIg")) $("kitIg").value = brandKit.instagram||"";
+      if($("kitPhone")) $("kitPhone").value = brandKit.phone||"";
       if(brandKit.personality && $("kitNote")) $("kitNote").innerHTML="<b>"+esc2(brandKit.personality)+"</b><br>"+esc2(brandKit.designLanguage||"");
       if($("kitAnalyze")) $("kitAnalyze").onclick=function(){
         brandKit.website=($("kitSite").value||"").trim();
         brandKit.instagram=($("kitIg").value||"").trim();
+        if($("kitPhone")) brandKit.phone=($("kitPhone").value||"").trim();
         saveKit(); analyzeBrand();
       };
       if($("refPhotos")) $("refPhotos").addEventListener("change", async function(e){
@@ -7179,7 +7463,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     async function run(limit){
       try{ await ensureEmail(); }catch(e){ $("ccErr").textContent=e.message; return; }
       var t=($("topic").value||"").trim();
-      if(!t){ $("topic").focus(); return; }
+      if(!t){ window.pkNeedPrompt && window.pkNeedPrompt(); return; }
       var card=$("conceptsCard"); card.style.display="block";
       $("conceptsCard").querySelector(".std-sub").textContent = limit===1
         ? "One polished design for your post." : "Four unique directions. The first is ready, tap the others to reveal them.";
@@ -7196,7 +7480,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     async function runSlides(n){
       try{ await ensureEmail(); }catch(e){ $("ccErr").textContent=e.message; return; }
       var t=($("topic").value||"").trim();
-      if(!t){ $("topic").focus(); return; }
+      if(!t){ window.pkNeedPrompt && window.pkNeedPrompt(); return; }
       var card=$("conceptsCard"); card.style.display="block";
       card.querySelector(".std-sub").textContent="Building a "+n+"-slide carousel that tells one story…";
       $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
@@ -7266,7 +7550,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     '</div>';
     document.body.insertAdjacentHTML("beforeend", html);
     edBindCanvas();
-    $("edClose").onclick=closeEditor;
+    $("edClose").onclick=function(){ closeEditor(false); };
     $("edUndo").onclick=edUndo;
     $("edRedo").onclick=edRedo;
     $("edSave").onclick=function(){ saveDataUri(edExport("png"), "edited"); edDone($("edSave"),"Saved \u2713"); };
@@ -7474,9 +7758,9 @@ document.addEventListener("click",function(e){
       if(!u){ noteEl.textContent="Could not load your usage."; return; }
       if(u.plan==="none"){
         planEl.textContent="Not started";
-        leftEl.textContent="3 free";
+        leftEl.textContent="5 free";
         barEl.style.width="0%";
-        noteEl.textContent="Enter your email in the form to start your 3 free posts.";
+        noteEl.textContent="Enter your email in the form to start your 5 free posts.";
         return;
       }
       var used=u.used||0, limit=u.limit||0, left=Math.max(0,limit-used);
@@ -7545,12 +7829,12 @@ document.addEventListener("click",function(e){
     // reset the card straight away: never show a signed out person someone else's plan
     var _p=$$("pkPlan"), _l=$$("pkLeft"), _b=$$("pkBar"), _n=$$("pkUsage");
     if(_p) _p.textContent="Not started";
-    if(_l) _l.textContent="3 free";
+    if(_l) _l.textContent="5 free";
     if(_b) _b.style.width="0%";
     if(_n) _n.textContent="Sign in or enter your email to start.";
     var _cc=document.getElementById("codeCard"); if(_cc) _cc.style.display="";
     var _tl=document.getElementById("trialLine");
-    if(_tl) _tl.textContent="Try 3 posts for free. Just your email, no password.";
+    if(_tl) _tl.textContent="Try 5 posts for free. Just your email, no password.";
     // tell Google to forget the session too, otherwise it keeps offering the same account
     try{ if(window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); }catch(e){}
     $$("pkSignedIn").style.display="none";
@@ -7604,6 +7888,7 @@ document.addEventListener("click",function(e){
       + "&nonce=" + encodeURIComponent(nonce)
       + "&prompt=select_account";
   }
+  window.pkGoogleRedirect = pkGoogleRedirect;   // the email gate uses this too
   var fb=$$("pkGoogleFallback"); if(fb) fb.onclick=pkGoogleRedirect;
 
   // returning from the redirect: Google puts the token in the URL hash
@@ -7641,6 +7926,75 @@ document.addEventListener("click",function(e){
     var sec=$$("pkAcctSec");
     if(sec) sec.style.display="none";   // no sign in configured yet, hide the empty section
   }
+})();
+</script>
+<script>
+/* ---------- install as an app ---------- */
+(function(){
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("/sw.js").catch(function(){});
+    });
+  }
+
+  var deferred=null;
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferred=e; showInstall();
+  });
+
+  function isStandalone(){
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+  }
+  function dismissed(){
+    try{ return localStorage.getItem("pk_install_off")==="1"; }catch(e){ return false; }
+  }
+
+  function showInstall(){
+    if(isStandalone() || dismissed() || document.getElementById("pkInstall")) return;
+    var bar=document.createElement("div");
+    bar.id="pkInstall";
+    bar.innerHTML=
+      '<img src="/icon-192.png" alt="">'+
+      '<div class="pki-txt"><b>Install PostKit</b><span>Add it to your home screen</span></div>'+
+      '<button type="button" id="pkInstallGo">Install</button>'+
+      '<button type="button" id="pkInstallNo" aria-label="Not now">✕</button>';
+    document.body.appendChild(bar);
+    requestAnimationFrame(function(){ bar.classList.add("in"); });
+
+    document.getElementById("pkInstallGo").onclick=async function(){
+      if(!deferred) return;
+      deferred.prompt();
+      try{ await deferred.userChoice; }catch(e){}
+      deferred=null; bar.remove();
+    };
+    document.getElementById("pkInstallNo").onclick=function(){
+      try{ localStorage.setItem("pk_install_off","1"); }catch(e){}
+      bar.remove();
+    };
+  }
+
+  // iPhone has no install prompt, so tell them how, once
+  window.addEventListener("load", function(){
+    var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    var isSafari=/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+    if(isIOS && isSafari && !isStandalone() && !dismissed()){
+      setTimeout(function(){
+        if(document.getElementById("pkInstall")) return;
+        var bar=document.createElement("div");
+        bar.id="pkInstall";
+        bar.innerHTML=
+          '<img src="/icon-192.png" alt="">'+
+          '<div class="pki-txt"><b>Add PostKit to your home screen</b><span>Tap Share, then Add to Home Screen</span></div>'+
+          '<button type="button" id="pkInstallNo" aria-label="Not now">✕</button>';
+        document.body.appendChild(bar);
+        requestAnimationFrame(function(){ bar.classList.add("in"); });
+        document.getElementById("pkInstallNo").onclick=function(){
+          try{ localStorage.setItem("pk_install_off","1"); }catch(e){}
+          bar.remove();
+        };
+      }, 12000);
+    }
+  });
 })();
 </script>
 </body>

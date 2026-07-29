@@ -31,7 +31,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F7F6F2; --card:#FFFFFF; --border:#E9E7E0; --line:#DBD9D1;
+    --bg:#FFFFFF; --card:#FFFFFF; --border:#E6E4DD; --line:#DFDDD5;
     --text:#191A17; --muted:#73746D; --dim:#A6A79F;
     --lime:#2B44DE; --lime-dark:#C7CEF6; --lime-bg:#EEF2FF;
     --red:#C0483C;
@@ -88,7 +88,7 @@
   /* ---------- app ---------- */
   .section-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:24px;margin:26px 0 4px}
   .section-sub{color:var(--muted);font-size:14px;margin-bottom:16px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 1px 2px rgba(25,26,23,.04),0 6px 20px rgba(25,26,23,.05)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 1px 2px rgba(25,26,23,.04),0 10px 26px -16px rgba(25,26,23,.14)}
   label{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 7px}
   label:first-child{margin-top:0}
   input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px 14px;font-size:15px;font-family:inherit}
@@ -474,23 +474,71 @@
   .cc-label{display:none}
   .cc-hint{color:var(--muted);font-size:12px;font-weight:600;padding:0 14px;line-height:1.5}
   /* glass controls, only on a finished design, sitting over the artwork */
+  /* toolbar sits under the design so the artwork is never covered */
+  .cc-item{display:block}
   .cc-actions{
-    display:none;position:absolute;left:50%;transform:translateX(-50%) translateY(6px);bottom:14px;
-    gap:4px;justify-content:center;padding:5px;border-radius:999px;
-    background:rgba(18,19,16,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-    box-shadow:0 6px 18px -8px rgba(0,0,0,.6);
-    opacity:0;transition:opacity .3s,transform .3s;
+    display:none;gap:6px;margin-top:10px;
+    grid-template-columns:repeat(4,1fr);align-items:stretch;
   }
-  .cc-slot.loaded .cc-actions{display:flex;opacity:1;transform:translateX(-50%)}
+  .cc-slot.loaded + .cc-actions,
+  .cc-item .cc-actions.on{display:grid}
   .cc-actions button{
-    background:transparent;border:none;color:#fff;border-radius:999px;
-    width:40px;height:40px;padding:0;font-size:17px;line-height:1;
-    display:flex;align-items:center;justify-content:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    background:#fff;border:1px solid var(--border);color:var(--text);
+    border-radius:13px;padding:9px 4px 8px;font-size:11px;font-weight:600;line-height:1;
+    transition:border-color .15s,transform .12s,color .15s;
   }
-  .cc-actions button b{font-weight:400;font-size:17px}
-  .cc-actions button:active{background:rgba(255,255,255,.2)}
+  .cc-actions button b{font-weight:400;font-size:16px;line-height:1}
+  .cc-actions button:hover{border-color:var(--lime-dark);color:var(--lime)}
+  .cc-actions button:active{transform:scale(.96)}
+  .cc-actions button[data-a="edit"]{background:var(--lime);border-color:var(--lime);color:#fff}
+  .cc-actions button[data-a="edit"]:hover{color:#fff;filter:brightness(1.06)}
   .cc-spin{width:30px;height:30px;border:3px solid #E6E4DD;border-top-color:var(--lime);border-radius:50%;animation:ccspin .8s linear infinite}
   @keyframes ccspin{to{transform:rotate(360deg)}}
+
+  /* ---- caption panel ---- */
+  .cc-caption{background:#FCFBF9;border:1px solid var(--border);border-radius:16px;padding:15px 16px 14px;margin-top:14px}
+  .cc-cap-head{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:9px}
+  .cc-cap-body{white-space:pre-wrap;font-size:14.5px;line-height:1.62;color:var(--text)}
+  .cc-cap-tags{margin-top:11px;padding-top:11px;border-top:1px solid var(--border);
+    font-size:13px;line-height:1.65;color:var(--lime);word-break:break-word}
+  .cc-cap-copy{width:100%;margin-top:13px;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:11px;font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer;transition:border-color .15s,color .15s}
+  .cc-cap-copy:hover{border-color:var(--lime-dark);color:var(--lime)}
+  .cc-cap-copy.done{border-color:var(--lime);color:var(--lime)}
+
+  /* ---- animated busy state on any button ---- */
+  .pk-working{position:relative;overflow:hidden;pointer-events:none}
+  .pk-working::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.42) 50%,transparent 70%);
+    background-size:260% 100%;animation:pkSweep 1.5s ease-in-out infinite}
+  @keyframes pkSweep{0%{background-position:170% 0}100%{background-position:-70% 0}}
+  .pk-working .pk-dots::after{content:"";display:inline-block;width:1.1em;text-align:left;
+    animation:pkDots 1.4s steps(1,end) infinite}
+  @keyframes pkDots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}100%{content:""}}
+  @media (prefers-reduced-motion: reduce){
+    .pk-working::before{animation:none}
+    .pk-working .pk-dots::after{animation:none;content:"..."}
+  }
+
+  /* ---- interactive waiting state ---- */
+  .cc-slot.working{position:relative;overflow:hidden;
+    background:linear-gradient(180deg,#FFFFFF,#FAF9F6)}
+  .cc-slot.working::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(105deg,transparent 20%,rgba(43,68,222,.10) 45%,rgba(255,255,255,.55) 50%,rgba(43,68,222,.10) 55%,transparent 80%);
+    background-size:280% 100%;animation:ccShimmer 1.9s ease-in-out infinite}
+  @keyframes ccShimmer{0%{background-position:180% 0}100%{background-position:-80% 0}}
+  .cc-stage{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px;text-align:center}
+  .cc-stage .cc-step{font-size:13px;font-weight:600;color:var(--text);line-height:1.35;min-height:18px}
+  .cc-stage .cc-sub{font-size:11.5px;color:var(--muted);line-height:1.4;max-width:22ch}
+  .cc-stage .cc-time{font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;color:var(--lime);letter-spacing:.02em}
+  .cc-bar{width:74%;max-width:190px;height:4px;border-radius:99px;background:var(--lime-bg);overflow:hidden;margin-top:2px}
+  .cc-bar i{display:block;height:100%;width:8%;border-radius:99px;background:var(--lime);
+    animation:ccCrawl 2.4s cubic-bezier(.4,0,.2,1) infinite}
+  @keyframes ccCrawl{0%{width:6%;margin-left:0}50%{width:56%}100%{width:8%;margin-left:92%}}
+  @media (prefers-reduced-motion: reduce){
+    .cc-slot.working::after,.cc-bar i{animation:none}
+  }
 
   /* ===== fullscreen design viewer ===== */
   #cvOverlay{position:fixed;inset:0;height:100dvh;z-index:1200;display:none;flex-direction:column;background:rgba(14,15,12,.92);backdrop-filter:blur(18px)}
@@ -629,13 +677,15 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 #pkMenuBtn{background:#fff;border:1px solid var(--line);border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s;
   opacity:1!important;animation:none!important;visibility:visible!important}
 #pkMenuBtn:hover{border-color:var(--lime);box-shadow:0 4px 12px -6px rgba(43,68,222,.5)}
-#pkScrim{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(18,18,16,.42);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .24s ease;z-index:998}
+#pkScrim{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(18,18,16,.42);opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:998}
 #pkScrim.open{opacity:1;pointer-events:auto}
-#pkPanel{position:fixed;top:0;bottom:0;right:-420px;width:min(90vw,372px);background:var(--bg);overscroll-behavior:contain;
-  border-radius:22px 0 0 22px;transition:right .3s cubic-bezier(.32,.72,0,1);
+#pkPanel{position:fixed;top:0;bottom:0;right:0;width:min(90vw,372px);background:var(--bg);overscroll-behavior:contain;
+  border-radius:22px 0 0 22px;transform:translate3d(102%,0,0);will-change:transform;backface-visibility:hidden;
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
   z-index:999;overflow-y:auto;-webkit-overflow-scrolling:touch;
   box-shadow:-28px 0 60px -30px rgba(0,0,0,.45);padding:0 0 34px}
-#pkPanel.open{right:0}
+#pkPanel.open{transform:translate3d(0,0,0)}
+#pkPanel.settled{transform:none;will-change:auto}
 .pkp-top{position:sticky;top:0;background:rgba(247,246,242,.92);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);
   display:flex;align-items:center;justify-content:space-between;padding:16px 18px;z-index:3;border-bottom:1px solid rgba(0,0,0,.05)}
 .pkp-brand{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:.15em;font-size:14px}
@@ -646,7 +696,9 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 .pkp-h{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:11px}
 .pkp-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:8px 0 0}
 .pkp-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px}
-#pkGoogleBtn{display:flex;justify-content:center}
+#pkGoogleBtn{display:flex;justify-content:center;min-height:44px;overflow:hidden}
+#pkGoogleBtn svg{max-width:32px;max-height:32px}
+#pkGoogleBtn > div{max-width:100%}
 #pkGoogleBtn > div{margin:0 auto}
 #pkSignedIn{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
 #pkGoogleFallback{display:block;width:100%;margin-top:8px;background:#fff;border:1px solid var(--line);
@@ -757,6 +809,21 @@ body.pk-panel-open .wa-float{display:none!important}
 @media (min-width: 1180px) {
   .wrap { max-width: 1120px; }
 }
+
+
+
+
+
+/* pure white page: surfaces separate by edge, not by background contrast */
+.card,.plan,.step,details.acc,.faq-item{border-color:var(--border)!important}
+details.acc{background:#fff!important}
+#hgComposer{border-color:var(--line)!important;box-shadow:0 1px 2px rgba(25,26,23,.04),0 8px 22px -16px rgba(25,26,23,.16)}
+input,textarea,select{background:#FCFBF9!important;border:1px solid var(--line)!important}
+.p1-ideas .chip{background:#fff!important;border:1px solid var(--line)!important}
+header{background:rgba(255,255,255,.92)!important;border-bottom:1px solid var(--border)!important}
+#pkPanel{background:#FCFBF9!important}
+.pkp-card,#pkSignedIn,.pkp-feats li button,.pkp-row{background:#fff!important;border-color:var(--border)!important}
+.cc-ghost{background:linear-gradient(180deg,#FFFFFF,#FAF9F6)!important;border-color:var(--line)!important}
 </style>
 </head>
 <body>
@@ -849,7 +916,7 @@ body.pk-panel-open .wa-float{display:none!important}
   <div class="card reveal">
     <label for="topic" style="font-size:15px">Describe your post</label>
     <div id="hgComposer">
-      <textarea id="topic" placeholder="Describe your post and I'll design it"></textarea>
+      <textarea id="topic" placeholder="Describe your post and I'll design it" autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
       <div id="hgBar"><span style="flex:1"></span><span class="hg-neon"><button id="hgSubmit" type="button">Generate ✦</button></span></div>
     </div>
     <button id="voiceBtn" type="button" style="margin-top:8px;background:transparent;border:1px dashed var(--lime-dark);color:var(--lime);border-radius:10px;padding:9px 14px;font-size:13px;width:100%">🎤 Speak your idea</button>
@@ -2133,7 +2200,7 @@ async function generate() {
   const topic = document.getElementById("topic").value.trim();
   errorMsg.textContent = "";
   if (!topic) { errorMsg.textContent = "Describe what the post is about first."; return; }
-  genBtn.disabled = true; genBtn.textContent = "Generating…";
+  var restoreGen = window.pkBusy(genBtn, "Generating");
   var _ep0 = document.getElementById("emptyPreview"); if (_ep0) _ep0.style.display = "none";
   skel.style.display = "block"; skel.parentElement.style.display = "block";
 
@@ -2188,7 +2255,7 @@ async function generate() {
   } catch (e) {
     errorMsg.textContent = "Connection failed. Check your internet and try again.";
   } finally {
-    genBtn.disabled = false; genBtn.textContent = "Generate post";
+    restoreGen();
     skel.style.display = "none"; skel.parentElement.style.display = "none";
   }
 }
@@ -2299,7 +2366,7 @@ bgBtn.onclick = async () => {
   const p = document.getElementById("bgPrompt").value.trim();
   bgError.textContent = "";
   if (!p) { bgError.textContent = "Describe the background photo first."; return; }
-  bgBtn.disabled = true; bgBtn.textContent = "Generating… (~10s)";
+  var restoreBg = window.pkBusy(bgBtn, "Generating");
   try {
     const res = await fetch(WORKER_URL + "/background", {
       method: "POST",
@@ -2322,7 +2389,7 @@ bgBtn.onclick = async () => {
   } catch {
     bgError.textContent = "Connection failed. Try again.";
   } finally {
-    bgBtn.disabled = false; bgBtn.textContent = "✦ Generate background";
+    restoreBg();
   }
 };
 bgClear.onclick = () => { bgImg = null; bgClear.style.display = "none"; rerender(); };
@@ -6499,6 +6566,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     throw new Error(data.message||"Couldn't build the carousel.");
   }
   function renderSlides(r, restoring){
+    window.__pkBatchConsistent = true;   // slides must match each other
     lastConcepts={brand:r.brand, shared:r.shared};
     var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
     if(r.shared){
@@ -6531,6 +6599,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     throw new Error(data.message||"Couldn't plan the month. Try again.");
   }
   function renderPack(r, restoring){
+    window.__pkBatchConsistent = true;   // one look across the whole month
     lastConcepts={brand:r.brand, shared:null};
     var grid=$("ccGrid"); grid.innerHTML=""; grid.style.gridTemplateColumns="1fr";
     $("ccShared").innerHTML='<div class="std-sub" style="margin:0">Tap any post to generate its design. Each one uses the same brand system.</div>';
@@ -6582,7 +6651,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         "on packaging, cups, walls, menus, napkins or any surface, every surface must be blank and unbranded.";
     }
     var res=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", bakedText:!lock, bizType:$("bizType").value, size:(window.__pkFormat||"square") })});
+      body:JSON.stringify({ code:state.code, mode:"image", clientId:pkClientId(), email:pkEmail(), prompt:sendPrompt, kind:kind, model:"auto", bakedText:!lock, consistent:!!window.__pkBatchConsistent, bizType:$("bizType").value, size:(window.__pkFormat||"square") })});
     var data=await res.json();
     if(data.ok && data.image){
       if(data.usage){
@@ -6596,7 +6665,7 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         if(tl && data.usage.plan==="trial"){
           tl.textContent = left>0
             ? (left+" of "+data.usage.limit+" free posts left. No signup needed.")
-            : "You have used your free posts. Enter an access code below to keep creating.";
+            : "You have used your free posts. Message us on WhatsApp to keep creating.";
         } else if(tl){ tl.textContent = "Your plan: "+data.usage.plan+". "+data.usage.used+" of "+data.usage.limit+" used this month."; }
       }
       if(lock){
@@ -6649,13 +6718,21 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   function showConceptImage(slot, c, img){
-      slot.innerHTML='<img src="'+img+'" alt="'+esc2((c.headline||"Generated design"))+'" loading="lazy">'+
-        '<div class="cc-actions">'+
-          '<button data-a="edit" title="Edit"><b>\u270e</b></button>'+
-          '<button data-a="save" title="Download"><b>\u2913</b></button>'+
-          '<button data-a="fav" title="Favourite"><b>\u2661</b></button>'+
-          '<button data-a="regen" title="Regenerate"><b>\u21bb</b></button>'+
-        '</div>';
+    try{ clearInterval(slot._tick); }catch(e){}
+    slot.classList.remove("working");
+      slot.innerHTML='<img src="'+img+'" alt="'+esc2((c.headline||"Generated design"))+'" loading="lazy">';
+      // toolbar lives below the image so nothing is hidden behind it
+      var _bar = slot.parentNode && slot.parentNode.querySelector(":scope > .cc-actions");
+      if(!_bar){
+        _bar=document.createElement("div"); _bar.className="cc-actions";
+        _bar.innerHTML=
+          '<button data-a="edit" title="Edit"><b>\u270e</b>Edit</button>'+
+          '<button data-a="save" title="Download"><b>\u2913</b>Save</button>'+
+          '<button data-a="fav" title="Favourite"><b>\u2661</b>Save it</button>'+
+          '<button data-a="regen" title="Regenerate"><b>\u21bb</b>Redo</button>';
+        if(slot.parentNode) slot.parentNode.insertBefore(_bar, slot.nextSibling);
+      }
+      _bar.classList.add("on");
       slot.classList.add("loaded"); slot._loaded=true; slot._img=img; slot._c=c;
 
       // tapping the artwork opens the full screen viewer
@@ -6663,13 +6740,13 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         if(e.target.closest(".cc-actions")) return;
         openViewer(img, c);
       };
-      var rgBtn=slot.querySelector('[data-a="regen"]');
+      var rgBtn=_bar.querySelector('[data-a="regen"]');
       if(rgBtn) rgBtn.onclick=function(e){ e.stopPropagation(); loadConceptImage(slot,c); };
-      var edBtn=slot.querySelector('[data-a="edit"]');
+      var edBtn=_bar.querySelector('[data-a="edit"]');
       if(edBtn) edBtn.onclick=function(e){ e.stopPropagation(); openEditor(c.__raw || img, c, !c.__raw); };
-      var svBtn=slot.querySelector('[data-a="save"]');
+      var svBtn=_bar.querySelector('[data-a="save"]');
       if(svBtn) svBtn.onclick=function(e){ e.stopPropagation(); saveDataUri(img, c.label||"design"); svBtn.innerHTML="<b>\u2713</b>"; setTimeout(function(){ svBtn.innerHTML="<b>\u2913</b>"; },1400); };
-      var fvBtn=slot.querySelector('[data-a="fav"]');
+      var fvBtn=_bar.querySelector('[data-a="fav"]');
       if(fvBtn) fvBtn.onclick=function(e){
         e.stopPropagation();
         var base=templateFor(c.__tpl||0);
@@ -6735,7 +6812,42 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
 
   async function loadConceptImage(slot, c){
     slot._busy=true; slot.classList.remove("loaded");
-    slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span><div class="cc-spin"></div>';
+    slot.classList.add("working");
+    slot.innerHTML='<span class="cc-label">'+esc2(c.label||"")+'</span>'+
+      '<div class="cc-stage">'+
+        '<div class="cc-step">Reading your brief</div>'+
+        '<div class="cc-bar"><i></i></div>'+
+        '<div class="cc-time">0s</div>'+
+        '<div class="cc-sub">The design engine is composing this one.</div>'+
+      '</div>';
+    (function(){
+      var stepEl=slot.querySelector(".cc-step"),
+          subEl =slot.querySelector(".cc-sub"),
+          timeEl=slot.querySelector(".cc-time");
+      var stages=[
+        [0,   "Reading your brief",   "The design engine is composing this one."],
+        [6,   "Choosing the layout",  "Deciding where the headline and product sit."],
+        [16,  "Art directing",        "Setting the lighting, palette and mood."],
+        [32,  "Rendering the design", "This model takes its time for sharper detail."],
+        [60,  "Refining the details", "Cleaning up the type and the edges."],
+        [95,  "Finishing up",         "Almost there, adding the final polish."],
+        [140, "Nearly done",          "Bigger designs can take a little longer."]
+      ];
+      var t0=Date.now(), idx=-1;
+      try{ clearInterval(slot._tick); }catch(e){}
+      slot._tick=setInterval(function(){
+        if(!slot._busy){ clearInterval(slot._tick); return; }
+        var s=Math.round((Date.now()-t0)/1000);
+        if(timeEl) timeEl.textContent = s<60 ? (s+"s") : (Math.floor(s/60)+"m "+(s%60)+"s");
+        var want=0;
+        for(var k=0;k<stages.length;k++){ if(s>=stages[k][0]) want=k; }
+        if(want!==idx){
+          idx=want;
+          if(stepEl) stepEl.textContent=stages[want][1];
+          if(subEl)  subEl.textContent =stages[want][2];
+        }
+      },1000);
+    })();
     try{
       var img=await callImage(c);
       // fingerprint it and, if it clashes with another concept, try once more
@@ -6765,16 +6877,28 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
     slot._busy=false;
   }
   function renderConcepts(r, limit, restoring){
+    window.__pkBatchConsistent = false;  // concepts are meant to differ
     lastConcepts=r;
     limit = limit || 4;
     var grid=$("ccGrid"); grid.innerHTML="";
     grid.style.gridTemplateColumns="1fr";
     if(r.shared){
       var full=(r.shared.caption||"")+"\n\n"+((r.shared.hashtags||[]).map(function(h){return "#"+h;}).join(" "));
-      $("ccShared").innerHTML='<div class="std-title" style="font-size:12px;margin-bottom:6px">Caption</div>'+
-        '<div style="white-space:pre-wrap;font-size:14px;line-height:1.6;margin-bottom:8px">'+esc2(full)+'</div>'+
-        '<button class="miniai" id="ccCopy" style="width:100%">Copy caption + hashtags</button>';
-      var cc=$("ccCopy"); if(cc) cc.onclick=function(){ if(navigator.clipboard) navigator.clipboard.writeText(full); };
+      var _tags=(full.match(/#[^\s#]+/g)||[]).join(" ");
+      var _body=full.replace(/#[^\s#]+/g,"").replace(/\n{3,}/g,"\n\n").trim();
+      $("ccShared").innerHTML=
+        '<div class="cc-caption">'+
+          '<div class="cc-cap-head">Caption</div>'+
+          '<div class="cc-cap-body">'+esc2(_body)+'</div>'+
+          (_tags ? '<div class="cc-cap-tags">'+esc2(_tags)+'</div>' : '')+
+          '<button class="cc-cap-copy" id="ccCopy">Copy caption + hashtags</button>'+
+        '</div>';
+      var cc=$("ccCopy");
+      if(cc) cc.onclick=function(){
+        if(navigator.clipboard) navigator.clipboard.writeText(full);
+        cc.textContent="Copied ✓"; cc.classList.add("done");
+        setTimeout(function(){ cc.textContent="Copy caption + hashtags"; cc.classList.remove("done"); },1600);
+      };
     }
     (r.concepts||[]).slice(0,limit).forEach(function(c,i){
       var slot=document.createElement("div"); slot.className="cc-slot";
@@ -6787,6 +6911,27 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
   }
 
   // preview tiles should show the shape the user picked, not always a square
+  // browsers restore textarea contents on reload; the prompt box should start empty
+  (function(){
+    function clearTopic(){ var t=document.getElementById("topic"); if(t) t.value=""; }
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", clearTopic);
+    else clearTopic();
+    window.addEventListener("pageshow", function(e){ if(e.persisted) clearTopic(); });
+  })();
+
+  // put any button into an animated working state
+  window.pkBusy = function(el, label){
+    if(!el) return function(){};
+    var old = el.innerHTML, wasDisabled = el.disabled;
+    el.classList.add("pk-working");
+    el.innerHTML = (label||"Creating") + '<span class="pk-dots"></span>';
+    el.disabled = true;
+    return function(){
+      el.classList.remove("pk-working");
+      el.innerHTML = old; el.disabled = wasDisabled;
+    };
+  };
+
   window.pkSetPreviewRatio = function(fmt){
     var ar = fmt==="portrait" ? "4/5"
            : (fmt==="story"||fmt==="portrait9") ? "9/16"
@@ -7034,11 +7179,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
         ? "One polished design for your post." : "Four unique directions. The first is ready, tap the others to reveal them.";
       $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
       var btns=[$("act4"),$("act1"),$("actM"),$("hgSubmit")].filter(Boolean); btns.forEach(function(b){b.disabled=true;});
-      var a=(limit===1?$("act1"):($("hgSubmit")||$("act4"))); var old=a.textContent; a.textContent="Creating…";
+      var a=(limit===1?$("act1"):($("hgSubmit")||$("act4"))); var restoreA=window.pkBusy(a,"Creating");
       card.scrollIntoView({behavior:"smooth",block:"start"});
       try{ var r=await callConcepts(); savePlan("concepts", r, limit); renderConcepts(r, limit); }
       catch(e){ $("ccErr").textContent=e.message; }
-      finally{ btns.forEach(function(b){b.disabled=false;}); a.textContent=old; }
+      finally{ btns.forEach(function(b){b.disabled=false;}); restoreA(); }
     }
     if($("act4")) $("act4").onclick=function(){ run(4); };
     if($("act1")) $("act1").onclick=function(){ run(1); };
@@ -7050,11 +7195,11 @@ function drawPost(canvas, { template, palette: p, headline, subline, brand, H = 
       card.querySelector(".std-sub").textContent="Building a "+n+"-slide carousel that tells one story…";
       $("ccGrid").innerHTML=""; $("ccShared").innerHTML=""; $("ccErr").textContent="";
       var all=[$("act4"),$("act1"),$("actM"),$("act3"),$("act5")]; all.forEach(function(b){ if(b) b.disabled=true; });
-      var btn=(n===3?$("act3"):$("act5")); var old=btn.textContent; btn.textContent="Creating…";
+      var btn=(n===3?$("act3"):$("act5")); var restoreB=window.pkBusy(btn,"Creating");
       card.scrollIntoView({behavior:"smooth",block:"start"});
       try{ var r=await callSlides(n); savePlan("slides", r, n); card.querySelector(".std-sub").textContent=n+" slides, one brand, one story. Tap each to generate."; renderSlides(r); }
       catch(e){ $("ccErr").textContent=e.message; }
-      finally{ all.forEach(function(b){ if(b) b.disabled=false; }); btn.textContent=old; }
+      finally{ all.forEach(function(b){ if(b) b.disabled=false; }); restoreB(); }
     }
     if($("act3")) $("act3").onclick=function(){ runSlides(3); };
     if($("act5")) $("act5").onclick=function(){ runSlides(5); };
@@ -7199,10 +7344,16 @@ document.addEventListener("click",function(e){
     document.body.style.left="0"; document.body.style.right="0";
     document.body.style.width="100%";
     document.body.style.overflow="hidden";
+    // once the slide finishes, drop the transform so embedded iframes (Google) tap correctly
+    clearTimeout(window.__pkSettleT);
+    panel.classList.remove("settled");
+    window.__pkSettleT = setTimeout(function(){ panel.classList.add("settled"); }, 340);
     var c=$$("pkClose"); if(c) setTimeout(function(){ c.focus(); },80);
     refreshUsage();
   }
   function closePanel(){
+    clearTimeout(window.__pkSettleT);
+    panel.classList.remove("settled");   // put the transform back so it can animate out
     panel.classList.remove("open"); scrim.classList.remove("open");
     panel.setAttribute("aria-hidden","true");
     if(mb) mb.setAttribute("aria-expanded","false");
@@ -7323,6 +7474,18 @@ document.addEventListener("click",function(e){
         return;
       }
       var used=u.used||0, limit=u.limit||0, left=Math.max(0,limit-used);
+      // the line under "Create your post" should reflect the real account, not always the trial pitch
+      var tline=document.getElementById("trialLine");
+      if(tline){
+        if(u.plan==="trial"){
+          tline.textContent = left>0
+            ? (left+" of "+limit+" free posts left. No signup needed.")
+            : "You have used your free posts. Message us on WhatsApp to keep creating.";
+        } else {
+          var planName=u.plan.charAt(0).toUpperCase()+u.plan.slice(1);
+          tline.textContent = planName+" plan. "+left+" posts left this month.";
+        }
+      }
       planEl.textContent = u.plan==="trial" ? "Free trial" : (u.plan.charAt(0).toUpperCase()+u.plan.slice(1));
       leftEl.textContent = left+" left";
       barEl.style.width = limit ? Math.min(100,Math.round(used/limit*100))+"%" : "0%";
@@ -7342,6 +7505,7 @@ document.addEventListener("click",function(e){
       document.body.style.left=""; document.body.style.right="";
       document.body.style.width=""; document.body.style.overflow="";
       panel.classList.remove("open");
+      panel.classList.remove("settled");
       scrim.classList.remove("open");
     }catch(e){}
   }
@@ -7374,6 +7538,7 @@ document.addEventListener("click",function(e){
     try{ if(window.google && google.accounts && google.accounts.id) google.accounts.id.disableAutoSelect(); }catch(e){}
     $$("pkSignedIn").style.display="none";
     $$("pkSignedOut").style.display="";
+    if(window.pkRenderGoogleBtn) setTimeout(window.pkRenderGoogleBtn, 40);
     var n=$$("pkAuthNote"); if(n) n.textContent="";
     refreshUsage();
   }
@@ -7383,6 +7548,18 @@ document.addEventListener("click",function(e){
     var saved=JSON.parse(localStorage.getItem("postkit_user")||"null");
     if(saved && saved.email) showUser(saved);
   }catch(e){}
+
+  // render (or re-render) the Google button cleanly
+  window.pkRenderGoogleBtn = function(){
+    var box=$$("pkGoogleBtn");
+    if(!box || !window.google || !google.accounts || !google.accounts.id) return;
+    box.innerHTML = "";                       // stale button markup is what showed as a giant G
+    try{
+      google.accounts.id.renderButton(box, {
+        theme:"outline", size:"large", width:300, text:"signin_with", shape:"pill", logo_alignment:"center"
+      });
+    }catch(e){}
+  };
 
   async function onGoogle(resp){
     var note=$$("pkAuthNote");
@@ -7437,10 +7614,7 @@ document.addEventListener("click",function(e){
           itp_support: true,
           cancel_on_tap_outside: true
         });
-        var w = Math.min(320, Math.max(220, (panel.clientWidth || 340) - 44));
-        google.accounts.id.renderButton($$("pkGoogleBtn"), {
-          theme:"outline", size:"large", width:w, text:"signin_with", shape:"pill", logo_alignment:"center"
-        });
+        window.pkRenderGoogleBtn();
       }catch(e){
         $$("pkAuthNote").textContent="Google sign in is not set up for this site yet.";
       }

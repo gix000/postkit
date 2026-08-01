@@ -35,6 +35,23 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="PostKit">
 <meta name="description" content="Generate ready-to-post Instagram designs and captions with AI. For businesses in Lebanon who don't have time to design.">
+<!-- Open Graph / social share (WhatsApp, Facebook, iMessage, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PostKit">
+<meta property="og:url" content="https://postkitlb.com/">
+<meta property="og:title" content="PostKit — Your AI social media manager">
+<meta property="og:description" content="AI Instagram designs, captions and hashtags in seconds — no designer needed. Try 5 posts free, no card.">
+<meta property="og:image" content="https://postkitlb.com/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PostKit — AI Instagram posts, captions and hashtags in seconds">
+<meta property="og:locale" content="en_US">
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PostKit — Your AI social media manager">
+<meta name="twitter:description" content="AI Instagram designs, captions and hashtags in seconds. Try 5 posts free, no card.">
+<meta name="twitter:image" content="https://postkitlb.com/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="prefetch" href="studio.html" as="document">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&family=Tajawal:wght@500;700&family=Archivo:wght@500;800&family=Fraunces:ital,wght@0,600;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Poppins:wght@600;800&family=Bebas+Neue&family=Montserrat:wght@600;800&family=Lora:ital,wght@0,600;1,500&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=DM+Serif+Display:ital@0;1&family=Anton&family=Abril+Fatface&family=Space+Mono:wght@700&family=Caveat:wght@700&family=Archivo+Black&family=Libre+Baskerville:wght@700&family=Righteous&display=swap" rel="stylesheet">
@@ -83,15 +100,63 @@
     border-color:rgba(25,26,23,.08);
     padding:10px 12px 10px 18px;
     box-shadow:0 14px 34px -18px rgba(25,26,23,.45), 0 1px 0 rgba(255,255,255,.9) inset}
-  /* when scrolled, back the whole bar so hero content can't peek around the pill */
-  body.pk-scrolled header{background:rgba(255,255,255,.9);
-    -webkit-backdrop-filter:saturate(180%) blur(12px);backdrop-filter:saturate(180%) blur(12px)}
+  /* header itself stays fully transparent — only the pill has a surface, so the
+     mascot and hero show through behind it with no visible panel/block */
+  body.pk-scrolled header{background:transparent}
   .logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
   .logo-mark{width:22px;height:22px;background:var(--lime);border-radius:6px;transform:rotate(45deg)}
   .logo-text{font-family:'Archivo',sans-serif;font-weight:800;font-size:18px;letter-spacing:.05em}
   .logo-text em{font-style:normal;color:var(--lime)}
   .nav-cta{background:transparent;border:1px solid var(--lime-dark);color:var(--lime);border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;text-decoration:none;white-space:nowrap}
-  .pk-headbar{flex-wrap:nowrap}
+  /* Studio link: the same rainbow runs through the text and the border ring.
+     The ring is a masked pseudo element, the only way to get a gradient border
+     that keeps rounded corners. The selector is .nav-cta.nav-rainbow so the
+     later plain .nav-cta rule cannot repaint the border on top of it. */
+  .nav-cta.nav-rainbow{
+    position:relative;
+    border-color:transparent !important;
+    background:linear-gradient(90deg,#FF2D55,#FF8A00,#FFD500,#22C55E,#00C2FF,#7C3AED,#FF2D55);
+    background-size:300% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    -webkit-text-fill-color:transparent;
+    animation:navFlow 3s linear infinite;
+  }
+  .nav-cta.nav-rainbow::before{
+    content:"";
+    position:absolute;
+    inset:-1px;                 /* cover the transparent border, not sit inside it */
+    border-radius:999px;
+    padding:1.5px;
+    background:linear-gradient(90deg,#FF2D55,#FF8A00,#FFD500,#22C55E,#00C2FF,#7C3AED,#FF2D55);
+    background-size:300% 100%;
+    -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+    mask-composite:exclude;
+    animation:navFlow 3s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes navFlow{to{background-position:300% 0}}
+  @media (prefers-reduced-motion:reduce){
+    .nav-cta.nav-rainbow,.nav-cta.nav-rainbow::before{animation:none}
+  }
+  .pk-headbar{flex-wrap:nowrap;overflow:hidden}
+  /* Narrow phones: tighten the header so the menu button can never be pushed
+     outside the pill. Nothing is hidden, it just compresses. */
+  @media (max-width:430px){
+    .pk-headbar{gap:6px;padding-left:12px}
+    body.pk-scrolled .pk-headbar{padding:10px 8px 10px 14px}
+    .logo{gap:7px}
+    .logo-mark{width:19px;height:19px}
+    .logo-text{font-size:16px;letter-spacing:.02em}
+    .nav-cta{padding:6px 10px;font-size:12px}
+  }
+  @media (max-width:370px){
+    .logo-text{font-size:15px}
+    .nav-cta{padding:6px 9px;font-size:11.5px}
+  }
   .pk-headbar > div:last-child{flex-shrink:0}
 
   /* ---------- hero ---------- */
@@ -115,6 +180,111 @@
   .step b{background:var(--lime-bg);color:var(--lime);font-family:'Archivo',sans-serif;font-size:16px;min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
   .step div{font-size:14px;color:var(--muted)}
   .step div strong{color:var(--text);display:block;margin-bottom:2px;font-size:15px}
+
+  /* ---------- built-in / everything included ---------- */
+  .bi-head .hl{background:var(--lime-bg);color:var(--lime);border-radius:9px;padding:1px 9px;
+    white-space:nowrap;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .bi-stage{
+    position:relative;margin:6px 0 8px;padding:20px 0;overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  }
+  .bi-track{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1}
+  .bi-row{display:flex;gap:14px;width:max-content;will-change:transform}
+  .bi-row.r1{animation:biL 40s linear infinite}
+  .bi-row.r2{animation:biR 48s linear infinite}
+  .bi-row.r3{animation:biL 44s linear infinite}
+  @keyframes biL{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes biR{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+  .bi-stage:hover .bi-row{animation-play-state:paused}
+  .bi-pill{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;white-space:nowrap;
+    background:#fff;border:1px solid rgba(18,22,55,.05);border-radius:20px;padding:19px 30px;
+    box-shadow:0 5px 14px -8px rgba(20,26,61,.14)}
+  .bi-pill b{font-weight:700;font-size:16.5px;letter-spacing:-.01em;color:#1B2150}
+  .bi-ic{display:none}
+  /* Holo-style: each label gets its own colour, cycling through a palette.
+     Rows are duplicated 6+6, so a 6-step cycle repeats seamlessly at the loop. */
+  .bi-row .bi-pill:nth-child(6n+1) b{color:#2B44DE}
+  .bi-row .bi-pill:nth-child(6n+2) b{color:#0D9488}
+  .bi-row .bi-pill:nth-child(6n+3) b{color:#DB2777}
+  .bi-row .bi-pill:nth-child(6n+4) b{color:#EA580C}
+  .bi-row .bi-pill:nth-child(6n+5) b{color:#7C3AED}
+  .bi-row .bi-pill:nth-child(6n+6) b{color:#2563EB}
+  @media (prefers-reduced-motion:reduce){
+    .bi-row{animation:none!important}
+    .bi-stage{overflow-x:auto;-webkit-overflow-scrolling:touch;
+      -webkit-mask-image:none;mask-image:none}
+  }
+
+  /* ---------- time-saved calculator ---------- */
+  .tc-head{text-align:center;margin:40px 0 0}
+  .tc-eyebrow{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);border:1px solid var(--border);
+    border-radius:999px;padding:5px 12px;margin-bottom:14px}
+  .tc-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1.08;
+    letter-spacing:-.02em;color:var(--text);margin:0 0 10px}
+  .tc-sub{color:var(--muted);font-size:14.5px;line-height:1.5;max-width:360px;margin:0 auto}
+  .tc-card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:18px;
+    margin:22px 0 0;box-shadow:0 1px 2px rgba(25,26,23,.04),0 18px 40px -24px rgba(25,26,23,.22)}
+  .tc-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .tc-stat{background:#F7F7F5;border-radius:16px;padding:16px 16px 15px}
+  .tc-stat .lbl{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .tc-stat .val{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1;color:var(--text)}
+  .tc-stat .val small{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:14px;color:var(--muted);margin-left:5px}
+  .tc-stat.money .val{color:#12A150}
+  .tc-bars{background:#F7F7F5;border-radius:16px;padding:16px;margin-top:12px}
+  .tc-bar+.tc-bar{margin-top:15px}
+  .tc-bar .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
+  .tc-bar .row .name{color:var(--muted);font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tc-bar .row .amt{color:var(--muted);font-weight:600;white-space:nowrap}
+  .tc-bar.pk .row .name{color:var(--text);font-weight:700}
+  .tc-bar.pk .row .amt{color:var(--lime)}
+  .tc-fast{font-size:11px;font-weight:700;color:var(--lime);background:var(--lime-bg);border-radius:999px;padding:3px 9px}
+  .tc-track{height:9px;border-radius:999px;background:#E5E5DF;overflow:hidden}
+  .tc-fill{height:100%;border-radius:999px;width:0;transition:width .55s cubic-bezier(.2,.7,.2,1)}
+  .tc-bar.base .tc-fill{background:#C9C9C2}
+  .tc-bar.pk .tc-fill{background:var(--lime)}
+  .tc-controls{display:grid;grid-template-columns:auto 1fr;gap:24px;margin-top:20px;align-items:start}
+  .tc-controls .clbl{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  .tc-step{display:flex;align-items:center;gap:6px}
+  .tc-step button{width:46px;height:46px;border:1px solid var(--border);background:var(--card);
+    border-radius:14px;font-size:22px;font-weight:500;color:var(--text);display:flex;
+    align-items:center;justify-content:center;line-height:1}
+  .tc-step button:active{background:#F2F2EF}
+  .tc-step .num{font-family:'Archivo',sans-serif;font-weight:800;font-size:24px;min-width:46px;text-align:center;color:var(--text)}
+  .tc-rates{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .tc-rate{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:11px 14px;
+    font-size:14px;font-weight:600;color:var(--muted)}
+  .tc-rate.other{border-style:dashed}
+  .tc-rate.on{border-color:var(--lime);background:var(--lime-bg);color:var(--lime);border-style:solid}
+  .tc-oinput{width:88px;border:1px solid var(--lime);border-radius:12px;padding:11px 12px;
+    font-size:14px;font-weight:600;color:var(--text);font-family:inherit}
+  .tc-note{font-size:12px;color:var(--dim);line-height:1.5;margin-top:16px}
+  .tc-cta{display:block;text-align:center;margin:20px auto 0;max-width:340px;background:var(--lime);
+    color:#fff;text-decoration:none;font-weight:700;font-size:15px;border-radius:999px;padding:15px 24px;
+    box-shadow:0 14px 30px -12px rgba(43,68,222,.55)}
+  .tc-cta-sub{text-align:center;color:var(--dim);font-size:12.5px;margin-top:10px}
+  @media (max-width:439px){.tc-controls{grid-template-columns:1fr;gap:18px}}
+  @media (min-width:560px){.tc-title{font-size:36px}}
+  @media (prefers-reduced-motion:reduce){.tc-fill{transition:none}}
+
+  /* ---------- hero mascot ---------- */
+  .pkm-wrap{display:flex;justify-content:center;margin:2px 0 6px}
+  .pkm{width:min(196px,46vw);height:auto;overflow:visible;animation:pkmFloat 4.2s ease-in-out infinite}
+  .pkm .pkm-eyes{transform-box:fill-box;transform-origin:center;animation:pkmBlink 5.4s ease-in-out infinite}
+  .pkm .pkm-glow{transform-box:fill-box;transform-origin:center;animation:pkmPulse 3.2s ease-in-out infinite}
+  .pkm .pkm-shadow{transform-box:fill-box;transform-origin:center;animation:pkmShadow 4.2s ease-in-out infinite}
+  @keyframes pkmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes pkmShadow{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(.85);opacity:.11}}
+  @keyframes pkmPulse{0%,100%{opacity:.8}50%{opacity:1}}
+  /* quick double-blink, then a long pause with eyes open */
+  @keyframes pkmBlink{0%,90%,100%{transform:scaleY(1)}
+    92.5%{transform:scaleY(.08)}94%{transform:scaleY(1)}
+    95.5%{transform:scaleY(.08)}97%{transform:scaleY(1)}}
+  @media (prefers-reduced-motion:reduce){
+    .pkm,.pkm .pkm-eyes,.pkm .pkm-glow,.pkm .pkm-shadow{animation:none}
+  }
 
   /* ---------- app ---------- */
   .section-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:24px;margin:26px 0 4px}
@@ -439,6 +609,7 @@
   html.pk-intro header + section p,
   html.pk-intro .hero p{animation:pkRise .55s cubic-bezier(.2,.8,.2,1) .26s both}
   html.pk-intro .hero-btns{animation:pkRise .55s cubic-bezier(.2,.8,.2,1) .34s both}
+  html.pk-intro .pkm-wrap{animation:pkRise .55s cubic-bezier(.2,.8,.2,1) .06s both}
   html.pk-intro .hero-btns .btn-primary{
     background-image:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.42) 42%,transparent 62%);
     background-size:220% 100%;background-repeat:no-repeat;
@@ -730,17 +901,47 @@
 .hero p{font-size:15px!important;margin:12px 0 18px!important;max-width:34ch!important}
 .hero-btns .btn-primary,.hero-btns .btn-ghost{padding:12px 20px!important;font-size:15px!important}
 #app.section-title{font-size:22px!important;margin-top:10px!important}
+
+/* mobile first-fold: shrink the mascot and tighten the hero so the composer's
+   textarea and Generate button land within the first screen on phones */
+@media (max-width:480px){
+  .pkm{width:min(122px,32vw)}
+  .pkm-wrap{margin:0!important}
+  .hero{padding-top:14px!important;padding-bottom:10px!important}
+  .hero p{margin:10px 0 14px!important}
+  #app.section-title{margin-top:4px!important}
+  #trialLine{margin-top:4px!important}
+}
 .section-sub{margin-bottom:14px!important}
 /* FAQ accordion */
 #faq.section-title{margin-top:40px;padding-top:26px;border-top:1px solid var(--line)}
-.faq-item{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
-.faq-item summary{list-style:none;cursor:pointer;padding:15px 18px;font-weight:600;font-size:15px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:52px}
-.faq-item summary::after{flex:none;line-height:1;align-self:center}
-.faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary::after{content:"+";font-size:20px;line-height:1;color:var(--muted);font-weight:400}
-.faq-item[open] summary::after{content:"\2212"}
-.faq-item .faq-a{padding:0 18px 16px;color:var(--muted);font-size:14px;line-height:1.55}
-.faq-item .faq-a a{color:var(--lime);font-weight:600}
+/* FAQ accordion — one card, rotating chevron, animated dropdown */
+.faq-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(25,26,23,.04),0 10px 26px -16px rgba(25,26,23,.14)}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item:last-child{border-bottom:none}
+.faq-item>summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;font-size:16px;
+  color:#1B2150;letter-spacing:-.01em;display:flex;justify-content:space-between;align-items:center;
+  gap:16px;min-height:56px}
+/* hover tint only where a real cursor exists, so a tap on mobile never
+   leaves a stuck highlight; warm neutral, not blue */
+@media (hover:hover) and (pointer:fine){
+  .faq-item>summary{transition:background .18s ease}
+  .faq-item>summary:hover{background:#FAFAF8}
+}
+.faq-item>summary::-webkit-details-marker{display:none}
+/* chevron drawn from two borders so it stays crisp and rotates on open */
+.faq-item>summary::after{content:"";flex:none;width:9px;height:9px;margin-right:3px;
+  border-right:2.2px solid #9095BC;border-bottom:2.2px solid #9095BC;border-radius:1px;
+  transform:translateY(-2px) rotate(45deg);transition:transform .32s cubic-bezier(.2,.7,.2,1)}
+.faq-item[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
+.faq-item .faq-a{height:0;overflow:hidden;transition:height .32s cubic-bezier(.2,.7,.2,1)}
+.faq-item[open] .faq-a{height:auto}
+.faq-a-in{padding:0 20px 18px;color:var(--muted);font-size:14.5px;line-height:1.6}
+.faq-a-in a{color:var(--lime);font-weight:600}
+@media (prefers-reduced-motion:reduce){
+  .faq-item .faq-a{transition:none}.faq-item>summary::after{transition:none}
+}
 /* declutter: hide extra helper buttons, keep "Need an idea?" */
 #voiceBtn,#enhanceBtn{display:none!important}
 /* "More ways to generate" collapsible */
@@ -754,9 +955,9 @@ details.acc{background:#fff!important;border:1px solid var(--line)!important}
 details.acc[open]{background:#fff!important;border-color:var(--line)!important}
 
 /* ===== side panel ===== */
-#pkMenuBtn{background:#fff;border:1px solid var(--line);border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s;
+#pkMenuBtn{background:transparent;border:none;border-radius:11px;width:40px;height:36px;font-size:15px;line-height:1;cursor:pointer;color:var(--text);transition:border-color .15s,box-shadow .15s;
   opacity:1!important;animation:none!important;visibility:visible!important}
-#pkMenuBtn:hover{border-color:var(--lime);box-shadow:0 4px 12px -6px rgba(43,68,222,.5)}
+#pkMenuBtn:hover{color:var(--lime)}
 #pkScrim{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(18,18,16,.42);opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:998}
 #pkScrim.open{opacity:1;pointer-events:auto}
 /* a dropdown card that hangs from the header, not a side drawer */
@@ -778,8 +979,8 @@ details.acc[open]{background:#fff!important;border-color:var(--line)!important}
   display:flex;align-items:center;justify-content:space-between;padding:15px 18px;z-index:3;border-bottom:1px solid rgba(0,0,0,.05)}
 .pkp-brand{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:.15em;font-size:14px}
 .pkp-brand em{font-style:normal;color:var(--lime)}
-#pkClose{background:#fff;border:1px solid var(--line);border-radius:9px;width:30px;height:30px;font-size:13px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
-#pkClose:hover{color:var(--text);border-color:var(--lime-dark)}
+#pkClose{background:transparent;border:none;border-radius:9px;width:30px;height:30px;font-size:13px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center}
+#pkClose:hover{color:var(--text)}
 .pkp-sec{padding:18px}
 .pkp-h{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:11px}
 .pkp-note{font-size:12.5px;color:var(--muted);line-height:1.55;margin:8px 0 0}
@@ -900,7 +1101,7 @@ body.pk-panel-open .wa-float{display:none!important}
   .cc-grid > * { flex:initial; max-width:none; }
 
   /* FAQ centered and readable */
-  .faq-item { max-width: 760px; margin-left: auto; margin-right: auto; }
+  .faq-card { max-width: 760px; margin-left: auto; margin-right: auto; }
 
   /* footer links row */
   footer { text-align: center; }
@@ -914,7 +1115,7 @@ body.pk-panel-open .wa-float{display:none!important}
 
 
 /* pure white page: surfaces separate by edge, not by background contrast */
-.card,.plan,.step,details.acc,.faq-item{border-color:var(--border)!important}
+.card,.plan,.step,details.acc,.faq-card{border-color:var(--border)!important}
 details.acc{background:#fff!important}
 #hgComposer{border-color:var(--line)!important;box-shadow:0 1px 2px rgba(25,26,23,.04),0 8px 22px -16px rgba(25,26,23,.16)}
 input,textarea,select{background:#FCFBF9!important;border:1px solid #C9C6BC!important}
@@ -1034,7 +1235,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--lime)!important;
     <div class="pk-headbar">
       <div class="logo"><div class="logo-mark"></div><span class="logo-text">POST<em>KIT</em></span></div>
       <div style="display:flex;align-items:center;gap:8px">
-        <a href="studio.html" class="nav-cta">Studio</a>
+        <a href="studio.html" class="nav-cta nav-rainbow">Studio</a>
         <a href="#pricing" class="nav-cta">Pricing</a>
         <button type="button" id="pkMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="pkPanel">☰</button>
       </div>
@@ -1082,6 +1283,41 @@ input:focus,textarea:focus,select:focus{border-color:var(--lime)!important;
 
   <!-- HERO -->
   <section class="hero">
+    <div class="pkm-wrap" aria-hidden="true">
+      <svg class="pkm" viewBox="0 0 260 250" role="img" aria-label="PostKit mascot">
+        <defs>
+          <linearGradient id="pkmBody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9ECF5"/>
+          </linearGradient>
+          <linearGradient id="pkmVisor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#232A57"/><stop offset="1" stop-color="#0B0F2C"/>
+          </linearGradient>
+          <radialGradient id="pkmEye" cx="0.5" cy="0.4" r="0.62">
+            <stop offset="0" stop-color="#F1F2FF"/>
+            <stop offset="0.34" stop-color="#8E97FF"/>
+            <stop offset="0.72" stop-color="#3B4FE0"/>
+            <stop offset="1" stop-color="#3B4FE0" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="pkmBlur" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="7"/></filter>
+          <filter id="pkmSoft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9"/></filter>
+        </defs>
+        <ellipse class="pkm-shadow" cx="130" cy="230" rx="82" ry="15" fill="#1B2150" filter="url(#pkmSoft)"/>
+        <ellipse cx="130" cy="120" rx="96" ry="93" fill="url(#pkmBody)"/>
+        <ellipse cx="96" cy="66" rx="46" ry="26" fill="#FFFFFF" opacity="0.65" filter="url(#pkmBlur)"/>
+        <path d="M60 100 C60 72 84 62 130 62 C176 62 200 72 200 100 C200 126 192 146 170 152 C156 156 144 150 130 138 C116 150 104 156 90 152 C68 146 60 126 60 100 Z" fill="url(#pkmVisor)"/>
+        <g class="pkm-eyes">
+          <g class="pkm-glow">
+            <ellipse cx="100" cy="107" rx="27" ry="31" fill="url(#pkmEye)" filter="url(#pkmBlur)"/>
+            <ellipse cx="160" cy="107" rx="27" ry="31" fill="url(#pkmEye)" filter="url(#pkmBlur)"/>
+          </g>
+          <ellipse cx="100" cy="107" rx="17" ry="22" fill="url(#pkmEye)"/>
+          <ellipse cx="160" cy="107" rx="17" ry="22" fill="url(#pkmEye)"/>
+        </g>
+        <path d="M113 170 Q130 184 147 170" fill="none" stroke="#0B0F2C" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+        <circle cx="57" cy="118" r="3" fill="#C7CBDA"/>
+        <circle cx="203" cy="118" r="3" fill="#C7CBDA"/>
+      </svg>
+    </div>
     <h1 id="heroTitle" aria-label="Your AI social media manager."><span id="ht1"></span><em id="ht2"></em><span id="ht3"></span><span id="heroCursor">|</span></h1>
     <p>Posts, captions and hashtags in seconds, no designer needed.</p>
     <div class="hero-btns">
@@ -1432,6 +1668,142 @@ input:focus,textarea:focus,select:focus{border-color:var(--lime)!important;
     <div class="step"><b>3</b><div><strong>Download &amp; post</strong>Grab the image, caption and hashtags, ready for Instagram.</div></div>
   </section>
 
+  <!-- EVERYTHING BUILT IN -->
+  <div class="bi-head reveal">
+    <h2 class="section-title">Everything you need is <span class="hl">built-in</span></h2>
+    <p class="section-sub">Captions, designs, hashtags, languages and more, all in one place, ready the moment you type.</p>
+  </div>
+  <div class="bi-stage" role="img" aria-label="PostKit includes captions, hashtags, 14 templates, brand kit, AI images, color palettes, 10+ languages, a content calendar, WhatsApp broadcasts, post ideas, trending topics, voice input, full campaigns, logo overlay, font pairs, layout shuffle, PNG JPG and WEBP export, and month planning.">
+    <div class="bi-track" aria-hidden="true">
+      <div class="bi-row r1">
+        <span class="bi-pill"><span class="bi-ic" style="background:#EEF2FF">✍️</span><b>Captions</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#E6F6EC">#️⃣</span><b>Hashtags</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#FBEFE1">🧩</span><b>14 templates</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#FBE9EC">🎨</span><b>Brand kit</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#F0EBFB">🖼️</span><b>AI images</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#E6F1FB">🌈</span><b>Color palettes</b></span>
+      </div>
+      <div class="bi-row r2">
+        <span class="bi-pill"><span class="bi-ic" style="background:#E6F1FB">🌐</span><b>10+ languages</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#EEF2FF">📅</span><b>Content calendar</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#E6F6EC">💬</span><b>WhatsApp broadcast</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#FBEFE1">✨</span><b>Post ideas</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#FBE9EC">🔥</span><b>Trending topics</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#F0EBFB">🎤</span><b>Voice input</b></span>
+      </div>
+      <div class="bi-row r3">
+        <span class="bi-pill"><span class="bi-ic" style="background:#E6F6EC">🎯</span><b>Full campaigns</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#EEF2FF">🏷️</span><b>Logo overlay</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#F0EBFB">🔤</span><b>Font pairs</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#FBEFE1">🎲</span><b>Shuffle layouts</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#E6F1FB">📥</span><b>PNG · JPG · WEBP</b></span>
+        <span class="bi-pill"><span class="bi-ic" style="background:#FBE9EC">🗓️</span><b>Plan your month</b></span>
+      </div>
+    </div>
+  </div>
+  <script>
+  /* Duplicate each row once so the marquee loops seamlessly at translateX(-50%). */
+  (function(){
+    var rows=document.querySelectorAll(".bi-row");
+    for(var i=0;i<rows.length;i++){ rows[i].innerHTML += rows[i].innerHTML; }
+  })();
+  </script>
+
+  <!-- TIME SAVED CALCULATOR -->
+  <div class="tc-head reveal">
+    <span class="tc-eyebrow">Time saved</span>
+    <h2 class="tc-title">How much time would you save?</h2>
+    <p class="tc-sub">Estimate your time saved. Adjust the inputs to match how you post.</p>
+  </div>
+  <div class="tc-card reveal">
+    <div class="tc-stats">
+      <div class="tc-stat">
+        <div class="lbl">Hours saved</div>
+        <div class="val"><span id="tcHours">8</span><small>hr/mo</small></div>
+      </div>
+      <div class="tc-stat money">
+        <div class="lbl">Cost saved</div>
+        <div class="val">$<span id="tcCost">200</span><small>/mo</small></div>
+      </div>
+    </div>
+    <div class="tc-bars">
+      <div class="tc-bar base">
+        <div class="row"><span class="name">Designing it yourself</span><span class="amt"><span id="tcBaseH">9</span> hr/mo</span></div>
+        <div class="tc-track"><div class="tc-fill" id="tcBaseFill"></div></div>
+      </div>
+      <div class="tc-bar pk">
+        <div class="row"><span class="name">With PostKit <span class="tc-fast">9× faster</span></span><span class="amt"><span id="tcPkH">1</span> hr/mo</span></div>
+        <div class="tc-track"><div class="tc-fill" id="tcPkFill"></div></div>
+      </div>
+    </div>
+    <div class="tc-controls">
+      <div>
+        <div class="clbl">Posts per month</div>
+        <div class="tc-step">
+          <button type="button" id="tcMinus" aria-label="Fewer posts">−</button>
+          <span class="num" id="tcPosts">12</span>
+          <button type="button" id="tcPlus" aria-label="More posts">+</button>
+        </div>
+      </div>
+      <div>
+        <div class="clbl">Your hourly rate</div>
+        <div class="tc-rates" id="tcRates">
+          <button type="button" class="tc-rate on" data-rate="25">$25</button>
+          <button type="button" class="tc-rate" data-rate="50">$50</button>
+          <button type="button" class="tc-rate" data-rate="75">$75</button>
+          <button type="button" class="tc-rate" data-rate="100">$100</button>
+          <button type="button" class="tc-rate other" id="tcOther">Other</button>
+          <input type="number" id="tcOtherInput" class="tc-oinput" min="1" max="999" inputmode="numeric" placeholder="$/hr" style="display:none">
+        </div>
+      </div>
+    </div>
+    <p class="tc-note">A rough estimate: designing, captioning and hashtagging one post by hand takes about 45 minutes, versus a couple of minutes in PostKit. Your numbers will vary.</p>
+  </div>
+  <a class="tc-cta reveal" href="#app">Try it free →</a>
+  <p class="tc-cta-sub reveal">Free to start. Paid plans from $19/month.</p>
+  <script>
+  /* Time-saved estimator. Minutes-per-post are the only assumptions; everything
+     else is derived so the two numbers and the bars always stay consistent. */
+  (function(){
+    var MANUAL=45, PK=5;              // minutes to make one post, by hand vs PostKit
+    var posts=12, rate=25;
+    var $=function(id){return document.getElementById(id);};
+    var clampPosts=function(n){return Math.max(1,Math.min(100,n));};
+    var clampRate=function(n){return Math.max(1,Math.min(999,n));};
+    var fmt=function(n){return n>=10?Math.round(n):Math.round(n*10)/10;};
+    function render(){
+      var baseH=posts*MANUAL/60, pkH=posts*PK/60, savedH=baseH-pkH;
+      $("tcPosts").textContent=posts;
+      $("tcBaseH").textContent=fmt(baseH);
+      $("tcPkH").textContent=fmt(pkH);
+      $("tcHours").textContent=fmt(savedH);
+      $("tcCost").textContent=Math.round(savedH*rate).toLocaleString();
+      $("tcBaseFill").style.width="100%";
+      $("tcPkFill").style.width=(pkH/baseH*100)+"%";
+    }
+    $("tcMinus").addEventListener("click",function(){posts=clampPosts(posts-1);render();});
+    $("tcPlus").addEventListener("click",function(){posts=clampPosts(posts+1);render();});
+    var rates=Array.prototype.slice.call(document.querySelectorAll("#tcRates .tc-rate[data-rate]"));
+    function clearOn(){rates.forEach(function(x){x.classList.remove("on");});$("tcOther").classList.remove("on");}
+    rates.forEach(function(b){
+      b.addEventListener("click",function(){
+        clearOn(); $("tcOtherInput").style.display="none";
+        b.classList.add("on"); rate=+b.dataset.rate; render();
+      });
+    });
+    $("tcOther").addEventListener("click",function(){
+      clearOn(); $("tcOther").classList.add("on");
+      var inp=$("tcOtherInput"); inp.style.display=""; inp.focus();
+      if(inp.value){ rate=clampRate(parseInt(inp.value,10)||rate); render(); }
+    });
+    $("tcOtherInput").addEventListener("input",function(){
+      var v=parseInt(this.value,10);
+      if(!isNaN(v)&&v>0){ rate=clampRate(v); render(); }
+    });
+    render();
+  })();
+  </script>
+
   <!-- PRICING -->
   <h2 class="section-title" id="pricing">Pricing</h2>
   <p class="section-sub">Pay via Whish or OMT. Message us on WhatsApp and your plan is active in minutes.</p>
@@ -1467,7 +1839,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--lime)!important;
   <!-- FAQ -->
   <h2 class="section-title" id="faq">Questions</h2>
   <p class="section-sub">Everything you might be wondering.</p>
-  <div class="reveal">
+  <div class="faq-card reveal">
     <details class="faq-item">
       <summary>Do I need any design skills?</summary>
       <div class="faq-a">None. Describe your post in one line and PostKit designs it, writes the caption and picks the hashtags, ready to post.</div>
@@ -1489,6 +1861,51 @@ input:focus,textarea:focus,select:focus{border-color:var(--lime)!important;
       <div class="faq-a">Pick a plan, message us on <a href="https://wa.me/96179106883" target="_blank" rel="noopener">WhatsApp</a>, pay by Whish or OMT, and we send your access code in minutes.</div>
     </details>
   </div>
+  <script>
+  /* Smooth height-based dropdown for each FAQ row. We drive the toggle
+     ourselves so both opening and closing animate (native <details> snaps). */
+  (function(){
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll(".faq-item").forEach(function(item){
+      var sum = item.querySelector("summary");
+      var a   = item.querySelector(".faq-a");
+      if(!sum || !a) return;
+      // move the answer content into an inner box so its padding is inside
+      // the animated height (a padded height:0 box would still show a gap).
+      var inner = document.createElement("div");
+      inner.className = "faq-a-in";
+      while(a.firstChild){ inner.appendChild(a.firstChild); }
+      a.appendChild(inner);
+      sum.addEventListener("click", function(e){
+        e.preventDefault();
+        if(item._busy) return;
+        var isOpen = item.hasAttribute("open");
+        if(reduce){ isOpen ? item.removeAttribute("open") : item.setAttribute("open",""); return; }
+        item._busy = true;
+        if(!isOpen){
+          item.setAttribute("open","");
+          a.style.height = "0px";
+          var target = a.scrollHeight;          // full content height
+          requestAnimationFrame(function(){ a.style.height = target + "px"; });
+          a.addEventListener("transitionend", function te(ev){
+            if(ev.propertyName !== "height") return;
+            a.style.height = ""; item._busy = false;
+            a.removeEventListener("transitionend", te);
+          });
+        } else {
+          a.style.height = a.scrollHeight + "px";
+          a.offsetHeight;                        // force reflow
+          requestAnimationFrame(function(){ a.style.height = "0px"; });
+          a.addEventListener("transitionend", function te(ev){
+            if(ev.propertyName !== "height") return;
+            item.removeAttribute("open"); a.style.height = ""; item._busy = false;
+            a.removeEventListener("transitionend", te);
+          });
+        }
+      });
+    });
+  })();
+  </script>
 
   <footer>
     <div style="opacity:.75">PostKit • All rights reserved 2026</div>

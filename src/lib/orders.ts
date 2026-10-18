@@ -3,7 +3,6 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { createPayment, getCollectStatus, type WhishCurrency } from "@/lib/whish";
 import { ITEMS, isItemId, type ItemId } from "@/lib/plans";
 import { site } from "@/lib/env";
-import type { Locale } from "@/lib/i18n";
 
 export type OrderRow = {
   id: string;
@@ -37,7 +36,7 @@ async function hasActivePlan(userId: string) {
 }
 
 /** Creates a pending order and returns the Whish URL to send the buyer to. */
-export async function startCheckout(userId: string, itemId: ItemId, locale: Locale) {
+export async function startCheckout(userId: string, itemId: ItemId) {
   if (!isItemId(itemId)) throw new CheckoutError("unknown_item", "Unknown item.");
   const item = ITEMS[itemId];
   if (item.addOn && !(await hasActivePlan(userId))) {
@@ -52,7 +51,7 @@ export async function startCheckout(userId: string, itemId: ItemId, locale: Loca
     .single<OrderRow>();
   if (error || !order) throw new CheckoutError("payment_unavailable", "Could not create the order.");
 
-  const back = `${site.url}/${locale}/checkout/return?order=${order.id}`;
+  const back = `${site.url}/checkout/return?order=${order.id}`;
   const callback = `${site.url}/api/whish/callback?order=${order.id}`;
 
   try {

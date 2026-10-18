@@ -1,10 +1,10 @@
-import { notFound } from "next/navigation";
-import { getDict, isLocale } from "@/lib/i18n";
+import type { Metadata } from "next";
+import { t as dict } from "@/lib/i18n";
 
-export default async function TermsPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  if (!isLocale(locale)) notFound();
-  const t = getDict(locale).terms;
+export const metadata: Metadata = { title: "Terms and refunds — PostKit" };
+
+export default function TermsPage() {
+  const t = dict.terms;
 
   return (
     <div className="page">

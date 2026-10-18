@@ -10,8 +10,6 @@ export const en = {
     faq: "Questions",
     signIn: "Sign in",
     account: "Your account",
-    switchTo: "عربي",
-    switchLabel: "اقرأ الصفحة بالعربي",
   },
   hero: {
     title: "Cut the silences. Keep the dialect.",

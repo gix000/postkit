@@ -1,20 +1,20 @@
 # PostKit — website
 
-Bilingual (English / Arabic) sales and account site for the PostKit Premiere Pro panel.
+Sales and account site for the PostKit Premiere Pro panel.
 Next.js 15 (App Router) on Vercel, Supabase for accounts and data, Whish Pay for checkout.
 
 ## What's in it
 
 | Area | Where |
 | --- | --- |
-| Landing page with live timeline demo, tools, caption styles, pricing, FAQ | `src/app/[locale]/page.tsx` |
-| Email-code sign-in (no passwords) | `src/app/[locale]/login` |
-| Account: plan, downloads, computers, payments, AI credits | `src/app/[locale]/account` |
-| Whish checkout → return page | `src/app/api/checkout`, `src/app/[locale]/checkout` |
+| Landing page with live timeline demo, tools, caption styles, pricing, FAQ | `src/app/page.tsx` |
+| Email-code sign-in (no passwords) | `src/app/login` |
+| Account: plan, downloads, computers, payments, AI credits | `src/app/account` |
+| Whish checkout → return page | `src/app/api/checkout`, `src/app/checkout` |
 | Whish callback (always re-checks status with Whish) | `src/app/api/whish/callback` |
 | Panel licence API: sign in, register computer, heartbeat | `src/app/api/panel/{login,verify,check}` |
 | Prices and plan lengths (one file) | `src/lib/plans.ts` |
-| All copy, both languages | `src/lib/dict/en.ts`, `src/lib/dict/ar.ts` |
+| All site copy | `src/lib/dict/en.ts` |
 | Database schema, RLS and fulfilment function | `supabase/migrations/0001_init.sql` |
 
 ## Set up
@@ -30,7 +30,7 @@ Next.js 15 (App Router) on Vercel, Supabase for accounts and data, Whish Pay for
    - Create a project; copy the URL, anon key and service-role key into `.env.local`.
    - SQL editor → run `supabase/migrations/0001_init.sql`.
    - Authentication → Email templates → **Magic Link**: put the code in the email, e.g.
-     `Your PostKit code is {{ .Token }}`. Sign-in uses the code (6–10 digits, per your Supabase OTP length setting), not the link.
+     `Your PostKit sign-in code is {{ .Token }}` (templates unlock once custom SMTP is set up, e.g. Resend). Sign-in uses the code (6–10 digits, per your Supabase OTP length setting), not the link.
    - Authentication → URL configuration: set the Site URL to your domain.
 
 3. **Licence keys** — run `npm run keys` and paste both lines into `.env.local`.

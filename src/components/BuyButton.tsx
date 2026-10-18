@@ -3,18 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ItemId } from "@/lib/plans";
-import type { Locale } from "@/lib/i18n";
 
 export function BuyButton({
   item,
-  locale,
   label,
   busyLabel,
   errors,
   variant = "primary",
 }: {
   item: ItemId;
-  locale: Locale;
   label: string;
   busyLabel: string;
   errors: Record<string, string>;
@@ -31,11 +28,11 @@ export function BuyButton({
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item, locale }),
+        body: JSON.stringify({ item }),
       });
       if (res.status === 401) {
-        const next = `/${locale}/checkout/start?item=${item}`;
-        router.push(`/${locale}/login?next=${encodeURIComponent(next)}`);
+        const next = `/checkout/start?item=${item}`;
+        router.push(`/login?next=${encodeURIComponent(next)}`);
         return;
       }
       const data = (await res.json()) as { url?: string; error?: string };

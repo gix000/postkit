@@ -1,15 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { fill, getDict, isLocale } from "@/lib/i18n";
+import { fill, t } from "@/lib/i18n";
 import { ITEMS, yearlySavingUsd } from "@/lib/plans";
 import { site } from "@/lib/env";
 import { TimelineDemo } from "@/components/TimelineDemo";
 import { BuyButton } from "@/components/BuyButton";
 
-export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  if (!isLocale(locale)) notFound();
-  const t = getDict(locale);
+export default function Home() {
   const plans = [
     { item: ITEMS.monthly, copy: t.pricing.monthly, note: null as string | null },
     { item: ITEMS.yearly, copy: t.pricing.yearly, note: fill(t.pricing.save, { n: yearlySavingUsd }) },
@@ -39,7 +35,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             pauseLabel={t.hero.demo.pause}
             sequence={t.hero.demo.sequence}
             tracks={t.hero.demo.tracks}
-            locale={locale}
           />
         </div>
       </section>
@@ -129,7 +124,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                   <p className="plan__note">{note ?? " "}</p>
                   <BuyButton
                     item={item.id}
-                    locale={locale}
                     label={fill(t.pricing.pay, { price: item.priceUsd })}
                     busyLabel={t.checkout.redirecting}
                     errors={t.checkout.errors}
@@ -158,7 +152,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               </div>
               <BuyButton
                 item="credits1000"
-                locale={locale}
                 label={t.pricing.credits.pay}
                 busyLabel={t.checkout.redirecting}
                 errors={t.checkout.errors}

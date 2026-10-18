@@ -64,7 +64,6 @@ export function TimelineDemo({
   pauseLabel,
   sequence,
   tracks,
-  locale,
 }: {
   label: string;
   removed: string;
@@ -72,7 +71,6 @@ export function TimelineDemo({
   pauseLabel: string;
   sequence: string;
   tracks: { video: string; audio: string; captions: string };
-  locale: "en" | "ar";
 }) {
   const phrases = useMemo(buildPhrases, []);
   const words = useMemo(() => phrases.flat(), [phrases]);
@@ -125,7 +123,7 @@ export function TimelineDemo({
   );
   const phrase = phrases[phraseIndex];
   const headPct = phase === "play" ? (t / SPEECH_TOTAL) * 100 : 0;
-  const seconds = locale === "ar" ? `${SILENCE_TOTAL.toFixed(1)} ثانية` : `${SILENCE_TOTAL.toFixed(1)} s`;
+  const seconds = `${SILENCE_TOTAL.toFixed(1)} s`;
 
   let speechIndex = -1;
   let wordCursor = 0;

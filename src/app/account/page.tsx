@@ -1,5 +1,5 @@
-import { notFound, redirect } from "next/navigation";
-import { fill, formatDate, getDict, isLocale } from "@/lib/i18n";
+import { redirect } from "next/navigation";
+import { fill, formatDate, t } from "@/lib/i18n";
 import { createUserClient, getUser } from "@/lib/supabase/server";
 import { ITEMS } from "@/lib/plans";
 import { serverEnv, site } from "@/lib/env";
@@ -12,13 +12,10 @@ export const dynamic = "force-dynamic";
 type Device = { id: string; name: string | null; platform: string | null; last_seen_at: string };
 type Order = { id: string; number: number; item: string; amount: number; status: string; created_at: string };
 
-export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
-  if (!isLocale(locale)) notFound();
+export default async function AccountPage() {
   const user = await getUser();
-  if (!user) redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/account`)}`);
+  if (!user) redirect(`/login?next=${encodeURIComponent("/account")}`);
 
-  const t = getDict(locale);
   const a = t.account;
   const supabase = await createUserClient();
 
@@ -48,14 +45,13 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
             <p>
               <span className={`status-dot${active ? " status-dot--on" : ""}`} aria-hidden="true" />
               {!sub && a.plan.none}
-              {sub && active && fill(a.plan.active, { plan: planName, date: formatDate(sub.expires_at, locale) })}
-              {sub && !active && fill(a.plan.expired, { date: formatDate(sub.expires_at, locale) })}
+              {sub && active && fill(a.plan.active, { plan: planName, date: formatDate(sub.expires_at) })}
+              {sub && !active && fill(a.plan.expired, { date: formatDate(sub.expires_at) })}
             </p>
             {sub && <p className="muted">{a.plan.renew}</p>}
             <div className="actions">
               <BuyButton
                 item="monthly"
-                locale={locale}
                 label={`${t.pricing.monthly.name} $${ITEMS.monthly.priceUsd}`}
                 busyLabel={t.checkout.redirecting}
                 errors={t.checkout.errors}
@@ -63,7 +59,6 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
               />
               <BuyButton
                 item="yearly"
-                locale={locale}
                 label={`${t.pricing.yearly.name} $${ITEMS.yearly.priceUsd}`}
                 busyLabel={t.checkout.redirecting}
                 errors={t.checkout.errors}
@@ -104,11 +99,10 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                   <li key={d.id}>
                     <div>
                       <strong dir="auto">{d.name ?? (d.platform ? a.devices.platforms[d.platform] : "—")}</strong>
-                      <span>{fill(a.devices.lastSeen, { date: formatDate(d.last_seen_at, locale) })}</span>
+                      <span>{fill(a.devices.lastSeen, { date: formatDate(d.last_seen_at) })}</span>
                     </div>
                     <form action={removeDevice}>
                       <input type="hidden" name="id" value={d.id} />
-                      <input type="hidden" name="locale" value={locale} />
                       <SubmitButton label={a.devices.remove} busyLabel={a.devices.removing} />
                     </form>
                   </li>
@@ -127,7 +121,6 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                 <div className="actions">
                   <BuyButton
                     item="credits1000"
-                    locale={locale}
                     label={t.pricing.credits.pay}
                     busyLabel={t.checkout.redirecting}
                     errors={t.checkout.errors}
@@ -154,7 +147,7 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
                   <tbody>
                     {(orders as Order[]).map((o) => (
                       <tr key={o.id}>
-                        <td>{formatDate(o.created_at, locale)}</td>
+                        <td>{formatDate(o.created_at)}</td>
                         <td>{a.orders.items[o.item] ?? o.item}</td>
                         <td className="num" dir="ltr">
                           ${Number(o.amount).toFixed(2)}
@@ -172,7 +165,6 @@ export default async function AccountPage({ params }: { params: Promise<{ locale
         </div>
 
         <form action={signOut} className="signout">
-          <input type="hidden" name="locale" value={locale} />
           <SubmitButton label={a.signOut} className="link-button" />
         </form>
       </div>

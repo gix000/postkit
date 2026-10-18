@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { getDict, isLocale } from "@/lib/i18n";
+import { redirect } from "next/navigation";
+import { t } from "@/lib/i18n";
 import { createUserClient, getUser } from "@/lib/supabase/server";
 import { settleOrder } from "@/lib/orders";
 import { AutoRefresh } from "@/components/AutoRefresh";
@@ -8,21 +8,12 @@ import { AutoRefresh } from "@/components/AutoRefresh";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Whish sends the buyer here after paying (or cancelling).
-export default async function CheckoutReturn({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ locale: string }>;
-  searchParams: Promise<{ order?: string }>;
-}) {
-  const { locale } = await params;
-  if (!isLocale(locale)) notFound();
-  const t = getDict(locale);
+export default async function CheckoutReturn({ searchParams }: { searchParams: Promise<{ order?: string }> }) {
   const { order: orderId = "" } = await searchParams;
 
   const user = await getUser();
   if (!user) {
-    redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/checkout/return?order=${orderId}`)}`);
+    redirect(`/login?next=${encodeURIComponent(`/checkout/return?order=${orderId}`)}`);
   }
 
   let status: "paid" | "pending" | "failed" | "missing" = "missing";
@@ -52,11 +43,11 @@ export default async function CheckoutReturn({
           {copy.body}
         </p>
         <div className="actions">
-          <Link className="btn btn--primary" href={`/${locale}/account`}>
+          <Link className="btn btn--primary" href="/account">
             {t.checkout.result.toAccount}
           </Link>
           {status === "failed" && (
-            <Link className="btn btn--quiet" href={`/${locale}#pricing`}>
+            <Link className="btn btn--quiet" href="/#pricing">
               {t.checkout.result.tryAgain}
             </Link>
           )}

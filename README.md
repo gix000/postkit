@@ -30,7 +30,7 @@ Next.js 15 (App Router) on Vercel, Supabase for accounts and data, Whish Pay for
    - Create a project; copy the URL, anon key and service-role key into `.env.local`.
    - SQL editor → run `supabase/migrations/0001_init.sql`.
    - Authentication → Email templates → **Magic Link**: put the code in the email, e.g.
-     `Your PostKit code is {{ .Token }}`. Sign-in uses the 6-digit code, not the link.
+     `Your PostKit code is {{ .Token }}`. Sign-in uses the code (6–10 digits, per your Supabase OTP length setting), not the link.
    - Authentication → URL configuration: set the Site URL to your domain.
 
 3. **Licence keys** — run `npm run keys` and paste both lines into `.env.local`.
@@ -65,7 +65,7 @@ All bodies are JSON. Tokens are ES256 JWTs valid for up to 7 days offline and ne
 
 | Call | Body | Returns |
 | --- | --- | --- |
-| `POST /api/panel/login` | `{ email }` | Emails a 6-digit code |
+| `POST /api/panel/login` | `{ email }` | Emails a sign-in code (6–10 digits) |
 | `POST /api/panel/verify` | `{ email, code, device: { hash, name?, platform? } }` | `{ token, planExpires, credits }` |
 | `POST /api/panel/check` | `{ token }` | Fresh `{ token, planExpires, credits }` — call on launch and daily |
 

@@ -93,12 +93,12 @@ export function LoginForm({ t, next }: { t: Copy; next: string }) {
           dir="ltr"
           inputMode="numeric"
           autoComplete="one-time-code"
-          pattern="\d{6}"
-          maxLength={6}
+          pattern="\d{6,10}"
+          maxLength={10}
           required
           autoFocus
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 10))}
           aria-invalid={!!error}
           aria-describedby={error ? "code-error" : undefined}
         />
@@ -108,7 +108,7 @@ export function LoginForm({ t, next }: { t: Copy; next: string }) {
           </p>
         )}
       </div>
-      <button className="btn btn--primary" type="submit" disabled={busy || code.length !== 6}>
+      <button className="btn btn--primary" type="submit" disabled={busy || code.length < 6}>
         {busy ? t.verifying : t.verify}
       </button>
       <div className="actions">

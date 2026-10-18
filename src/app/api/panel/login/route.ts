@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAnonClient } from "@/lib/supabase/server";
 
-// Panel step 1: email a 6-digit sign-in code.
+// Panel step 1: email a sign-in code.
 const Body = z.object({ email: z.string().email().max(254) });
 
 export async function POST(request: Request) {

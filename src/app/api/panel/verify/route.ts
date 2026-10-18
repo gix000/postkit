@@ -6,7 +6,7 @@ import { registerDevice, issueToken, creditBalance, LicenseError } from "@/lib/l
 // Panel step 2: check the code, register this computer, return a licence token.
 const Body = z.object({
   email: z.string().email().max(254),
-  code: z.string().regex(/^\d{6}$/),
+  code: z.string().regex(/^\d{6,10}$/),
   device: z.object({
     hash: z.string().regex(/^[a-f0-9]{32,128}$/i),
     name: z.string().max(80).optional(),

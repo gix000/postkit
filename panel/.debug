@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Lets you open Chrome DevTools on the panel at http://localhost:8088 while developing. -->
+<ExtensionList>
+  <Extension Id="com.postkit.panel.main">
+    <HostList>
+      <Host Name="PPRO" Port="8088" />
+    </HostList>
+  </Extension>
+</ExtensionList>

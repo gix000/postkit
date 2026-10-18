@@ -138,6 +138,29 @@ export async function refreshToken(token: string) {
   return issueToken(claims.sub, claims.dev, sub);
 }
 
+/** Checks a panel token for a paid action: valid signature, not expired, computer still registered. */
+export async function verifyPanelToken(token: string): Promise<LicenseClaims> {
+  const key = await importSPKI(serverEnv.licensePublicKey(), ALG);
+  let claims: LicenseClaims;
+  try {
+    const { payload } = await jwtVerify(token, key, { issuer: ISSUER });
+    claims = payload as unknown as LicenseClaims;
+  } catch {
+    throw new LicenseError("bad_token", 401, "Sign in again.");
+  }
+  const admin = createAdminClient();
+  const { data: device } = await admin
+    .from("devices")
+    .select("id")
+    .eq("id", claims.dev)
+    .eq("user_id", claims.sub)
+    .maybeSingle();
+  if (!device) {
+    throw new LicenseError("device_removed", 401, "This computer was removed from your account. Sign in again.");
+  }
+  return claims;
+}
+
 export async function creditBalance(userId: string) {
   const admin = createAdminClient();
   const { data } = await admin.from("credit_balances").select("balance").eq("user_id", userId).maybeSingle();

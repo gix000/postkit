@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PostKit</title>
+    <link rel="stylesheet" href="css/panel.css" />
+  </head>
+  <body>
+    <header class="top">
+      <span class="mark">PostKit<i aria-hidden="true"></i></span>
+      <button id="account-btn" class="link" hidden>Account</button>
+    </header>
+
+    <!-- Sign in -->
+    <section id="view-signin" class="view" hidden>
+      <h1>Sign in</h1>
+      <p class="muted">Use the email you bought PostKit with. We'll send you a code.</p>
+      <form id="form-email" class="stack">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" required />
+        <button class="primary" type="submit">Email me a code</button>
+      </form>
+      <form id="form-code" class="stack" hidden>
+        <p class="muted" id="code-sent"></p>
+        <label for="code">Code from the email</label>
+        <input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required />
+        <button class="primary" type="submit">Sign in</button>
+        <button class="link" type="button" id="change-email">Use a different email</button>
+      </form>
+    </section>
+
+    <!-- Main -->
+    <section id="view-main" class="view" hidden>
+      <div class="source">
+        <div class="row">
+          <strong id="seq-name">No sequence open</strong>
+          <button class="link" id="refresh" title="Reload the active sequence">Refresh</button>
+        </div>
+        <div class="grid2">
+          <label>Speech track<select id="a-track"></select></label>
+          <label>Camera track<select id="v-track"></select></label>
+        </div>
+      </div>
+
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="cut" aria-selected="true">Smart cut</button>
+        <button role="tab" data-tab="captions" aria-selected="false">Captions</button>
+        <button role="tab" data-tab="zoom" aria-selected="false">Auto zoom</button>
+      </nav>
+
+      <!-- Smart cut -->
+      <div class="tab" data-panel="cut">
+        <p class="muted">Finds the pauses on the speech track and removes them from a copy of the sequence. Your original stays untouched.</p>
+        <label>Silence below <output id="thr-out">-35 dB</output>
+          <input id="thr" type="range" min="-55" max="-20" step="1" value="-35" />
+        </label>
+        <label>Pauses longer than <output id="min-out">0.40 s</output>
+          <input id="min" type="range" min="0.2" max="1.5" step="0.05" value="0.4" />
+        </label>
+        <label>Keep around speech <output id="pad-out">0.12 s</output>
+          <input id="pad" type="range" min="0" max="0.3" step="0.01" value="0.12" />
+        </label>
+        <div class="actions">
+          <button id="find" class="secondary">Find pauses</button>
+          <button id="cut" class="primary" disabled>Cut on a copy</button>
+        </div>
+        <p class="result" id="cut-result"></p>
+      </div>
+
+      <!-- Captions -->
+      <div class="tab" data-panel="captions" hidden>
+        <div class="grid2">
+          <label>Language
+            <select id="lang">
+              <option value="">Detect automatically</option>
+              <option value="ar">Arabic</option>
+              <option value="en">English</option>
+              <option value="fr">French</option>
+            </select>
+          </label>
+          <label>Words per caption
+            <select id="wpc">
+              <option value="1">1 — one at a time</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+            </select>
+          </label>
+        </div>
+        <div class="actions">
+          <button id="transcribe" class="secondary">Transcribe</button>
+          <button id="add-captions" class="primary" disabled>Add captions</button>
+        </div>
+        <p class="result" id="cap-result"></p>
+        <div id="transcript" class="transcript" dir="auto" hidden></div>
+      </div>
+
+      <!-- Auto zoom -->
+      <div class="tab" data-panel="zoom" hidden>
+        <p class="muted">Changes the framing with each sentence of the transcript, as keyframes on the camera track you can still edit.</p>
+        <div class="grid2">
+          <label>Style
+            <select id="zstyle">
+              <option value="punch">Punch-in cut</option>
+              <option value="push">Slow push</option>
+            </select>
+          </label>
+          <label>Zoom <output id="zamt-out">12%</output>
+            <input id="zamt" type="range" min="4" max="30" step="1" value="12" />
+          </label>
+        </div>
+        <div class="actions">
+          <button id="zoom-clear" class="secondary">Remove zoom</button>
+          <button id="zoom" class="primary">Apply zoom</button>
+        </div>
+        <p class="result" id="zoom-result"></p>
+      </div>
+    </section>
+
+    <!-- Account -->
+    <section id="view-account" class="view" hidden>
+      <h1>Account</h1>
+      <dl class="facts">
+        <dt>Signed in as</dt><dd id="acc-email"></dd>
+        <dt>Plan active until</dt><dd id="acc-until"></dd>
+      </dl>
+      <div class="actions">
+        <button class="secondary" id="back">Back</button>
+        <button class="secondary" id="sign-out">Sign out</button>
+      </div>
+      <p class="muted">Manage your plan and computers at postkitlb.com/account.</p>
+    </section>
+
+    <footer class="status" id="status" role="status" aria-live="polite"></footer>
+
+    <script src="js/main.js"></script>
+  </body>
+</html>

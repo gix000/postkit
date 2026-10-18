@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { preflight, withCors } from "@/lib/cors";
 import { z } from "zod";
 import { createAnonClient } from "@/lib/supabase/server";
 import { registerDevice, issueToken, creditBalance, LicenseError } from "@/lib/license";
@@ -14,24 +15,26 @@ const Body = z.object({
   }),
 });
 
+export const OPTIONS = preflight;
+
 export async function POST(request: Request) {
   const parsed = Body.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: "bad_request" }, { status: 400 });
+  if (!parsed.success) return withCors(NextResponse.json({ error: "bad_request" }, { status: 400 }));
 
   const { data, error } = await createAnonClient().auth.verifyOtp({
     email: parsed.data.email,
     token: parsed.data.code,
     type: "email",
   });
-  if (error || !data.user) return NextResponse.json({ error: "code" }, { status: 401 });
+  if (error || !data.user) return withCors(NextResponse.json({ error: "code" }, { status: 401 }));
 
   try {
     const { deviceId, sub } = await registerDevice(data.user.id, parsed.data.device);
     const license = await issueToken(data.user.id, deviceId, sub);
-    return NextResponse.json({ ...license, credits: await creditBalance(data.user.id) });
+    return withCors(NextResponse.json({ ...license, credits: await creditBalance(data.user.id) }));
   } catch (err) {
     if (err instanceof LicenseError) {
-      return NextResponse.json({ error: err.code, message: err.message }, { status: err.status });
+      return withCors(NextResponse.json({ error: err.code, message: err.message }, { status: err.status }));
     }
     throw err;
   }

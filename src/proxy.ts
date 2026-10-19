@@ -3,8 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /** Keeps the Supabase session cookie fresh on every navigation. */
 export async function proxy(request: NextRequest) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = process.env.NEXT_PUBLIC_HUB_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_HUB_SUPABASE_ANON_KEY;
   let response = NextResponse.next({ request });
   if (!url || !key) return response;
 

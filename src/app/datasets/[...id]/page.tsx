@@ -79,7 +79,7 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
         preview ? (
           <PreviewTable preview={preview} basePath={path} />
         ) : (
-          <div className="rounded-lg border border-dashed border-rule px-6 py-10">
+          <div className="rounded-2xl border border-dashed border-rule px-6 py-10">
             <p className="font-medium">No preview for this dataset.</p>
             <p className="text-sm text-muted mt-1">It may be gated, too large, or in a format the viewer can&apos;t read. Download it from the Files tab.</p>
           </div>
@@ -87,7 +87,7 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
       ) : readme ? (
         <Markdown source={readme} base={fileBase("dataset", ds.id)} />
       ) : (
-        <div className="rounded-lg border border-dashed border-rule px-6 py-10">
+        <div className="rounded-2xl border border-dashed border-rule px-6 py-10">
           <p className="font-medium">This dataset has no card.</p>
           <p className="text-sm text-muted mt-1">Open the Preview tab to see sample rows.</p>
         </div>

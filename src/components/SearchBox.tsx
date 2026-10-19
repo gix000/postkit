@@ -97,7 +97,7 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
         placeholder={compact ? "Search models, datasets…" : "Search models and datasets"}
         className={
           compact
-            ? "w-full h-8 rounded-md border border-rule bg-surface px-3 text-sm placeholder:text-muted focus:outline-none focus:border-cobalt"
+            ? "w-full h-9 rounded-full border border-rule bg-paper/50 px-4 text-sm placeholder:text-muted focus:outline-none focus:border-cobalt"
             : "w-full h-16 rounded-xl border-2 border-ink bg-surface px-5 text-xl placeholder:text-muted focus:outline-none focus:border-cobalt"
         }
       />
@@ -105,7 +105,7 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
         <div
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-lg border border-rule bg-surface shadow-[0_12px_32px_-12px_rgba(16,18,22,0.25)] overflow-hidden"
+          className="glass glass-solid absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl overflow-hidden"
         >
           {visible.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted">{loading ? "Searching…" : "No matches. Press Enter to search all models."}</p>

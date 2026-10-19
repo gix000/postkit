@@ -32,7 +32,7 @@ export default function PreviewTable({ preview, basePath }: { preview: Preview; 
                 key={s.config + s.split}
                 href={`${basePath}?tab=preview&config=${encodeURIComponent(s.config)}&split=${encodeURIComponent(s.split)}`}
                 aria-current={on ? "true" : undefined}
-                className={`rounded-full border px-2.5 py-1 text-[13px] leading-none ${on ? "bg-ink text-paper border-ink" : "border-rule bg-surface hover:border-ink"}`}
+                className={`tap rounded-full border px-3 py-1.5 text-[13px] leading-none ${on ? "bg-ink text-paper border-ink" : "border-rule bg-surface hover:border-ink"}`}
               >
                 {label}
               </Link>
@@ -47,7 +47,7 @@ export default function PreviewTable({ preview, basePath }: { preview: Preview; 
           <p className="text-sm text-muted mb-2">
             First {preview.rows.length} rows of <span className="font-mono">{preview.split.split}</span>
           </p>
-          <div className="rounded-lg border border-rule overflow-auto max-h-[70vh]">
+          <div className="rounded-2xl border border-rule overflow-auto max-h-[70vh]">
             <table className="text-[13px] min-w-full">
               <thead className="bg-surface sticky top-0">
                 <tr>

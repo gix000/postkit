@@ -3,7 +3,7 @@ import { DATASET_TASKS, MODEL_TASKS } from "@/lib/tasks";
 
 export type Fields = { description: string; task: string; license: string; readme: string };
 
-const input = "mt-1 w-full h-10 rounded-md border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt";
+const input = "mt-1 w-full h-10 rounded-xl border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt";
 
 export default function RepoFields({ kind, value, onChange }: { kind: "model" | "dataset"; value: Fields; onChange: (v: Fields) => void }) {
   const tasks = kind === "model" ? MODEL_TASKS : DATASET_TASKS;
@@ -64,7 +64,7 @@ export default function RepoFields({ kind, value, onChange }: { kind: "model" | 
           value={value.readme}
           onChange={(e) => onChange({ ...value, readme: e.target.value })}
           placeholder={"## What it does\n\n## How it was trained\n\n## Limitations"}
-          className="mt-1 w-full rounded-md border border-rule bg-surface px-3 py-2 font-mono text-[13px] leading-relaxed focus:outline-none focus:border-cobalt"
+          className="mt-1 w-full rounded-xl border border-rule bg-surface px-3 py-2 font-mono text-[13px] leading-relaxed focus:outline-none focus:border-cobalt"
         />
       </div>
     </>

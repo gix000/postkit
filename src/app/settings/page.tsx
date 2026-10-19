@@ -24,7 +24,7 @@ export default async function SettingsPage() {
         </p>
       )}
       <form action="/auth/signout" method="post" className="mt-12 border-t border-rule pt-6">
-        <button className="h-10 px-4 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink">Sign out</button>
+        <button className="tap h-10 px-4 rounded-full border border-rule bg-surface text-sm font-medium hover:border-ink">Sign out</button>
       </form>
     </div>
   );

@@ -51,7 +51,7 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
           {mode && (
             <Link
               href={`/create?mode=${mode}&model=${encodeURIComponent(model.id)}`}
-              className="btn-neon inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold"
+              className="tap btn-neon inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold"
             >
               {mode === "chat" ? "Chat with this model" : mode === "video" ? "Create a video" : "Create a photo"}
             </Link>
@@ -79,7 +79,7 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
       ) : readme ? (
         <Markdown source={readme} base={fileBase("model", model.id)} />
       ) : (
-        <div className="rounded-lg border border-dashed border-rule px-6 py-10">
+        <div className="rounded-2xl border border-dashed border-rule px-6 py-10">
           <p className="font-medium">This model has no card.</p>
           <p className="text-sm text-muted mt-1">Check the Files tab to see what the repo contains.</p>
         </div>

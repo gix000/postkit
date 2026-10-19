@@ -21,7 +21,7 @@ export default function SaveButton({ refId, kind, label, path, initialSaved, cou
 
   const shownCount = count + (optimistic ? 1 : 0) - (initialSaved ? 1 : 0);
   const cls =
-    "inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium tabular-nums " +
+    "inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-sm font-medium tabular-nums " +
     (optimistic ? "border-cobalt bg-cobalt-soft text-cobalt" : "border-rule bg-surface hover:border-ink");
 
   if (!signedIn) {

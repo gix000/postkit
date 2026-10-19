@@ -33,11 +33,11 @@ export default async function ProfilePage({ params }: PageProps<"/u/[username]">
         {profile.bio && <p className="mt-3">{profile.bio}</p>}
         {isMe && (
           <div className="mt-5 flex flex-wrap gap-2">
-            <Link href="/settings" className="inline-flex h-9 items-center rounded-md border border-rule bg-surface px-3 text-sm font-medium hover:border-ink">
+            <Link href="/settings" className="tap inline-flex h-9 items-center rounded-full border border-rule bg-surface px-3 text-sm font-medium hover:border-ink">
               Edit profile
             </Link>
             <form action="/auth/signout" method="post">
-              <button className="inline-flex h-9 items-center rounded-md px-3 text-sm text-muted hover:text-ink">Sign out</button>
+              <button className="tap inline-flex h-9 items-center rounded-full px-3 text-sm text-muted hover:text-ink">Sign out</button>
             </form>
           </div>
         )}
@@ -54,7 +54,7 @@ export default async function ProfilePage({ params }: PageProps<"/u/[username]">
             )}
           </div>
           {repos.length ? (
-            <ul className="rounded-lg border border-rule overflow-hidden">
+            <ul className="rounded-2xl border border-rule overflow-hidden">
               {repos.map((r) => (
                 <RepoRow
                   key={r.id}
@@ -70,7 +70,7 @@ export default async function ProfilePage({ params }: PageProps<"/u/[username]">
         <section>
           <h2 className="text-2xl font-semibold tracking-tight mb-3">Saved</h2>
           {saves.length ? (
-            <ul className="rounded-lg border border-rule overflow-hidden">
+            <ul className="rounded-2xl border border-rule overflow-hidden">
               {saves.map((s) => (
                 <RepoRow key={s.ref} r={{ id: s.label, href: saveHref(s), task: s.kind === "model" ? "Model" : "Dataset", community: s.ref.startsWith("pk:") }} />
               ))}

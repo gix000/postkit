@@ -59,7 +59,7 @@ export function FilePicker({ files, setFiles }: { files: File[]; setFiles: (f: F
           setOver(false);
           setFiles([...files, ...Array.from(e.dataTransfer.files)]);
         }}
-        className={`block rounded-lg border-2 border-dashed px-6 py-8 text-center cursor-pointer ${over ? "border-cobalt bg-cobalt-soft" : "border-rule bg-surface"}`}
+        className={`block rounded-2xl border-2 border-dashed px-6 py-8 text-center cursor-pointer ${over ? "border-cobalt bg-cobalt-soft" : "border-rule bg-surface"}`}
       >
         <span className="font-medium">Drop files here or choose them</span>
         <span className="block text-sm text-muted mt-1">Weights, configs, CSV, Parquet, JSON — up to your Supabase file limit.</span>
@@ -71,7 +71,7 @@ export function FilePicker({ files, setFiles }: { files: File[]; setFiles: (f: F
         />
       </label>
       {files.length > 0 && (
-        <ul className="mt-3 text-sm divide-y divide-rule rounded-md border border-rule">
+        <ul className="mt-3 text-sm divide-y divide-rule rounded-xl border border-rule">
           {files.map((f, i) => (
             <li key={i} className="flex justify-between gap-3 px-3 py-2">
               <span className="font-mono text-[13px] truncate">{f.name}</span>

@@ -35,7 +35,7 @@ export default function RepoRow({ r }: { r: RowData }) {
   const name = rest.join("/");
   return (
     <li className="border-b border-rule last:border-b-0">
-      <Link href={r.href} className="group grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-1 px-4 py-3 hover:bg-surface">
+      <Link href={r.href} className="row-tap group grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-1 px-4 py-3 hover:bg-surface">
         <span className="font-mono text-[14px] leading-6 truncate">
           {name ? (
             <>

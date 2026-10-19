@@ -45,7 +45,7 @@ export default function NewRepoForm({ username }: { username: string }) {
           {(["model", "dataset"] as const).map((k) => (
             <label
               key={k}
-              className={`flex-1 cursor-pointer rounded-md border px-4 py-3 ${kind === k ? "border-cobalt bg-cobalt-soft" : "border-rule bg-surface"}`}
+              className={`flex-1 cursor-pointer rounded-xl border px-4 py-3 ${kind === k ? "border-cobalt bg-cobalt-soft" : "border-rule bg-surface"}`}
             >
               <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} className="sr-only" />
               <span className="font-medium">{k === "model" ? "Model" : "Dataset"}</span>
@@ -59,7 +59,7 @@ export default function NewRepoForm({ username }: { username: string }) {
         <label htmlFor="slug" className="text-sm font-medium">
           Name
         </label>
-        <div className="mt-1 flex items-center rounded-md border border-rule bg-surface focus-within:border-cobalt">
+        <div className="mt-1 flex items-center rounded-xl border border-rule bg-surface focus-within:border-cobalt">
           <span className="pl-3 font-mono text-[14px] text-muted">{username}/</span>
           <input
             id="slug"
@@ -83,7 +83,7 @@ export default function NewRepoForm({ username }: { username: string }) {
       <UploadProgress states={progress} />
       {error && <p className="text-sm text-danger">{error}</p>}
 
-      <button disabled={busy || !slug} className="h-11 px-5 rounded-md bg-ink text-paper text-sm font-medium disabled:opacity-50">
+      <button disabled={busy || !slug} className="tap h-11 px-5 rounded-full bg-ink text-paper text-sm font-medium disabled:opacity-50">
         {busy ? "Publishing…" : `Publish ${kind}`}
       </button>
     </form>

@@ -40,7 +40,7 @@ export default function LoginForm({ next }: { next: string }) {
     router.refresh();
   }
 
-  const input = "w-full h-11 rounded-md border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt";
+  const input = "w-full h-11 rounded-xl border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt";
 
   if (step === "code") {
     return (
@@ -60,7 +60,7 @@ export default function LoginForm({ next }: { next: string }) {
           onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
           className={`${input} font-mono text-lg tracking-[0.3em]`}
         />
-        <button disabled={busy || code.length < 6} className="w-full h-11 rounded-md bg-ink text-paper text-sm font-medium disabled:opacity-50">
+        <button disabled={busy || code.length < 6} className="tap w-full h-11 rounded-full bg-ink text-paper text-sm font-medium disabled:opacity-50">
           {busy ? "Signing in…" : "Sign in"}
         </button>
         <button
@@ -93,7 +93,7 @@ export default function LoginForm({ next }: { next: string }) {
         onChange={(e) => setEmail(e.target.value)}
         className={input}
       />
-      <button disabled={busy} className="w-full h-11 rounded-md bg-ink text-paper text-sm font-medium disabled:opacity-50">
+      <button disabled={busy} className="tap w-full h-11 rounded-full bg-ink text-paper text-sm font-medium disabled:opacity-50">
         {busy ? "Sending code…" : "Email me a sign-in code"}
       </button>
       {error && <p className="text-sm text-danger">{error}</p>}

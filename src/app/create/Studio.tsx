@@ -57,7 +57,7 @@ export default function Studio({
         <div className="glass rounded-2xl px-6 py-10">
           <p className="font-semibold text-lg">Sign in to create.</p>
           <p className="text-sm text-muted mt-1">It&apos;s free. Every photo and video uses AI credits, so creating is for signed-in members.</p>
-          <Link href="/login?next=/create" className="btn-neon mt-5 inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold">
+          <Link href="/login?next=/create" className="tap btn-neon mt-5 inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold">
             Sign in
           </Link>
         </div>
@@ -84,7 +84,7 @@ function ModelPicker({ value, onChange, suggestions, id, browseHref }: { value: 
         value={value}
         onChange={(e) => onChange(e.target.value.trim())}
         spellCheck={false}
-        className="mt-1 w-full h-10 rounded-md border border-rule bg-surface px-3 font-mono text-[13px] focus:outline-none focus:border-cobalt"
+        className="tap mt-1 w-full h-10 rounded-full border border-rule bg-surface px-3 font-mono text-[13px] focus:outline-none focus:border-cobalt"
       />
       <datalist id={`${id}-list`}>
         {suggestions.map((s) => (
@@ -194,7 +194,7 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
             onChange={(e) => setSystem(e.target.value)}
             rows={4}
             placeholder="Optional. e.g. Answer in Lebanese Arabic."
-            className="mt-1 w-full rounded-md border border-rule bg-surface px-3 py-2 text-sm focus:outline-none focus:border-cobalt"
+            className="mt-1 w-full rounded-xl border border-rule bg-surface px-3 py-2 text-sm focus:outline-none focus:border-cobalt"
           />
         </div>
         <div>
@@ -224,7 +224,7 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
         </button>
       </div>
 
-      <div className="rounded-lg border border-rule bg-surface flex flex-col min-h-[60vh]">
+      <div className="rounded-2xl border border-rule bg-surface flex flex-col min-h-[60vh]">
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5" aria-live="polite">
           {messages.length === 0 && (
             <p className="text-muted">Send a message to start. Replies stream in as the model writes them.</p>
@@ -234,7 +234,7 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
               <div
                 className={
                   m.role === "user"
-                    ? "max-w-[85%] rounded-lg bg-ink text-paper px-4 py-2.5 whitespace-pre-wrap"
+                    ? "max-w-[85%] rounded-2xl bg-ink text-paper px-4 py-2.5 whitespace-pre-wrap"
                     : "max-w-[72ch] whitespace-pre-wrap leading-relaxed"
                 }
               >
@@ -267,14 +267,14 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
             }}
             rows={1}
             placeholder="Message the model"
-            className="flex-1 resize-none rounded-md border border-rule bg-paper px-3 py-2.5 focus:outline-none focus:border-cobalt"
+            className="flex-1 resize-none rounded-xl border border-rule bg-paper px-3 py-2.5 focus:outline-none focus:border-cobalt"
           />
           {busy ? (
-            <button type="button" onClick={() => abortRef.current?.abort()} className="h-11 px-4 rounded-md border border-rule text-sm font-medium">
+            <button type="button" onClick={() => abortRef.current?.abort()} className="tap h-11 px-4 rounded-full border border-rule text-sm font-medium">
               Stop
             </button>
           ) : (
-            <button disabled={!input.trim()} className="btn-neon h-11 px-4 rounded-md text-sm font-semibold disabled:opacity-40">
+            <button disabled={!input.trim()} className="tap btn-neon h-11 px-4 rounded-full text-sm font-semibold disabled:opacity-40">
               Send
             </button>
           )}
@@ -361,7 +361,7 @@ function MediaGen({
           suggestions={isVideo ? VIDEO_SUGGESTIONS : PHOTO_SUGGESTIONS}
           browseHref={isVideo ? "/models?task=text-to-video" : "/models?task=text-to-image"}
         />
-        <button disabled={busy || !prompt.trim()} className="btn-neon h-12 w-full rounded-full text-[15px] font-semibold disabled:opacity-40">
+        <button disabled={busy || !prompt.trim()} className="tap btn-neon h-12 w-full rounded-full text-[15px] font-semibold disabled:opacity-40">
           {busy ? (isVideo ? "Making your video… this can take a few minutes" : "Making your photo…") : isVideo ? "Create video" : "Create photo"}
         </button>
         {error && <p className="text-sm text-danger">{error}</p>}

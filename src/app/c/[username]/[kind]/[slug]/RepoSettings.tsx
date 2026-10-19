@@ -41,7 +41,7 @@ export default function RepoSettings({
         <h2 className="text-xl font-semibold">Details</h2>
         <RepoFields kind={repo.kind} value={fields} onChange={setFields} />
         <div className="flex items-center gap-3">
-          <button disabled={busy} className="h-10 px-4 rounded-md bg-ink text-paper text-sm font-medium disabled:opacity-50">
+          <button disabled={busy} className="tap h-10 px-4 rounded-full bg-ink text-paper text-sm font-medium disabled:opacity-50">
             Save changes
           </button>
           {saveMsg && <span className="text-sm text-muted" role="status">{saveMsg}</span>}
@@ -64,13 +64,13 @@ export default function RepoSettings({
               router.refresh();
             }
           }}
-          className="h-10 px-4 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink disabled:opacity-50"
+          className="tap h-10 px-4 rounded-full border border-rule bg-surface text-sm font-medium hover:border-ink disabled:opacity-50"
         >
           Upload files
         </button>
       </section>
 
-      <section className="rounded-lg border border-danger/40 p-5 space-y-3">
+      <section className="rounded-2xl border border-danger/40 p-5 space-y-3">
         <h2 className="text-xl font-semibold">Delete this repo</h2>
         <p className="text-sm text-muted">
           This removes the repo, its card and every file. It can&apos;t be undone. Type <span className="font-mono text-ink">{repo.slug}</span> to confirm.
@@ -82,7 +82,7 @@ export default function RepoSettings({
           id="confirm-delete"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="w-full h-10 rounded-md border border-rule bg-surface px-3 font-mono text-[14px] focus:outline-none focus:border-danger"
+          className="tap w-full h-10 rounded-full border border-rule bg-surface px-3 font-mono text-[14px] focus:outline-none focus:border-danger"
         />
         <button
           disabled={confirm !== repo.slug || busy}
@@ -90,7 +90,7 @@ export default function RepoSettings({
             setBusy(true);
             await deleteRepo(repo.id);
           }}
-          className="h-10 px-4 rounded-md bg-danger text-white text-sm font-medium disabled:opacity-40"
+          className="tap h-10 px-4 rounded-full bg-danger text-white text-sm font-medium disabled:opacity-40"
         >
           Delete repo
         </button>

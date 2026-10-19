@@ -8,10 +8,10 @@ export default function NotFound() {
         This repo doesn&apos;t exist, is private, or was renamed. Check the spelling of the owner and name.
       </p>
       <div className="mt-6 flex gap-2">
-        <Link href="/models" className="inline-flex h-10 items-center rounded-md bg-ink text-paper px-4 text-sm font-medium">
+        <Link href="/models" className="tap inline-flex h-10 items-center rounded-full bg-ink text-paper px-4 text-sm font-medium">
           Browse models
         </Link>
-        <Link href="/datasets" className="inline-flex h-10 items-center rounded-md border border-rule bg-surface px-4 text-sm font-medium">
+        <Link href="/datasets" className="tap inline-flex h-10 items-center rounded-full border border-rule bg-surface px-4 text-sm font-medium">
           Browse datasets
         </Link>
       </div>

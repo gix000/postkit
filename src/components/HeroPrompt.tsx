@@ -50,7 +50,7 @@ export default function HeroPrompt() {
             </button>
           ))}
         </div>
-        <button className="btn-neon h-11 px-6 rounded-full text-[15px] font-semibold">Create</button>
+        <button className="tap btn-neon h-11 px-6 rounded-full text-[15px] font-semibold">Create</button>
       </div>
     </form>
   );

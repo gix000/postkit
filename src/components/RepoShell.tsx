@@ -27,7 +27,7 @@ export default function RepoShell({
   const name = rest.join("/");
   return (
     <div>
-      <div className="border-b border-rule bg-surface">
+      <div className="border-b border-rule">
         <div className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-8">
           <p className="text-sm text-muted">{kindLabel}</p>
           <h1 className="font-mono text-[22px] sm:text-[28px] leading-tight mt-1 break-all">
@@ -54,7 +54,7 @@ export default function RepoShell({
                   key={t.id}
                   href={t.href}
                   aria-current={on ? "page" : undefined}
-                  className={`px-3 py-2.5 text-[15px] border-b-2 whitespace-nowrap ${on ? "border-cobalt text-ink font-medium" : "border-transparent text-muted hover:text-ink"}`}
+                  className={`tap px-3 py-2.5 text-[15px] border-b-2 whitespace-nowrap ${on ? "border-cobalt text-ink font-medium" : "border-transparent text-muted hover:text-ink"}`}
                 >
                   {t.label}
                 </Link>
@@ -82,7 +82,7 @@ export function Stat({ label, value }: { label: string; value: ReactNode }) {
 
 export function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-lg border border-rule bg-surface p-4">
+    <section className="glass rounded-2xl p-4">
       <h2 className="text-[15px] font-semibold mb-2">{title}</h2>
       {children}
     </section>
@@ -91,7 +91,7 @@ export function Panel({ title, children }: { title: string; children: ReactNode 
 
 export function CodeBlock({ code }: { code: string }) {
   return (
-    <pre className="font-mono text-[12.5px] leading-relaxed bg-paper border border-rule rounded-md p-3 overflow-x-auto whitespace-pre">
+    <pre className="font-mono text-[12.5px] leading-relaxed bg-paper border border-rule rounded-xl p-3 overflow-x-auto whitespace-pre">
       <code>{code}</code>
     </pre>
   );
@@ -102,7 +102,7 @@ export function FileTable({ files }: { files: { path: string; size?: number; url
     return <p className="text-muted">This repo has no files yet.</p>;
   }
   return (
-    <div className="rounded-lg border border-rule overflow-hidden">
+    <div className="rounded-2xl border border-rule overflow-hidden">
       <table className="w-full text-sm">
         <thead className="bg-surface text-left text-muted">
           <tr>

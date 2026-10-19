@@ -98,7 +98,7 @@ export default async function CommunityRepoPage({ params, searchParams }: Params
       ) : repo.readme ? (
         <Markdown source={repo.readme} />
       ) : (
-        <div className="rounded-lg border border-dashed border-rule px-6 py-10">
+        <div className="rounded-2xl border border-dashed border-rule px-6 py-10">
           <p className="font-medium">No card yet.</p>
           <p className="text-sm text-muted mt-1">
             {isOwner ? (

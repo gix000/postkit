@@ -55,7 +55,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
                     key={t.id}
                     href={href(base, state, { task: on ? undefined : t.id, cursor: undefined })}
                     aria-current={on ? "true" : undefined}
-                    className={`rounded-full border px-2.5 py-1 text-[13px] leading-none ${on ? "bg-ink text-paper border-ink" : "border-rule bg-surface hover:border-ink"}`}
+                    className={`tap rounded-full border px-3 py-1.5 text-[13px] leading-none ${on ? "bg-ink text-paper border-ink" : "border-rule bg-surface hover:border-ink"}`}
                   >
                     {t.label}
                   </Link>
@@ -71,7 +71,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
     <div className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-8 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-x-10 gap-y-6">
       <aside className="lg:sticky lg:top-20 lg:self-start" aria-label="Filters">
         <h1 className="text-[32px] font-semibold tracking-tight leading-none mb-5">{title}</h1>
-        <details className="lg:hidden rounded-lg border border-rule bg-surface">
+        <details className="lg:hidden glass rounded-2xl">
           <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium">
             Filter by task{state.task ? `: ${tasks.find((t) => t.id === state.task)?.label ?? state.task}` : ""}
           </summary>
@@ -93,9 +93,9 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
             name="search"
             defaultValue={state.search}
             placeholder={`Filter ${title.toLowerCase()} by name`}
-            className="h-10 w-full sm:flex-1 rounded-md border border-rule bg-surface px-3 text-[15px] placeholder:text-muted focus:outline-none focus:border-cobalt"
+            className="h-10 w-full sm:flex-1 rounded-xl border border-rule bg-surface px-3 text-[15px] placeholder:text-muted focus:outline-none focus:border-cobalt"
           />
-          <button className="h-10 rounded-md bg-ink text-paper px-4 text-sm font-medium hover:opacity-90">Search</button>
+          <button className="tap h-10 rounded-full bg-ink text-paper px-4 text-sm font-medium hover:opacity-90">Search</button>
         </form>
 
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3 text-sm">
@@ -107,7 +107,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
                   key={s.id}
                   href={href(base, state, { sort: s.id, cursor: undefined })}
                   aria-current={on ? "true" : undefined}
-                  className={`whitespace-nowrap px-2.5 py-1 rounded-md ${on ? "bg-surface border border-rule text-ink font-medium" : "text-muted hover:text-ink border border-transparent"}`}
+                  className={`tap whitespace-nowrap px-3 py-1.5 rounded-full ${on ? "bg-surface border border-rule text-ink font-medium" : "text-muted hover:text-ink border border-transparent"}`}
                 >
                   {s.label}
                 </Link>
@@ -127,7 +127,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
                     key={s.id}
                     href={href(base, state, { source: s.id, cursor: undefined })}
                     aria-current={on ? "true" : undefined}
-                    className={`whitespace-nowrap px-2.5 py-1 rounded-md ${on ? "bg-surface border border-rule text-ink font-medium" : "text-muted hover:text-ink border border-transparent"}`}
+                    className={`tap whitespace-nowrap px-3 py-1.5 rounded-full ${on ? "bg-surface border border-rule text-ink font-medium" : "text-muted hover:text-ink border border-transparent"}`}
                   >
                     {s.label}
                   </Link>
@@ -138,7 +138,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
         </div>
 
         {total === 0 ? (
-          <div className="rounded-lg border border-dashed border-rule px-6 py-10 text-center">
+          <div className="rounded-2xl border border-dashed border-rule px-6 py-10 text-center">
             <p className="font-medium">Nothing matches these filters.</p>
             <p className="text-sm text-muted mt-1">
               Clear the task filter or try a shorter name.{" "}
@@ -148,7 +148,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
             </p>
           </div>
         ) : (
-          <div className="rounded-lg border border-rule bg-paper overflow-hidden">
+          <div className="rounded-2xl border border-rule bg-paper overflow-hidden">
             {showCommunity && community.length > 0 && (
               <ul className="border-b border-rule">
                 {community.map((r) => (
@@ -178,7 +178,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
             {nextCursor && (
               <Link
                 href={href(base, state, { cursor: nextCursor })}
-                className="inline-flex h-9 items-center rounded-md border border-rule bg-surface px-4 font-medium hover:border-ink"
+                className="tap inline-flex h-9 items-center rounded-full border border-rule bg-surface px-4 font-medium hover:border-ink"
               >
                 Next page
               </Link>

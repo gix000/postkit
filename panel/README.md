@@ -1,21 +1,37 @@
-# PostKit panel for Premiere Pro
+# PostKit panel for Premiere Pro — 1.0
 
-A CEP panel for Premiere Pro 2022 and newer (Windows and Mac). Version 0.2 has:
+A CEP panel for Premiere Pro 2022 and newer (Windows and Mac). The home screen is the
+**AI editor**: you say what you want, it looks at the video (transcript, pauses, four stills),
+plans with only the tools the job needs, shows you the plan and a few colour looks, then
+performs it on a copy of the sequence. Around it are 20 tools:
 
-| Tool | What it does | Where it runs |
+| Group | Tool | Runs |
 | --- | --- | --- |
-| Sign-in | Email code; licence token checked offline, refreshed daily | postkitlb.com API |
-| Smart cut | Finds pauses with ffmpeg and ripple-deletes them on a copy of the sequence | Local |
-| Transcription & captions | Word-timed transcript; 1–3 word captions on a new caption track | Server (Groq Whisper) + local |
-| Auto zoom | Scale keyframes on the camera track, one change per sentence | Local |
-| Search & markers | Jump to any spoken word, YouTube chapters, beat markers on the music | Local |
-| Motion presets | 11 moves (pop in, slide, spin, shake, fades…) as keyframes, 3 strengths | Local |
-| Your library | Your own folders of SFX, transitions and overlays; one click to the playhead | Local |
-| Safe zones | The frame under the playhead with TikTok, Reels or Shorts UI drawn over it | Local |
-| Project cleanup | Files loose project items into bins by type, plan shown first | Local |
+| Edit | Smart cut (with crossfades) · Auto zoom · Multicam · Motion presets (29) · Curve editor · Tracking | Local |
+| Text & graphics | Captions (16 animated styles or Premiere captions) · Liquid glass (17) · Animated titles (38) · Motion gallery (95 + AI motion) · Safe zones | Local render; transcription and AI motion on the server |
+| Audio | Studio voice · Sound effects (28 built-in + AI) · Automatic SFX · Auto ducking | Local; AI sounds on the server |
+| Colour & library | Colour looks (10 Lumetri grades) · B-roll (Pexels) · Your library · Search & markers · Project cleanup | Local; b-roll search on the server |
 
-Next: sound effects, automatic SFX, b-roll, studio voice (need ElevenLabs and Pexels keys),
-then the AI editor, motion gallery, animated titles, multicam, curve editor and tracking.
+## How graphics work
+
+`js/gfx/engine.js` draws a scene description (text, shapes, liquid glass, particles,
+keyframes, eases, per-word and per-letter animation, right-to-left Arabic) on a canvas.
+`js/lib/render.js` streams the frames into ffmpeg as ProRes 4444 with alpha (or Animation),
+and the file is placed on a free track above everything at that time. Liquid glass reads
+the camera track's footage under the graphic (`Backdrop`) and blurs and bends it, so the
+glass is real, not a tint.
+
+## Layout
+
+- `index.html`, `css/panel.css` — the panel
+- `js/core.js` — Premiere bridge, state, server calls, transcription, rendering
+- `js/ui.js` — controls, icons, the motion-graphics picker with live previews
+- `js/tools/*.js` — the tools; `js/ai.js` — the AI editor; `js/main.js` — start-up and navigation
+- `js/gfx/` — motion engine, templates, caption styles, fonts, validation of AI scenes
+- `js/lib/` — Node modules (ffmpeg, audio, voice, looks, motion, edit maths, licence…)
+- `jsx/host.jsx` — ExtendScript (ES3) functions Premiere runs
+- `assets/fonts` — 20 open-licence families (Latin + Arabic); `assets/sfx` — synthesised sounds
+- `tools/build-fonts.js`, `tools/build-sfx.js` — rebuild the assets
 
 ## Install (testing)
 
@@ -24,29 +40,8 @@ then the AI editor, motion gallery, animated titles, multicam, curve editor and 
 
 The installer copies the panel to Premiere's extensions folder, turns on loading of
 unsigned panels (`PlayerDebugMode`), and downloads ffmpeg into the panel's `bin` folder.
-Then restart Premiere and open **Window → Extensions → PostKit**.
 
-To see the panel's console while developing, open `http://localhost:8088` in Chrome
-(enabled by `.debug`).
+## Tests
 
-## How it's built
-
-- `index.html`, `css/`, `js/main.js` — the interface (runs in Premiere's browser with Node enabled).
-- `js/lib/` — plain Node modules: licence, ffmpeg, silence, audio, captions, zoom.
-- `jsx/host.jsx` — ExtendScript (ES3) that edits the timeline. Every function returns JSON.
-- `test/` — `node --test panel/test/*.test.js`. `host.test.js` runs the real host script
-  against a simulated timeline, including the linked-clip sync case.
-
-### Smart cut safety
-
-Ripple-deleting **linked** audio/video in Premiere slips the audio's source in-point.
-`pk_cut` therefore unlinks the speech and camera tracks, cuts from the last pause to
-the first, skips any pause where one track has a gap, then relinks each matching pair.
-It always works on a duplicate of the sequence.
-
-## Before selling
-
-- **Sign the panel as a ZXP** (Adobe's `ZXPSignCmd`) so customers don't need debug mode.
-- **ffmpeg licence:** the downloaded builds are third-party. For distribution, ship an
-  LGPL build with its licence notice, or keep downloading it at install time.
-- Plan the UXP port: Adobe will retire CEP in a future Premiere release.
+`node --test test/` — host functions against a simulated Premiere, the motion engine,
+templates, captions, edit maths, audio and rendering (ffmpeg needed for the last one).

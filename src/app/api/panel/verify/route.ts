@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { preflight, withCors } from "@/lib/cors";
+import { features } from "@/lib/panelAuth";
+import { ensureStarterCredits } from "@/lib/credits";
 import { z } from "zod";
 import { createAnonClient } from "@/lib/supabase/server";
 import { registerDevice, issueToken, creditBalance, LicenseError } from "@/lib/license";
@@ -31,7 +33,8 @@ export async function POST(request: Request) {
   try {
     const { deviceId, sub } = await registerDevice(data.user.id, parsed.data.device);
     const license = await issueToken(data.user.id, deviceId, sub);
-    return withCors(NextResponse.json({ ...license, credits: await creditBalance(data.user.id) }));
+    await ensureStarterCredits(data.user.id, sub.plan);
+    return withCors(NextResponse.json({ ...license, credits: await creditBalance(data.user.id), features: features() }));
   } catch (err) {
     if (err instanceof LicenseError) {
       return withCors(NextResponse.json({ error: err.code, message: err.message }, { status: err.status }));

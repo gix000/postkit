@@ -12,7 +12,7 @@ export const site = {
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP ?? "",
   instagram: process.env.NEXT_PUBLIC_INSTAGRAM ?? "",
   supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "",
-  aiEditor: process.env.NEXT_PUBLIC_AI_EDITOR === "1",
+  aiEditor: process.env.NEXT_PUBLIC_AI_EDITOR !== "0",
 };
 
 export const supabaseEnv = {

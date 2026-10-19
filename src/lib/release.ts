@@ -1,8 +1,11 @@
-// The current panel release, stored in the private Supabase Storage bucket "releases".
-// To publish a new version: upload the zip to releases/panel/ and update this file.
+// The current panel release. The zip ships inside the site's server bundle (releases/);
+// the first download uploads it to the private Supabase Storage bucket "releases",
+// and every download after that gets a short-lived signed link to it.
+// To publish a new version: put the zip in releases/ and change the version here.
 export const release = {
-  version: "0.2.0",
+  version: "1.0.0",
   bucket: "releases",
-  path: "panel/PostKit-panel-0.2.zip",
-  fileName: "PostKit-panel-0.2.zip",
+  path: "panel/PostKit-panel-1.0.0.zip",
+  fileName: "PostKit-panel-1.0.0.zip",
+  bundled: "releases/PostKit-panel-1.0.0.zip",
 };

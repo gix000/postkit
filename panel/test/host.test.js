@@ -92,6 +92,7 @@ test("smart cut ripple-deletes the same ranges on audio and video and keeps them
   assert.equal(res.cuts, 2);
   assert.equal(res.skipped, 0);
   assert.equal(res.removedSeconds, 2.5);
+  assert.deepEqual(res.applied, [{ start: 5, end: 6.5 }, { start: 2, end: 3 }]);
   const expected = [[0, 2, 0], [2, 4, 3], [4, 7.5, 6.5]];
   assert.deepEqual(snapshot(P.v[0]), expected);
   assert.deepEqual(snapshot(P.a[0]), expected); // same source in-points → in sync

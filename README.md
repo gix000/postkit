@@ -13,6 +13,8 @@ Next.js 15 (App Router) on Vercel, Supabase for accounts and data, Whish Pay for
 | Whish checkout → return page | `src/app/api/checkout`, `src/app/checkout` |
 | Whish callback (always re-checks status with Whish) | `src/app/api/whish/callback` |
 | Panel licence API: sign in, register computer, heartbeat | `src/app/api/panel/{login,verify,check}` |
+| Panel services: transcription, AI plan, AI motion, b-roll, AI sounds | `src/app/api/panel/{transcribe,ai/plan,ai/motion,broll,sfx}` |
+| AI credits (ledger, costs, refunds) | `src/lib/credits.ts` |
 | Prices and plan lengths (one file) | `src/lib/plans.ts` |
 | All site copy | `src/lib/dict/en.ts` |
 | Database schema, RLS and fulfilment function | `supabase/migrations/0001_init.sql` |
@@ -75,5 +77,10 @@ Errors come back as `{ error, message }`: `no_plan` / `plan_expired` (402), `dev
 ## Switching things on later
 
 - **AI credits** — set `NEXT_PUBLIC_AI_EDITOR=1` to show the credit pack and balance. Plans already grant credits.
-- **Downloads** — upload the panel zip to the private Supabase Storage bucket `releases` (under `panel/`) and update `src/lib/release.ts`. `/api/download` gives active subscribers a 60-second signed link.
+- **Downloads** — put the panel zip in `releases/` and update `src/lib/release.ts`. The first download uploads it to the private Supabase Storage bucket `releases`; every download gets a 60-second signed link.
+- **AI and media** — add `GROQ_API_KEY` (transcription), `ANTHROPIC_API_KEY` (AI editor, AI motion), `PEXELS_API_KEY` (b-roll) and `ELEVENLABS_API_KEY` (AI sounds) in Vercel. The panel hides what isn't switched on.
+
+## AI credits
+
+Plans grant credits (monthly 100, yearly 1,500); the credit pack adds 1,000. A plan from the AI editor costs `12 + 4 per minute` of video, an AI motion 4, an AI sound 6 (`src/lib/credits.ts`). Credits are taken before the AI call and refunded if it fails. Accounts whose plan was set by hand get their plan's credits the first time the panel checks in.
 - **Prices** — edit `src/lib/plans.ts`; the pricing section and checkout both read from it.

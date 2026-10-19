@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<ExtensionManifest Version="7.0" ExtensionBundleId="com.postkit.panel" ExtensionBundleVersion="0.2.0" ExtensionBundleName="PostKit"
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.postkit.panel" ExtensionBundleVersion="1.0.0" ExtensionBundleName="PostKit"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ExtensionList>
-    <Extension Id="com.postkit.panel.main" Version="0.2.0" />
+    <Extension Id="com.postkit.panel.main" Version="1.0.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -34,7 +34,7 @@
           <Type>Panel</Type>
           <Menu>PostKit</Menu>
           <Geometry>
-            <Size><Height>620</Height><Width>340</Width></Size>
+            <Size><Height>760</Height><Width>380</Width></Size>
             <MinSize><Height>400</Height><Width>280</Width></MinSize>
             <MaxSize><Height>2000</Height><Width>800</Width></MaxSize>
           </Geometry>

@@ -64,7 +64,7 @@ test("motion presets land inside the clip, scaled by strength", () => {
   assert.ok(out.opacity[0].time >= 13.5 && out.opacity.at(-1).time < 14);
   const whole = presets.plan("zoom-in", clip, { strength: "subtle" });
   assert.equal(whole.scale.at(-1).value, 105);
-  assert.equal(presets.list().length, 11);
+  assert.equal(presets.list().length, 29);
 });
 
 test("project cleanup files only loose items, by type", () => {

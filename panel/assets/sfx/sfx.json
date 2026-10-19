@@ -1,0 +1,324 @@
+[
+ {
+  "id": "pop",
+  "name": "Pop",
+  "category": "UI",
+  "tags": [
+   "word",
+   "caption",
+   "appear"
+  ],
+  "duration": 0.25,
+  "file": "pop.wav"
+ },
+ {
+  "id": "bubble",
+  "name": "Bubble",
+  "category": "UI",
+  "tags": [
+   "appear",
+   "cute"
+  ],
+  "duration": 0.25,
+  "file": "bubble.wav"
+ },
+ {
+  "id": "click",
+  "name": "Click",
+  "category": "UI",
+  "tags": [
+   "button",
+   "tap"
+  ],
+  "duration": 0.06,
+  "file": "click.wav"
+ },
+ {
+  "id": "tick",
+  "name": "Tick",
+  "category": "UI",
+  "tags": [
+   "timer",
+   "list"
+  ],
+  "duration": 0.07,
+  "file": "tick.wav"
+ },
+ {
+  "id": "swipe",
+  "name": "Swipe",
+  "category": "UI",
+  "tags": [
+   "slide",
+   "screen"
+  ],
+  "duration": 0.18,
+  "file": "swipe.wav"
+ },
+ {
+  "id": "ding",
+  "name": "Ding",
+  "category": "Bells",
+  "tags": [
+   "idea",
+   "correct",
+   "point"
+  ],
+  "duration": 1.4,
+  "file": "ding.wav"
+ },
+ {
+  "id": "chime",
+  "name": "Success chime",
+  "category": "Bells",
+  "tags": [
+   "win",
+   "done",
+   "check"
+  ],
+  "duration": 1.6,
+  "file": "chime.wav"
+ },
+ {
+  "id": "notify",
+  "name": "Notification",
+  "category": "Bells",
+  "tags": [
+   "message",
+   "phone",
+   "alert"
+  ],
+  "duration": 0.6,
+  "file": "notify.wav"
+ },
+ {
+  "id": "coin",
+  "name": "Coin",
+  "category": "Bells",
+  "tags": [
+   "money",
+   "price",
+   "sale"
+  ],
+  "duration": 0.9,
+  "file": "coin.wav"
+ },
+ {
+  "id": "sparkle",
+  "name": "Sparkle",
+  "category": "Bells",
+  "tags": [
+   "magic",
+   "reveal",
+   "new"
+  ],
+  "duration": 1.2,
+  "file": "sparkle.wav"
+ },
+ {
+  "id": "error",
+  "name": "Wrong",
+  "category": "UI",
+  "tags": [
+   "mistake",
+   "no",
+   "fail"
+  ],
+  "duration": 0.5,
+  "file": "error.wav"
+ },
+ {
+  "id": "beep",
+  "name": "Beep",
+  "category": "UI",
+  "tags": [
+   "countdown",
+   "timer"
+  ],
+  "duration": 0.16,
+  "file": "beep.wav"
+ },
+ {
+  "id": "whoosh",
+  "name": "Whoosh",
+  "category": "Transitions",
+  "tags": [
+   "cut",
+   "transition",
+   "fast"
+  ],
+  "duration": 0.6,
+  "file": "whoosh.wav"
+ },
+ {
+  "id": "whoosh-long",
+  "name": "Long whoosh",
+  "category": "Transitions",
+  "tags": [
+   "transition",
+   "scene"
+  ],
+  "duration": 1.1,
+  "file": "whoosh-long.wav"
+ },
+ {
+  "id": "swoosh",
+  "name": "Swoosh",
+  "category": "Transitions",
+  "tags": [
+   "title",
+   "text",
+   "appear"
+  ],
+  "duration": 0.3,
+  "file": "swoosh.wav"
+ },
+ {
+  "id": "riser",
+  "name": "Riser",
+  "category": "Transitions",
+  "tags": [
+   "build",
+   "reveal",
+   "tension"
+  ],
+  "duration": 2,
+  "file": "riser.wav"
+ },
+ {
+  "id": "impact",
+  "name": "Impact",
+  "category": "Hits",
+  "tags": [
+   "hook",
+   "reveal",
+   "boom"
+  ],
+  "duration": 1.8,
+  "file": "impact.wav"
+ },
+ {
+  "id": "thud",
+  "name": "Thud",
+  "category": "Hits",
+  "tags": [
+   "drop",
+   "land"
+  ],
+  "duration": 0.5,
+  "file": "thud.wav"
+ },
+ {
+  "id": "kick",
+  "name": "Kick",
+  "category": "Hits",
+  "tags": [
+   "beat",
+   "punch"
+  ],
+  "duration": 0.5,
+  "file": "kick.wav"
+ },
+ {
+  "id": "clap",
+  "name": "Clap",
+  "category": "Hits",
+  "tags": [
+   "applause",
+   "accent"
+  ],
+  "duration": 0.35,
+  "file": "clap.wav"
+ },
+ {
+  "id": "bass-drop",
+  "name": "Bass drop",
+  "category": "Hits",
+  "tags": [
+   "drop",
+   "dramatic"
+  ],
+  "duration": 2.4,
+  "file": "bass-drop.wav"
+ },
+ {
+  "id": "heartbeat",
+  "name": "Heartbeat",
+  "category": "Hits",
+  "tags": [
+   "tension",
+   "suspense"
+  ],
+  "duration": 0.9,
+  "file": "heartbeat.wav"
+ },
+ {
+  "id": "shutter",
+  "name": "Camera shutter",
+  "category": "Foley",
+  "tags": [
+   "photo",
+   "snapshot"
+  ],
+  "duration": 0.25,
+  "file": "shutter.wav"
+ },
+ {
+  "id": "typing",
+  "name": "Typing",
+  "category": "Foley",
+  "tags": [
+   "text",
+   "search",
+   "type"
+  ],
+  "duration": 1.2,
+  "file": "typing.wav"
+ },
+ {
+  "id": "glitch",
+  "name": "Glitch",
+  "category": "Foley",
+  "tags": [
+   "tech",
+   "error",
+   "digital"
+  ],
+  "duration": 0.45,
+  "file": "glitch.wav"
+ },
+ {
+  "id": "laser",
+  "name": "Laser",
+  "category": "Foley",
+  "tags": [
+   "sci-fi",
+   "zap"
+  ],
+  "duration": 0.4,
+  "file": "laser.wav"
+ },
+ {
+  "id": "boing",
+  "name": "Boing",
+  "category": "Foley",
+  "tags": [
+   "funny",
+   "bounce"
+  ],
+  "duration": 0.8,
+  "file": "boing.wav"
+ },
+ {
+  "id": "record-stop",
+  "name": "Record stop",
+  "category": "Foley",
+  "tags": [
+   "stop",
+   "freeze",
+   "wait"
+  ],
+  "duration": 0.9,
+  "file": "record-stop.wav"
+ }
+]

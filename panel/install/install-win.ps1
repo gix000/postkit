@@ -8,7 +8,7 @@ $Dest = Join-Path $env:APPDATA "Adobe\CEP\extensions\PostKit"
 
 Write-Host "Installing PostKit..."
 New-Item -ItemType Directory -Force -Path $Dest | Out-Null
-foreach ($item in @("CSXS", "css", "js", "jsx", "index.html", ".debug")) {
+foreach ($item in @("CSXS", "css", "js", "jsx", "assets", "index.html", ".debug")) {
   $target = Join-Path $Dest $item
   if (Test-Path $target) { Remove-Item -Recurse -Force $target }
   Copy-Item -Recurse -Force (Join-Path $Src $item) $target

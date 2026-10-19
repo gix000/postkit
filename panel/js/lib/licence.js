@@ -128,9 +128,15 @@ async function requestCode(email) {
 
 async function signIn(email, code) {
   const data = await api("/api/panel/verify", { email, code, device: deviceInfo() });
-  const state = { email, token: data.token, planExpires: data.planExpires, credits: data.credits, checkedAt: Date.now() };
+  const state = { email, token: data.token, planExpires: data.planExpires, credits: data.credits, features: data.features || null, checkedAt: Date.now() };
   save(state);
   return state;
+}
+
+/** Saves a changed credit balance or feature list without a server round trip. */
+function update(patch) {
+  const state = load();
+  if (state) save({ ...state, ...patch });
 }
 
 /**
@@ -144,7 +150,7 @@ async function current({ force = false } = {}) {
   if (due) {
     try {
       const data = await api("/api/panel/check", { token: state.token });
-      const next = { ...state, token: data.token, planExpires: data.planExpires, credits: data.credits, checkedAt: Date.now() };
+      const next = { ...state, token: data.token, planExpires: data.planExpires, credits: data.credits, features: data.features || state.features || null, checkedAt: Date.now() };
       save(next);
       return next;
     } catch (err) {
@@ -158,4 +164,4 @@ async function current({ force = false } = {}) {
   return verifyToken(state.token) ? state : null;
 }
 
-module.exports = { deviceId, deviceInfo, verifyToken, requestCode, signIn, current, signOut: clear, friendly, _storeFile: storeFile };
+module.exports = { update, deviceId, deviceInfo, verifyToken, requestCode, signIn, current, signOut: clear, friendly, _storeFile: storeFile };

@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // The panel installer ships inside the download route's bundle.
+  outputFileTracingIncludes: { "/api/download": ["./releases/**"] },
   async headers() {
     return [
       {

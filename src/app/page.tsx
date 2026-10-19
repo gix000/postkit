@@ -45,14 +45,23 @@ export default function Home() {
             <h2>{t.tools.title}</h2>
             <p>{t.tools.lede}</p>
           </header>
-          <dl className="tools">
-            {t.tools.items.map((tool) => (
-              <div key={tool.name} className="tools__row">
-                <dt>{tool.name}</dt>
-                <dd>{tool.body}</dd>
-              </div>
-            ))}
-          </dl>
+          <div className="tools__ai">
+            <h3>{t.tools.ai.name}</h3>
+            <p>{t.tools.ai.body}</p>
+          </div>
+          {t.tools.groups.map((group) => (
+            <div key={group.name} className="tools__group">
+              <h3 className="tools__group-name">{group.name}</h3>
+              <dl className="tools">
+                {group.items.map((tool) => (
+                  <div key={tool.name} className="tools__row">
+                    <dt>{tool.name}</dt>
+                    <dd>{tool.body}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
           <p className="tools__next">{t.tools.next}</p>
         </div>
       </section>

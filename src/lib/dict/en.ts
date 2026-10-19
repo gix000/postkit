@@ -1,8 +1,8 @@
 export const en = {
   meta: {
-    title: "PostKit — the short-form editing panel for Premiere Pro",
+    title: "PostKit — the AI editor for Premiere Pro",
     description:
-      "PostKit cuts silences, writes word-timed captions in Lebanese Arabic and English, and punches in on every sentence — inside Premiere Pro.",
+      "An AI editor inside Premiere Pro: say what you want and it cuts, captions, adds liquid-glass graphics, sounds and colour — in Lebanese Arabic and English.",
   },
   nav: {
     tools: "Tools",
@@ -12,11 +12,11 @@ export const en = {
     account: "Your account",
   },
   hero: {
-    title: "Cut the silences. Keep the dialect.",
+    title: "Say what you want. Watch it edit.",
     lede:
-      "PostKit is a panel inside Premiere Pro for people who edit reels every day. It removes dead air, writes captions timed to each word in Lebanese Arabic and English, and punches in on every sentence — all on your own timeline, where everything stays editable.",
+      "PostKit is an AI editor inside Premiere Pro. Tell it what you want in plain words; it looks at the video, cuts the pauses and retakes, opens on a hook, adds captions timed to every word, liquid-glass graphics, sounds and a colour grade — on a copy of your sequence, where everything stays editable.",
     ctaPrimary: "Get PostKit",
-    ctaSecondary: "See the six tools",
+    ctaSecondary: "See the tools",
     compat: "Works in Premiere Pro 2022 and newer, on Windows and Mac.",
     demo: {
       label: "PostKit cutting silences and adding captions to a reel",
@@ -28,17 +28,55 @@ export const en = {
     },
   },
   tools: {
-    title: "Six tools in one panel",
-    lede: "Everything runs inside Premiere. Your video never leaves your computer; only the audio goes out, and only when you ask for a transcript.",
-    items: [
-      { name: "Smart cut", body: "Finds every pause, removes it and closes the gap. You choose how long a pause has to be before it goes." },
-      { name: "Transcription", body: "Timing for every single word, in Arabic dialects, English and French — including sentences that switch language halfway." },
-      { name: "Captions", body: "One to three words at a time, timed to the word, on a caption track you edit like any other." },
-      { name: "Caption styles", body: "Styles drawn for Arabic and Latin together, not an English template with Arabic dropped in." },
-      { name: "Auto zoom", body: "A punch-in or a slow push on each sentence, written as real keyframes you can still adjust." },
-      { name: "Safe zones", body: "See where TikTok, Reels and Shorts buttons will cover your frame. Nothing is added to the export." },
+    title: "An AI editor, and 20 tools around it",
+    lede: "Everything runs inside Premiere. Your video stays on your computer; only the audio goes out for a transcript, and a few stills when you ask the AI editor for a plan.",
+    ai: {
+      name: "AI editor",
+      body: "Tell it what you want in plain words. It looks at the video and uses only what the job needs: it transcribes, cuts the repeats and silences, opens on a strong hook, builds animated scenes, drops captions and sounds on the word, and grades the colour — showing you a few looks to pick from first. It picks the style from the kind of video, or from “Your taste” if you set it once. It shows you the plan before it cuts anything, and it works on a copy of the sequence, so your original stays exactly as it was.",
+    },
+    groups: [
+      {
+        name: "Edit",
+        items: [
+          { name: "Smart cut", body: "Finds every pause, removes it and closes the gap, with a soft crossfade on each cut." },
+          { name: "Auto zoom", body: "A punch-in or a slow push on each sentence, written as keyframes you can still adjust." },
+          { name: "Multicam", body: "Listens to each camera's microphone and cuts to whoever is talking. You check the plan first." },
+          { name: "Motion presets", body: "29 moves — slams, whips, bounces, pans — as real keyframes, in three strengths." },
+          { name: "Curve editor", body: "Drag a curve or pick a shape, and it reshapes the move between every pair of keyframes." },
+          { name: "Tracking", body: "Draw a box on something that moves, and your title or sticker follows it. No credits." },
+        ],
+      },
+      {
+        name: "Text & graphics",
+        items: [
+          { name: "Captions", body: "Timed to every word, in Arabic dialects, English and French. 16 animated styles or editable Premiere captions." },
+          { name: "Liquid glass", body: "Glass cards, pills, notifications and buttons that really blur and bend the footage behind them." },
+          { name: "Animated titles", body: "30+ titles and lower thirds — kinetic, neon, 3D, typewriter, bilingual Arabic and English." },
+          { name: "Motion gallery", body: "95 motions: callouts, social cards, counters, transitions. Or describe one and the AI makes it." },
+          { name: "Safe zones", body: "See where TikTok, Reels and Shorts buttons will cover your frame." },
+        ],
+      },
+      {
+        name: "Audio",
+        items: [
+          { name: "Studio voice", body: "Checks your voice for free, then makes it cleaner, warmer and clearer at your platform's loudness." },
+          { name: "Sound effects", body: "28 built-in sounds, or describe one and it's generated for you." },
+          { name: "Automatic SFX", body: "Whooshes on cuts, pops on numbers, swooshes when graphics appear." },
+          { name: "Auto ducking", body: "The music dips under the voice and comes back up in the pauses." },
+        ],
+      },
+      {
+        name: "Colour & library",
+        items: [
+          { name: "Colour looks", body: "10 Lumetri grades, previewed on your own shot before you pick one." },
+          { name: "B-roll", body: "Search free stock video and photos and drop them above your camera." },
+          { name: "Your library", body: "Your own sound effects, transitions and overlays, one click away." },
+          { name: "Search & markers", body: "Jump to any word that's said, make YouTube chapters, mark the beats." },
+          { name: "Project cleanup", body: "Files every loose item into bins by type." },
+        ],
+      },
     ],
-    next: "Coming next: an AI editor that plans the whole cut from one sentence, sound effects placed on the word, and b-roll search.",
+    next: "AI credits only apply to the AI editor, AI motions and generated sounds — every other tool is unlimited. You always see the cost before anything runs.",
   },
   captions: {
     title: "Captions that look designed",
@@ -61,12 +99,13 @@ export const en = {
   },
   pricing: {
     title: "One plan, every tool",
-    lede: "Both terms unlock all six tools with no limits on how often you use them. Pick the length that suits you.",
+    lede: "Both terms unlock the AI editor and every tool. Pick the length that suits you.",
     monthly: { name: "Monthly", per: "/ month" },
     yearly: { name: "Yearly", per: "/ year" },
     save: "Saves ${n} over paying monthly",
     features: [
-      "All six tools, no usage limits",
+      "The AI editor and all 20 tools",
+      "Monthly: 100 AI credits · Yearly: 1,500 AI credits",
       "Transcription included",
       "Free updates while your plan is active",
       "One computer — move it yourself from your account",
@@ -84,7 +123,8 @@ export const en = {
     title: "Questions people ask first",
     items: [
       { q: "Which versions of Premiere does it work with?", a: "Premiere Pro 2022 and newer, on Windows and on Mac with Apple Silicon or Intel." },
-      { q: "Does my footage get uploaded?", a: "No. Cutting, zooms and caption styling run on your computer. Only the audio is sent for transcription, it isn't stored, and nothing else about your project leaves your machine." },
+      { q: "Does my footage get uploaded?", a: "No. Cutting, graphics, glass, voice and colour all run on your computer. The audio is sent for transcription and isn't stored. When you ask the AI editor for a plan, it also sends the transcript and four small stills — never the video." },
+      { q: "What are AI credits?", a: "The AI editor, AI motions and generated sounds use credits; every other tool is free to use as much as you like. A plan for a one-minute reel costs 16 credits, and you see the cost before it runs. Your plan comes with credits, they never expire, and you can buy more." },
       { q: "How accurate are the Arabic captions?", a: "Clear speech comes back accurately, including Lebanese and code-switched sentences. You'll still fix the odd name or brand, which is why captions land as normal editable text." },
       { q: "How does paying with Whish work?", a: "Choose a plan, approve the payment in your Whish account, and you're sent back here with your plan active. If Whish takes a moment to confirm, your account page updates on its own." },
       { q: "I don't use Whish. Can I still buy?", a: "Whish is the only way to pay for now. Message us on WhatsApp and we'll find a way." },

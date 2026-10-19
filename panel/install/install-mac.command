@@ -9,7 +9,7 @@ DEST="$HOME/Library/Application Support/Adobe/CEP/extensions/PostKit"
 echo "Installing PostKit…"
 mkdir -p "$DEST"
 # Copy the panel (keep an existing ffmpeg so updates are quick).
-for item in CSXS css js jsx index.html .debug; do
+for item in CSXS css js jsx assets index.html .debug; do
   rm -rf "$DEST/$item"
   cp -R "$SRC/$item" "$DEST/$item"
 done

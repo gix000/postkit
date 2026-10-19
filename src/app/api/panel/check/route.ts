@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { preflight, withCors } from "@/lib/cors";
+import { features } from "@/lib/panelAuth";
+import { ensureStarterCredits } from "@/lib/credits";
 import { z } from "zod";
 import { decodeJwt } from "jose";
 import { refreshToken, creditBalance, LicenseError } from "@/lib/license";
@@ -15,8 +17,10 @@ export async function POST(request: Request) {
 
   try {
     const license = await refreshToken(parsed.data.token);
-    const userId = decodeJwt(license.token).sub as string;
-    return withCors(NextResponse.json({ ...license, credits: await creditBalance(userId) }));
+    const claims = decodeJwt(license.token);
+    const userId = claims.sub as string;
+    await ensureStarterCredits(userId, String(claims.plan || "monthly"));
+    return withCors(NextResponse.json({ ...license, credits: await creditBalance(userId), features: features() }));
   } catch (err) {
     if (err instanceof LicenseError) {
       return withCors(NextResponse.json({ error: err.code, message: err.message }, { status: err.status }));

@@ -1,36 +1,37 @@
-import type { Metadata, Viewport } from "next";
-import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Noto_Naskh_Arabic } from "next/font/google";
-import { t } from "@/lib/i18n";
-import { site } from "@/lib/env";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
+import type { Metadata } from "next";
 import "./globals.css";
-
-const display = Fraunces({ subsets: ["latin"], variable: "--f-display", axes: ["opsz", "SOFT"] });
-const body = Hanken_Grotesk({ subsets: ["latin"], variable: "--f-body" });
-const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--f-mono" });
-// Arabic is only used inside the caption demos, which show the product's Arabic captions.
-const arabic = Noto_Naskh_Arabic({ subsets: ["arabic"], weight: ["400", "500", "600", "700"], variable: "--f-ar" });
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: t.meta.title,
-  description: t.meta.description,
-  openGraph: { title: t.meta.title, description: t.meta.description, locale: "en_US" },
+  title: { default: "PostKit — open models and datasets", template: "%s · PostKit" },
+  description: "Find open models and datasets, publish your own, and run them in the browser.",
 };
 
-export const viewport: Viewport = { themeColor: "#15140F", colorScheme: "dark" };
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable} ${arabic.variable}`}>
-      <body>
-        <a className="skip" href="#main">
+    <html lang="en" className="h-full">
+      <body className="min-h-full flex flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:bg-surface focus:px-3 focus:py-2"
+        >
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+        <Header />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <footer className="border-t border-rule mt-24">
+          <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-8 text-sm text-muted flex flex-wrap gap-x-6 gap-y-2 justify-between">
+            <span>PostKit Hub</span>
+            <span>
+              Hub data from the public{" "}
+              <a className="underline underline-offset-2" href="https://huggingface.co/docs/hub/api" rel="noreferrer">
+                Hugging Face API
+              </a>
+            </span>
+          </div>
+        </footer>
       </body>
     </html>
   );

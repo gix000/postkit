@@ -1,192 +1,132 @@
 import Link from "next/link";
-import { fill, t } from "@/lib/i18n";
-import { ITEMS, yearlySavingUsd } from "@/lib/plans";
-import { site } from "@/lib/env";
-import { TimelineDemo } from "@/components/TimelineDemo";
-import { BuyButton } from "@/components/BuyButton";
+import SearchBox from "@/components/SearchBox";
+import RepoRow from "@/components/RepoRow";
+import { listDatasets, listModels } from "@/lib/hf";
+import { listCommunity, repoPath } from "@/lib/community";
+import { MODEL_TASKS } from "@/lib/tasks";
+import { supabaseEnabled } from "@/lib/supabase/config";
 
-export default function Home() {
-  const plans = [
-    { item: ITEMS.monthly, copy: t.pricing.monthly, note: null as string | null },
-    { item: ITEMS.yearly, copy: t.pricing.yearly, note: fill(t.pricing.save, { n: yearlySavingUsd }) },
-  ];
+export default async function Home() {
+  const [models, datasets, community] = await Promise.all([
+    listModels({ limit: 8 }),
+    listDatasets({ limit: 6 }),
+    listCommunity({ kind: "model", limit: 5 }),
+  ]);
+
+  const quickTasks = ["text-generation", "text-to-image", "automatic-speech-recognition", "translation", "feature-extraction", "object-detection"];
 
   return (
-    <>
-      <section className="hero">
-        <div className="wrap">
-          <div className="hero__text">
-            <h1 className="hero__title">{t.hero.title}</h1>
-            <p className="hero__lede">{t.hero.lede}</p>
-            <div className="hero__actions">
-              <Link className="btn btn--primary" href="#pricing">
-                {t.hero.ctaPrimary}
-              </Link>
-              <Link className="btn btn--quiet" href="#tools">
-                {t.hero.ctaSecondary}
-              </Link>
-            </div>
-            <p className="hero__compat">{t.hero.compat}</p>
-          </div>
-          <TimelineDemo
-            label={t.hero.demo.label}
-            removed={t.hero.demo.removed}
-            playLabel={t.hero.demo.play}
-            pauseLabel={t.hero.demo.pause}
-            sequence={t.hero.demo.sequence}
-            tracks={t.hero.demo.tracks}
-          />
+    <div>
+      <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14 sm:pt-20 pb-12">
+        <h1 className="text-[44px] sm:text-[72px] lg:text-[88px] font-semibold leading-[0.95] tracking-[-0.035em] max-w-[13ch] [font-variation-settings:'wdth'_85]">
+          Open models, ready to run.
+        </h1>
+        <p className="mt-5 text-lg sm:text-xl text-muted max-w-[52ch]">
+          Browse models and datasets from Hugging Face, publish your own, and test chat and image models in the playground.
+        </p>
+        <div className="mt-8 max-w-[760px]">
+          <SearchBox />
         </div>
-      </section>
-
-      <section id="tools" className="section">
-        <div className="wrap">
-          <header className="section__head">
-            <h2>{t.tools.title}</h2>
-            <p>{t.tools.lede}</p>
-          </header>
-          <div className="tools__ai">
-            <h3>{t.tools.ai.name}</h3>
-            <p>{t.tools.ai.body}</p>
-            <p>{t.tools.ai.files}</p>
-          </div>
-          {t.tools.groups.map((group) => (
-            <div key={group.name} className="tools__group">
-              <h3 className="tools__group-name">{group.name}</h3>
-              <dl className="tools">
-                {group.items.map((tool) => (
-                  <div key={tool.name} className="tools__row">
-                    <dt>{tool.name}</dt>
-                    <dd>{tool.body}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {quickTasks.map((id) => (
+            <Link
+              key={id}
+              href={`/models?task=${id}`}
+              className="rounded-full border border-rule bg-surface px-3 py-1.5 text-sm hover:border-ink"
+            >
+              {MODEL_TASKS.find((t) => t.id === id)?.label}
+            </Link>
           ))}
-          <p className="tools__next">{t.tools.next}</p>
         </div>
       </section>
 
-      <section className="section section--captions">
-        <div className="wrap">
-          <header className="section__head">
-            <h2>{t.captions.title}</h2>
-            <p>{t.captions.lede}</p>
-          </header>
-          <ul className="styles" role="list">
-            {t.captions.styles.map((style, i) => (
-              <li key={style.name} className={`styles__item styles__item--${i + 1}`}>
-                <div className="styles__frame" aria-hidden="true">
-                  <p className="styles__caption" dir="rtl">
-                    {style.name === "Corniche" ? (
-                      <>
-                        <span>بلا ولا سكوت</span>
-                        <span className="styles__latin" dir="ltr">no silence at all</span>
-                      </>
-                    ) : (
-                      t.captions.sample.split(" ").map((w, j) => (
-                        <span key={j} className={j === 1 ? "is-on" : undefined}>
-                          {w}
-                        </span>
-                      ))
-                    )}
-                  </p>
-                </div>
-                <p className="styles__name" dir="ltr">{style.name}</p>
-                <p className="styles__note">{style.note}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="wrap">
-          <header className="section__head">
-            <h2>{t.steps.title}</h2>
-          </header>
-          <ol className="steps">
-            {t.steps.items.map((step) => (
-              <li key={step.title}>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section id="pricing" className="section section--pricing">
-        <div className="wrap">
-          <header className="section__head">
-            <h2>{t.pricing.title}</h2>
-            <p>{t.pricing.lede}</p>
-          </header>
-
-          <div className="pricing">
-            <div className="pricing__plans">
-              {plans.map(({ item, copy, note }) => (
-                <div key={item.id} className={`plan${item.id === "yearly" ? " plan--yearly" : ""}`}>
-                  <h3 className="plan__name">{copy.name}</h3>
-                  <p className="plan__price" dir="ltr">
-                    <span className="plan__amount">${item.priceUsd}</span> <span className="plan__per">{copy.per}</span>
-                  </p>
-                  <p className="plan__note">{note ?? " "}</p>
-                  <BuyButton
-                    item={item.id}
-                    label={fill(t.pricing.pay, { price: item.priceUsd })}
-                    busyLabel={t.checkout.redirecting}
-                    errors={t.checkout.errors}
-                    variant={item.id === "yearly" ? "primary" : "quiet"}
-                  />
-                </div>
+      <section className="mx-auto max-w-[1240px] px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10">
+        <div>
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-2xl font-semibold tracking-tight">Trending models</h2>
+            <Link href="/models" className="text-sm text-cobalt underline underline-offset-2">
+              All models
+            </Link>
+          </div>
+          {models.items.length ? (
+            <ul className="rounded-lg border border-rule overflow-hidden">
+              {models.items.map((m) => (
+                <RepoRow
+                  key={m.id}
+                  r={{ id: m.id, href: `/models/${m.id}`, task: m.pipeline_tag, downloads: m.downloads, likes: m.likes }}
+                />
               ))}
-            </div>
+            </ul>
+          ) : (
+            <Unavailable />
+          )}
+        </div>
 
-            <div className="pricing__details">
-              <ul className="ticks">
-                {t.pricing.features.map((f) => (
-                  <li key={f}>{f}</li>
+        <div className="space-y-10">
+          <div>
+            <div className="flex items-baseline justify-between mb-3">
+              <h2 className="text-2xl font-semibold tracking-tight">Trending datasets</h2>
+              <Link href="/datasets" className="text-sm text-cobalt underline underline-offset-2">
+                All datasets
+              </Link>
+            </div>
+            {datasets.items.length ? (
+              <ul className="rounded-lg border border-rule overflow-hidden">
+                {datasets.items.map((d) => (
+                  <RepoRow key={d.id} r={{ id: d.id, href: `/datasets/${d.id}`, downloads: d.downloads }} />
                 ))}
               </ul>
-              <p className="pricing__fine">{t.pricing.whishNote}</p>
-              <p className="pricing__fine">{t.pricing.noRenew}</p>
-            </div>
+            ) : (
+              <Unavailable />
+            )}
           </div>
 
-          {site.aiEditor && (
-            <div className="credits-pack">
-              <div>
-                <h3>{t.pricing.credits.name}</h3>
-                <p>{t.pricing.credits.body}</p>
+          <div className="rounded-lg bg-ink text-paper p-6">
+            <h2 className="text-2xl font-semibold tracking-tight">Playground</h2>
+            <p className="mt-2 text-paper/75 max-w-[40ch]">
+              Chat with open language models or generate images from a prompt. Pick any supported model from the hub.
+            </p>
+            <Link
+              href="/playground"
+              className="mt-5 inline-flex h-10 items-center rounded-md bg-cobalt text-cobalt-ink px-4 text-sm font-medium hover:opacity-90"
+            >
+              Open the playground
+            </Link>
+          </div>
+
+          {supabaseEnabled && (
+            <div>
+              <div className="flex items-baseline justify-between mb-3">
+                <h2 className="text-2xl font-semibold tracking-tight">New from the community</h2>
+                <Link href="/new" className="text-sm text-cobalt underline underline-offset-2">
+                  Publish a repo
+                </Link>
               </div>
-              <BuyButton
-                item="credits1000"
-                label={t.pricing.credits.pay}
-                busyLabel={t.checkout.redirecting}
-                errors={t.checkout.errors}
-                variant="quiet"
-              />
+              {community.length ? (
+                <ul className="rounded-lg border border-rule overflow-hidden">
+                  {community.map((r) => (
+                    <RepoRow
+                      key={r.id}
+                      r={{ id: `${r.owner?.username}/${r.slug}`, href: repoPath(r), task: r.task, updated: r.updated_at, community: true }}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted text-sm">No community repos yet. Publish the first one.</p>
+              )}
             </div>
           )}
         </div>
       </section>
+    </div>
+  );
+}
 
-      <section id="faq" className="section">
-        <div className="wrap">
-          <header className="section__head">
-            <h2>{t.faq.title}</h2>
-          </header>
-          <div className="faq">
-            {t.faq.items.map((item) => (
-              <details key={item.q}>
-                <summary>{item.q}</summary>
-                <p>{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+function Unavailable() {
+  return (
+    <div className="rounded-lg border border-dashed border-rule px-5 py-8 text-sm">
+      <p className="font-medium">The hub didn&apos;t respond.</p>
+      <p className="text-muted mt-1">Reload the page in a moment. If it keeps failing, add an HF_TOKEN to raise the rate limit.</p>
+    </div>
   );
 }

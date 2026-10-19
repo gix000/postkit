@@ -1,24 +1,32 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { t } from "@/lib/i18n";
-import { getUser } from "@/lib/supabase/server";
-import { LoginForm } from "./LoginForm";
+import LoginForm from "./LoginForm";
+import { first } from "@/lib/format";
+import { getViewer } from "@/lib/supabase/server";
+import { supabaseEnabled } from "@/lib/supabase/config";
 
-/** Only same-site paths are allowed as a destination. */
-function safeNext(next: string | undefined) {
-  return next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : "/account";
+export const metadata: Metadata = { title: "Sign in" };
+
+function safeNext(n?: string) {
+  return n && n.startsWith("/") && !n.startsWith("//") ? n : "/";
 }
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const next = safeNext((await searchParams).next);
-  if (await getUser()) redirect(next);
-
-  return (
-    <div className="page">
-      <div className="wrap">
-        <h1 className="page__title">{t.login.title}</h1>
-        <p className="page__lede">{t.login.lede}</p>
-        <LoginForm t={t.login} next={next} />
+export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  const next = safeNext(first((await searchParams).next));
+  if (!supabaseEnabled) {
+    return (
+      <div className="mx-auto max-w-[420px] px-4 pt-20">
+        <h1 className="text-3xl font-semibold tracking-tight">Accounts are off</h1>
+        <p className="text-muted mt-2">Add the Supabase keys from the README to turn on sign-in, uploads and saves.</p>
       </div>
+    );
+  }
+  if (await getViewer()) redirect(next);
+  return (
+    <div className="mx-auto max-w-[420px] px-4 pt-16 sm:pt-24">
+      <h1 className="text-4xl font-semibold tracking-tight">Sign in to PostKit</h1>
+      <p className="text-muted mt-2 mb-8">Publish models and datasets, save repos to your profile, and use the playground.</p>
+      <LoginForm next={next} />
     </div>
   );
 }

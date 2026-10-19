@@ -1,46 +1,40 @@
 import "server-only";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
-import { serverEnv, supabaseEnv } from "@/lib/env";
+import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseEnabled } from "./config";
 
-type CookieToSet = { name: string; value: string; options: CookieOptions };
-
-/** Acts as the signed-in visitor; row-level security applies. */
-export async function createUserClient() {
-  const cookieStore = await cookies();
-  return createServerClient(supabaseEnv.url, supabaseEnv.anonKey, {
+export async function createClient() {
+  if (!supabaseEnabled) return null;
+  const store = await cookies();
+  return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: (list: CookieToSet[]) => {
+      getAll: () => store.getAll(),
+      setAll: (list) => {
         try {
-          list.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          list.forEach(({ name, value, options }) => store.set(name, value, options));
         } catch {
-          // Called from a Server Component; the middleware refreshes cookies instead.
+          // Called from a Server Component: the proxy refreshes the session instead.
         }
       },
     },
   });
 }
 
-/** Bypasses row-level security. Server code only — orders, fulfilment, licences. */
-export function createAdminClient() {
-  return createClient(supabaseEnv.url, serverEnv.serviceRoleKey(), {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
+export type Profile = {
+  id: string;
+  username: string;
+  display_name: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+};
 
-/** Stateless client for the panel's email-code sign-in (no cookies). */
-export function createAnonClient() {
-  return createClient(supabaseEnv.url, supabaseEnv.anonKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
-
-export async function getUser() {
-  if (!supabaseEnv.configured) return null;
-  const supabase = await createUserClient();
-  // Returns null (never throws) when there is no session or Supabase is unreachable.
-  const { data } = await supabase.auth.getUser();
-  return data.user ?? null;
+export async function getViewer(): Promise<{ id: string; email?: string; profile: Profile | null } | null> {
+  const sb = await createClient();
+  if (!sb) return null;
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return null;
+  const { data: profile } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+  return { id: user.id, email: user.email, profile: (profile as Profile) ?? null };
 }

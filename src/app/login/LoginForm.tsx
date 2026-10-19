@@ -1,131 +1,79 @@
 "use client";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createBrowserSupabase } from "@/lib/supabase/browser";
-import type { Dict } from "@/lib/i18n";
+import { createClient } from "@/lib/supabase/browser";
 
-type Copy = Dict["login"];
-
-export function LoginForm({ t, next }: { t: Copy; next: string }) {
-  const router = useRouter();
-  const [step, setStep] = useState<"email" | "code">("email");
+export default function LoginForm({ next }: { next: string }) {
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
 
-  async function sendCode(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError(t.errors.email);
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    const { error } = await createBrowserSupabase().auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true },
-    });
-    setBusy(false);
-    if (error) {
-      setError(t.errors.send);
-      return;
-    }
-    setCode("");
-    setStep("code");
-  }
+  const redirectTo = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
-  async function verify(e: React.FormEvent) {
+  async function emailLink(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
+    const sb = createClient();
+    if (!sb) return;
+    setState("sending");
     setError(null);
-    const { error } = await createBrowserSupabase().auth.verifyOtp({ email, token: code, type: "email" });
+    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
     if (error) {
-      setBusy(false);
-      setError(t.errors.code);
-      return;
-    }
-    router.replace(next);
-    router.refresh();
+      setError(error.message);
+      setState("idle");
+    } else setState("sent");
   }
 
-  if (step === "email") {
+  async function github() {
+    const sb = createClient();
+    if (!sb) return;
+    const { error } = await sb.auth.signInWithOAuth({ provider: "github", options: { redirectTo: redirectTo() } });
+    if (error) setError(error.message);
+  }
+
+  if (state === "sent") {
     return (
-      <form className="form" onSubmit={sendCode} noValidate>
-        <div className="field">
-          <label htmlFor="email">{t.email}</label>
-          <input
-            id="email"
-            type="email"
-            dir="ltr"
-            autoComplete="email"
-            inputMode="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
-            aria-invalid={!!error}
-            aria-describedby={error ? "login-error" : undefined}
-          />
-          {error && (
-            <p id="login-error" className="form-error" role="alert">
-              {error}
-            </p>
-          )}
-        </div>
-        <button className="btn btn--primary" type="submit" disabled={busy}>
-          {busy ? t.sending : t.sendCode}
-        </button>
-      </form>
+      <div className="rounded-lg border border-rule bg-surface p-6">
+        <p className="font-medium">Check your inbox.</p>
+        <p className="text-sm text-muted mt-1">
+          We sent a sign-in link to <span className="text-ink">{email}</span>. Open it on this device.
+        </p>
+      </div>
     );
   }
 
   return (
-    <form className="form" onSubmit={verify} noValidate>
-      <p className="form-note" role="status">
-        {t.codeSent.replace("{email}", email)}
-      </p>
-      <div className="field">
-        <label htmlFor="code">{t.code}</label>
-        <input
-          id="code"
-          className="code"
-          dir="ltr"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          pattern="\d{6,10}"
-          maxLength={10}
-          required
-          autoFocus
-          value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 10))}
-          aria-invalid={!!error}
-          aria-describedby={error ? "code-error" : undefined}
-        />
-        {error && (
-          <p id="code-error" className="form-error" role="alert">
-            {error}
-          </p>
-        )}
-      </div>
-      <button className="btn btn--primary" type="submit" disabled={busy || code.length < 6}>
-        {busy ? t.verifying : t.verify}
+    <div className="space-y-4">
+      <button
+        onClick={github}
+        className="w-full h-11 rounded-md bg-ink text-paper text-sm font-medium hover:opacity-90"
+      >
+        Continue with GitHub
       </button>
-      <div className="actions">
-        <button type="button" className="link-button" onClick={() => sendCode()} disabled={busy}>
-          {t.resend}
-        </button>
-        <button
-          type="button"
-          className="link-button"
-          onClick={() => {
-            setStep("email");
-            setError(null);
-          }}
-        >
-          {t.changeEmail}
-        </button>
+      <div className="flex items-center gap-3 text-sm text-muted">
+        <span className="h-px flex-1 bg-rule" />
+        or
+        <span className="h-px flex-1 bg-rule" />
       </div>
-    </form>
+      <form onSubmit={emailLink} className="space-y-3">
+        <label htmlFor="email" className="text-sm font-medium block">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full h-11 rounded-md border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt"
+        />
+        <button
+          disabled={state === "sending"}
+          className="w-full h-11 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink disabled:opacity-50"
+        >
+          {state === "sending" ? "Sending link…" : "Email me a sign-in link"}
+        </button>
+      </form>
+      {error && <p className="text-sm text-danger">{error}</p>}
+    </div>
   );
 }

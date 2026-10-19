@@ -1,86 +1,65 @@
-# PostKit — website
+# PostKit Hub
 
-Sales and account site for the PostKit Premiere Pro panel.
-Next.js 15 (App Router) on Vercel, Supabase for accounts and data, Whish Pay for checkout.
+A model and dataset hub built with Next.js 16. It browses everything on the Hugging Face Hub through the public API, hosts your users' own models and datasets, and runs chat and image models in a playground.
 
-## What's in it
+## What's inside
 
-| Area | Where |
-| --- | --- |
-| Landing page with live timeline demo, tools, caption styles, pricing, FAQ | `src/app/page.tsx` |
-| Email-code sign-in (no passwords) | `src/app/login` |
-| Account: plan, downloads, computers, payments, AI credits | `src/app/account` |
-| Whish checkout → return page | `src/app/api/checkout`, `src/app/checkout` |
-| Whish callback (always re-checks status with Whish) | `src/app/api/whish/callback` |
-| Panel licence API: sign in, register computer, heartbeat | `src/app/api/panel/{login,verify,check}` |
-| Panel services: transcription, AI plan, AI motion, b-roll, AI sounds | `src/app/api/panel/{transcribe,ai/plan,ai/motion,broll,sfx}` |
-| AI credits (ledger, costs, refunds) | `src/lib/credits.ts` |
-| Prices and plan lengths (one file) | `src/lib/plans.ts` |
-| All site copy | `src/lib/dict/en.ts` |
-| Database schema, RLS and fulfilment function | `supabase/migrations/0001_init.sql` |
-
-## Set up
-
-1. **Install**
-
-   ```bash
-   npm install
-   cp .env.example .env.local
-   ```
-
-2. **Supabase**
-   - Create a project; copy the URL, anon key and service-role key into `.env.local`.
-   - SQL editor → run `supabase/migrations/0001_init.sql`.
-   - Authentication → Email templates → **Magic Link**: put the code in the email, e.g.
-     `Your PostKit sign-in code is {{ .Token }}` (templates unlock once custom SMTP is set up, e.g. Resend). Sign-in uses the code (6–10 digits, per your Supabase OTP length setting), not the link.
-   - Authentication → URL configuration: set the Site URL to your domain.
-
-3. **Licence keys** — run `npm run keys` and paste both lines into `.env.local`.
-   Ship `LICENSE_PUBLIC_KEY` inside the panel so it can check its token offline.
-
-4. **Run locally** — `npm run dev`. With `WHISH_FAKE=1`, every payment is approved
-   instantly so you can test the whole flow without Whish.
-
-5. **Whish** — ask Whish for merchant (collect) credentials: `channel`, `secret`, and the
-   website URL they register. Test in `WHISH_MODE=sandbox` with `WHISH_FAKE=0`.
-   Sandbox test payer: phone `96170902894`, OTP `111111`.
-   Before going live, confirm the endpoints in `src/lib/whish.ts` against the documentation
-   Whish sends you — they come from a community client, not official docs.
-
-6. **Deploy** — push to GitHub, import into Vercel, add every variable from `.env.example`,
-   set `NEXT_PUBLIC_SITE_URL` to the live domain, `WHISH_MODE=production`, `WHISH_FAKE=0`.
-
-## How a payment works
-
-1. Buyer picks a plan → `POST /api/checkout` creates a `pending` order and asks Whish for a payment page.
-2. Buyer approves in Whish → Whish calls `/api/whish/callback?order=…` and sends the buyer to `/checkout/return`.
-3. Both places call `settleOrder`, which asks Whish for the real status. On `success`,
-   the database function `fulfil_order` marks the order paid and extends the plan **once**,
-   however many times it's called.
-4. If Whish is slow, the return page keeps checking every few seconds.
-
-Paying again adds a new term to the end of the current one. Nothing renews automatically.
-
-## Panel licence API
-
-All bodies are JSON. Tokens are ES256 JWTs valid for up to 7 days offline and never past the plan's end.
-
-| Call | Body | Returns |
+| Area | What it does | Built on |
 | --- | --- | --- |
-| `POST /api/panel/login` | `{ email }` | Emails a sign-in code (6–10 digits) |
-| `POST /api/panel/verify` | `{ email, code, device: { hash, name?, platform? } }` | `{ token, planExpires, credits }` |
-| `POST /api/panel/check` | `{ token }` | Fresh `{ token, planExpires, credits }` — call on launch and daily |
+| Models | Search, task filters, sort, pagination, model cards, file lists, "Use this model" code | Hugging Face Hub API |
+| Datasets | Same as models, plus a preview table of the first rows of each split | Hub API + datasets-server |
+| Community repos | Signed-in users publish models/datasets with a card and files | Supabase (Postgres + Storage) |
+| Accounts | GitHub or email-link sign-in, profiles, saved repos | Supabase Auth |
+| Playground | Streaming chat and text-to-image with any supported model | Hugging Face Inference Providers |
 
-Errors come back as `{ error, message }`: `no_plan` / `plan_expired` (402), `device_limit` (409),
-`device_removed` / `bad_token` (401). `device.hash` is a 32–128 character hex fingerprint of the machine.
+## Run it locally
 
-## Switching things on later
+```bash
+npm install
+cp .env.example .env.local   # fill in the keys below
+npm run dev
+```
 
-- **AI credits** — set `NEXT_PUBLIC_AI_EDITOR=1` to show the credit pack and balance. Plans already grant credits.
-- **Downloads** — put the panel zip in `releases/` and update `src/lib/release.ts`. The first download uploads it to the private Supabase Storage bucket `releases`; every download gets a 60-second signed link.
-- **AI and media** — add `GROQ_API_KEY` (transcription), `ANTHROPIC_API_KEY` (AI editor, AI motion), `PEXELS_API_KEY` (b-roll) and `ELEVENLABS_API_KEY` (AI sounds) in Vercel. The panel hides what isn't switched on.
+Open http://localhost:3000. The hub works with no keys at all; accounts and the playground switch on as you add them.
 
-## AI credits
+### 1. Hugging Face token (playground)
 
-Plans grant credits (monthly 100, yearly 1,500); the credit pack adds 1,000. A plan from the AI editor costs `12 + 4 per minute` of video, an AI motion 4, an AI sound 6 (`src/lib/credits.ts`). Credits are taken before the AI call and refunded if it fails. Accounts whose plan was set by hand get their plan's credits the first time the panel checks in.
-- **Prices** — edit `src/lib/plans.ts`; the pricing section and checkout both read from it.
+Create a fine-grained token at https://huggingface.co/settings/tokens with **Make calls to Inference Providers**, and set `HF_TOKEN`. Runs are billed to that account, so the playground requires sign-in whenever accounts are on, and each user gets `PLAYGROUND_RATE_PER_MIN` runs per minute.
+
+### 2. Supabase (accounts, uploads, saves)
+
+1. Create a project at https://supabase.com.
+2. SQL editor → paste and run `supabase/schema.sql`. It creates `profiles`, `repos`, `saves`, the public `repos` storage bucket and all row-level security policies.
+3. Authentication → URL configuration: set Site URL to your domain and add `https://YOUR_DOMAIN/auth/callback` (and `http://localhost:3000/auth/callback`) to Redirect URLs.
+4. Authentication → Providers: turn on GitHub (paste a GitHub OAuth app's client id/secret) and keep Email on.
+5. Copy the project URL and anon key into `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+6. Storage → `repos` bucket: raise the file size limit if you expect large weights (the free plan caps uploads at 50 MB per file).
+
+## Deploy to Vercel
+
+Push to GitHub, import the repo in Vercel, add the same environment variables, deploy. Nothing else is required.
+
+## Project map
+
+```
+src/
+  app/
+    page.tsx                     home: search + trending
+    models/ datasets/            index pages and [...id] detail pages
+    c/[username]/[kind]/[slug]/  community repo page (+ owner settings)
+    u/[username]/                profile: repos and saves
+    new/ settings/ login/        publish, profile, sign-in
+    playground/                  chat + image UI
+    api/chat  api/image          inference (streams through router.huggingface.co)
+    api/search                   header search: Hub quicksearch + community repos
+  lib/hf.ts                      Hub API client
+  lib/community.ts               Supabase queries
+  proxy.ts                       keeps the auth session fresh (Next 16's middleware)
+supabase/schema.sql
+```
+
+## Notes
+
+- The design, name and mark are PostKit's own. Hub content shown on the site belongs to its authors; each page links back to the original repo.
+- `HF_ENDPOINT` points the hub client at a mirror if you need one.
+- Hub pages are cached for 5 minutes (`revalidate: 300` in `lib/hf.ts`).

@@ -31,7 +31,7 @@ Create a fine-grained token at https://huggingface.co/settings/tokens with **Mak
 1. Create a project at https://supabase.com.
 2. SQL editor → paste and run `supabase/schema.sql`. It creates `profiles`, `repos`, `saves`, the public `repos` storage bucket and all row-level security policies.
 3. Authentication → URL configuration: set Site URL to your domain and add `https://YOUR_DOMAIN/auth/callback` (and `http://localhost:3000/auth/callback`) to Redirect URLs.
-4. Authentication → Providers: turn on GitHub (paste a GitHub OAuth app's client id/secret) and keep Email on.
+4. Authentication → Providers: keep Email on. Sign-in uses a 6-digit code, so make sure the Magic Link email template includes `{{ .Token }}`.
 5. Copy the project URL and anon key into `NEXT_PUBLIC_HUB_SUPABASE_URL` and `NEXT_PUBLIC_HUB_SUPABASE_ANON_KEY`.
 6. Storage → `repos` bucket: raise the file size limit if you expect large weights (the free plan caps uploads at 50 MB per file).
 

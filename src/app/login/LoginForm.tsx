@@ -1,79 +1,102 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 
+/** Email + 6-digit code sign-in. Needs no redirect URL in Supabase. */
 export default function LoginForm({ next }: { next: string }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"email" | "code">("email");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const redirectTo = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
-
-  async function emailLink(e: React.FormEvent) {
+  async function sendCode(e: React.FormEvent) {
     e.preventDefault();
     const sb = createClient();
     if (!sb) return;
-    setState("sending");
+    setBusy(true);
     setError(null);
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo() } });
-    if (error) {
-      setError(error.message);
-      setState("idle");
-    } else setState("sent");
+    const { error } = await sb.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
+    setBusy(false);
+    if (error) setError(error.message);
+    else setStep("code");
   }
 
-  async function github() {
+  async function verify(e: React.FormEvent) {
+    e.preventDefault();
     const sb = createClient();
     if (!sb) return;
-    const { error } = await sb.auth.signInWithOAuth({ provider: "github", options: { redirectTo: redirectTo() } });
-    if (error) setError(error.message);
+    setBusy(true);
+    setError(null);
+    const { error } = await sb.auth.verifyOtp({ email: email.trim(), token: code.trim(), type: "email" });
+    if (error) {
+      setBusy(false);
+      setError(error.message.includes("expired") ? "That code expired. Send a new one." : "That code didn't match. Check the latest email and try again.");
+      return;
+    }
+    router.push(next);
+    router.refresh();
   }
 
-  if (state === "sent") {
+  const input = "w-full h-11 rounded-md border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt";
+
+  if (step === "code") {
     return (
-      <div className="rounded-lg border border-rule bg-surface p-6">
-        <p className="font-medium">Check your inbox.</p>
-        <p className="text-sm text-muted mt-1">
-          We sent a sign-in link to <span className="text-ink">{email}</span>. Open it on this device.
+      <form onSubmit={verify} className="space-y-3">
+        <p className="text-sm text-muted">
+          We emailed a 6-digit code to <span className="text-ink">{email}</span>.
         </p>
-      </div>
+        <label htmlFor="code" className="text-sm font-medium block">
+          Code
+        </label>
+        <input
+          id="code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          required
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+          className={`${input} font-mono text-lg tracking-[0.3em]`}
+        />
+        <button disabled={busy || code.length < 6} className="w-full h-11 rounded-md bg-ink text-paper text-sm font-medium disabled:opacity-50">
+          {busy ? "Signing in…" : "Sign in"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setStep("email");
+            setCode("");
+            setError(null);
+          }}
+          className="text-sm text-muted underline underline-offset-2 hover:text-ink"
+        >
+          Use a different email
+        </button>
+        {error && <p className="text-sm text-danger">{error}</p>}
+      </form>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <button
-        onClick={github}
-        className="w-full h-11 rounded-md bg-ink text-paper text-sm font-medium hover:opacity-90"
-      >
-        Continue with GitHub
+    <form onSubmit={sendCode} className="space-y-3">
+      <label htmlFor="email" className="text-sm font-medium block">
+        Email
+      </label>
+      <input
+        id="email"
+        type="email"
+        required
+        autoComplete="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className={input}
+      />
+      <button disabled={busy} className="w-full h-11 rounded-md bg-ink text-paper text-sm font-medium disabled:opacity-50">
+        {busy ? "Sending code…" : "Email me a sign-in code"}
       </button>
-      <div className="flex items-center gap-3 text-sm text-muted">
-        <span className="h-px flex-1 bg-rule" />
-        or
-        <span className="h-px flex-1 bg-rule" />
-      </div>
-      <form onSubmit={emailLink} className="space-y-3">
-        <label htmlFor="email" className="text-sm font-medium block">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full h-11 rounded-md border border-rule bg-surface px-3 focus:outline-none focus:border-cobalt"
-        />
-        <button
-          disabled={state === "sending"}
-          className="w-full h-11 rounded-md border border-rule bg-surface text-sm font-medium hover:border-ink disabled:opacity-50"
-        >
-          {state === "sending" ? "Sending link…" : "Email me a sign-in link"}
-        </button>
-      </form>
       {error && <p className="text-sm text-danger">{error}</p>}
-    </div>
+    </form>
   );
 }

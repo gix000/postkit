@@ -1,13 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import ModelChooser, { CURATED } from "@/components/ModelChooser";
 
 export type Mode = "photo" | "video" | "chat";
 type Msg = { role: "user" | "assistant"; content: string };
 
-const CHAT_SUGGESTIONS = ["meta-llama/Llama-3.1-8B-Instruct", "Qwen/Qwen2.5-72B-Instruct", "mistralai/Mistral-7B-Instruct-v0.3"];
-const PHOTO_SUGGESTIONS = ["black-forest-labs/FLUX.1-schnell", "black-forest-labs/FLUX.1-dev", "stabilityai/stable-diffusion-xl-base-1.0"];
-const VIDEO_SUGGESTIONS = ["Wan-AI/Wan2.1-T2V-14B", "Lightricks/LTX-Video", "tencent/HunyuanVideo"];
 
 const MODES: { id: Mode; label: string }[] = [
   { id: "photo", label: "Photo" },
@@ -27,9 +25,9 @@ export default function Studio({
   locked: boolean;
 }) {
   const [mode, setMode] = useState<Mode>(initialMode);
-  const [chatModel, setChatModel] = useState(initialMode === "chat" && initialModel ? initialModel : CHAT_SUGGESTIONS[0]);
-  const [photoModel, setPhotoModel] = useState(initialMode === "photo" && initialModel ? initialModel : PHOTO_SUGGESTIONS[0]);
-  const [videoModel, setVideoModel] = useState(initialMode === "video" && initialModel ? initialModel : VIDEO_SUGGESTIONS[0]);
+  const [chatModel, setChatModel] = useState(initialMode === "chat" && initialModel ? initialModel : CURATED.chat[0].id);
+  const [photoModel, setPhotoModel] = useState(initialMode === "photo" && initialModel ? initialModel : CURATED.photo[0].id);
+  const [videoModel, setVideoModel] = useState(initialMode === "video" && initialModel ? initialModel : CURATED.video[0].id);
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-8">
@@ -68,36 +66,6 @@ export default function Studio({
       ) : (
         <MediaGen key="video" kind="video" model={videoModel} setModel={setVideoModel} initialPrompt={initialPrompt} />
       )}
-    </div>
-  );
-}
-
-function ModelPicker({ value, onChange, suggestions, id, browseHref }: { value: string; onChange: (v: string) => void; suggestions: string[]; id: string; browseHref: string }) {
-  return (
-    <div>
-      <label htmlFor={id} className="text-sm font-medium">
-        Model
-      </label>
-      <input
-        id={id}
-        list={`${id}-list`}
-        value={value}
-        onChange={(e) => onChange(e.target.value.trim())}
-        spellCheck={false}
-        className="tap mt-1 w-full h-10 rounded-full border border-rule bg-surface px-3 font-mono text-[13px] focus:outline-none focus:border-cobalt"
-      />
-      <datalist id={`${id}-list`}>
-        {suggestions.map((s) => (
-          <option key={s} value={s} />
-        ))}
-      </datalist>
-      <p className="text-xs text-muted mt-1">
-        Type any model id, or{" "}
-        <Link href={browseHref} className="underline underline-offset-2">
-          browse models
-        </Link>
-        .
-      </p>
     </div>
   );
 }
@@ -183,7 +151,7 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
       <div className="space-y-5">
-        <ModelPicker id="chat-model" value={model} onChange={setModel} suggestions={CHAT_SUGGESTIONS} browseHref="/models?task=text-generation" />
+        <ModelChooser kind="chat" value={model} onChange={setModel} />
         <div>
           <label htmlFor="system" className="text-sm font-medium">
             System prompt
@@ -354,13 +322,7 @@ function MediaGen({
             className="mt-1 w-full rounded-xl border border-rule bg-surface px-3 py-2.5 text-[15px] focus:outline-none focus:border-cobalt"
           />
         </div>
-        <ModelPicker
-          id={`${kind}-model`}
-          value={model}
-          onChange={setModel}
-          suggestions={isVideo ? VIDEO_SUGGESTIONS : PHOTO_SUGGESTIONS}
-          browseHref={isVideo ? "/models?task=text-to-video" : "/models?task=text-to-image"}
-        />
+        <ModelChooser kind={kind} value={model} onChange={setModel} />
         <button disabled={busy || !prompt.trim()} className="tap btn-neon h-12 w-full rounded-full text-[15px] font-semibold disabled:opacity-40">
           {busy ? (isVideo ? "Making your video… this can take a few minutes" : "Making your photo…") : isVideo ? "Create video" : "Create photo"}
         </button>

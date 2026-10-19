@@ -52,5 +52,6 @@ export async function refund(userId: string, amount: number, reason: string) {
 export const COSTS = {
   plan: (seconds: number) => 12 + 4 * Math.ceil(Math.max(1, seconds) / 60),
   motion: 4,
+  montage: 8,
   sfx: 6,
 };

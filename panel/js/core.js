@@ -30,7 +30,7 @@
     captions: lib("captions.js"), zoom: lib("zoom.js"), beats: lib("beats.js"), chapters: lib("chapters.js"),
     presets: lib("presets.js"), cleanup: lib("cleanup.js"), library: lib("library.js"), safezones: lib("safezones.js"),
     config: lib("config.js"), render: lib("render.js"), voice: lib("voice.js"), looks: lib("looks.js"),
-    motion: lib("motion.js"), edl: lib("edl.js"),
+    motion: lib("motion.js"), edl: lib("edl.js"), footage: lib("footage.js"),
   };
 
   // ── Premiere bridge ──────────────────────────────────────

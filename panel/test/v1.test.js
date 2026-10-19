@@ -120,3 +120,21 @@ test("renders frames to ProRes 4444 with alpha, and reads footage for glass", { 
   bd.close();
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+test("footage: probe parsing, beat slots and choosing the good moments", () => {
+  const footage = require("../js/lib/footage");
+  const p = footage.parseProbe("Duration: 00:00:12.50, start: 0\n  Stream #0:0: Video: h264, yuv420p, 1920x1080, 29.97 fps\n    displaymatrix: rotation of -90.00 degrees\n  Stream #0:1: Audio: aac");
+  assert.deepEqual(p, { duration: 12.5, width: 1080, height: 1920, fps: 29.97, audio: true });
+  const beats = Array.from({ length: 40 }, (_, i) => 0.25 + i * 0.5);
+  const sl = footage.slots(beats, { length: 10, pace: "normal" });
+  assert.ok(Math.abs(sl.reduce((a, b) => a + b, 0) - 10) < 1e-6);
+  assert.ok(sl.slice(1, -1).every((x) => Math.abs(x - 2) < 0.01), "four beats a cut at 120 BPM");
+  // A clip that is black for its first 4 seconds, then good.
+  const a = { step: 0.25, bright: [], sharp: [], motion: [], cuts: [], duration: 10 };
+  for (let i = 0; i < 40; i++) { const ok = i >= 16; a.bright.push(ok ? 0.5 : 0.02); a.sharp.push(ok ? 0.1 : 0); a.motion.push(ok ? 0.03 : 0); }
+  const picks = footage.pickMoments([{ path: "a", duration: 10, analysis: a }], [2, 2]);
+  assert.ok(picks.every((x) => x.srcIn >= 4), "skips the black start");
+  assert.ok(picks[1].srcIn >= picks[0].srcOut, "in order, no overlap");
+  assert.deepEqual(footage.allocate([10, 2, 30], 5), [2, 1, 2]);
+  assert.equal(footage.fillScale(1920, 1080, 1080, 1920), 177.78);
+});

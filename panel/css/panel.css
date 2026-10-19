@@ -195,3 +195,12 @@ textarea[readonly] { font: 12px/1.5 ui-monospace, monospace; }
 .status.busy::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-inline-end: 8px; border-radius: 50%; background: var(--mark); animation: pulse 1s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) { .status.busy::before, .run-steps li.busy::before { animation: none; } .progress-fill { transition: none; } }
+
+/* ── start from video files ───────────────────────────── */
+.from-files { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.from-files h2 { margin-top: 0; }
+.file-list { list-style: none; margin: 0 0 10px; padding: 0; }
+.file-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.file-list li.music { color: var(--mark); }
+.file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.from-files > .primary { width: 100%; margin-top: 4px; }

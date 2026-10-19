@@ -991,3 +991,105 @@ function pk_keysAt(vIndex, itemsJson) {
     return pk_err(e);
   }
 }
+
+// ════════════════════════════════════════════════════════════
+// 1.1 — start from video files: build a sequence, reframe, assemble a montage
+// ════════════════════════════════════════════════════════════
+
+/**
+ * Imports the files into PostKit / Footage and makes a sequence from them, in order,
+ * matched to the first file. With `empty`, the clips are taken off again (for a montage).
+ * With width/height, the frame is changed (e.g. 1080×1920 for vertical).
+ */
+function pk_newSequence(name, pathsJson, width, height, empty) {
+  try {
+    var paths = pk_parse(pathsJson);
+    if (!paths.length) throw "Choose at least one video.";
+    var items = [];
+    for (var i = 0; i < paths.length; i++) items.push(pk_import(paths[i], "Footage"));
+    if (typeof app.project.createNewSequenceFromClips !== "function") throw "This Premiere version can't make sequences from a script. Update to Premiere 2022 or newer.";
+    var seq = app.project.createNewSequenceFromClips(name, items, pk_bin("Sequences"));
+    if (!seq) throw "Premiere couldn't create the sequence.";
+    app.project.openSequence(seq.sequenceID);
+    seq = app.project.activeSequence || seq;
+    if (empty) {
+      var lists = [seq.videoTracks, seq.audioTracks];
+      for (var l = 0; l < lists.length; l++) {
+        for (var t = 0; t < lists[l].numTracks; t++) {
+          var clips = pk_clipsOf(lists[l][t]);
+          for (var c = clips.length - 1; c >= 0; c--) clips[c].remove(false, true);
+        }
+      }
+    }
+    var resized = false;
+    if (width && height) {
+      try {
+        var s = seq.getSettings();
+        if (s.videoFrameWidth !== width || s.videoFrameHeight !== height) {
+          s.videoFrameWidth = width;
+          s.videoFrameHeight = height;
+          seq.setSettings(s);
+        }
+        resized = true;
+      } catch (e1) { resized = false; }
+    }
+    return pk_ok({ name: seq.name, id: seq.sequenceID, resized: resized });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+/** Sets Scale on the clips of a video track, per source file: {mediaPath: percent}. Fills a reframed frame. */
+function pk_scaleClips(vIndex, scalesJson) {
+  try {
+    var scales = pk_parse(scalesJson);
+    var clips = pk_clipsOf(pk_track(pk_seq(), "video", vIndex));
+    var n = 0;
+    for (var i = 0; i < clips.length; i++) {
+      var media = clips[i].projectItem && clips[i].projectItem.getMediaPath ? clips[i].projectItem.getMediaPath() : "";
+      if (!scales.hasOwnProperty(media)) continue;
+      var p = pk_scaleParam(clips[i]);
+      if (p) { p.setValue(scales[media], true); n++; }
+    }
+    return pk_ok({ clips: n });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+/**
+ * Lays pieces of source files one after another on a video track (a montage).
+ * itemsJson: [{path, srcIn, srcOut, at, scale}] in seconds. With withAudio, each piece's
+ * own sound goes on the audio track too.
+ */
+function pk_assemble(itemsJson, vIndex, aIndex, withAudio) {
+  try {
+    var items = pk_parse(itemsJson);
+    var placed = 0;
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      var pi = pk_import(it.path, "Footage");
+      pi.setInPoint(it.srcIn, 4);
+      pi.setOutPoint(it.srcOut, 4);
+      var seq = pk_seq();
+      var vt = pk_track(seq, "video", vIndex);
+      try { vt.overwriteClip(pi, pk_time(it.at)); } catch (e1) { vt.overwriteClip(pi, it.at); }
+      if (withAudio && aIndex >= 0) {
+        var at = pk_track(seq, "audio", aIndex);
+        if (!pk_clipAt(at, it.at)) {
+          try { at.overwriteClip(pi, pk_time(it.at)); } catch (e2) { at.overwriteClip(pi, it.at); }
+        }
+      }
+      if (typeof pi.clearInPoint === "function") { pi.clearInPoint(); pi.clearOutPoint(); }
+      if (it.scale) {
+        var c = pk_clipAt(vt, it.at);
+        var p = c ? pk_scaleParam(c) : null;
+        if (p) p.setValue(it.scale, true);
+      }
+      placed++;
+    }
+    return pk_ok({ placed: placed });
+  } catch (e) {
+    return pk_err(e);
+  }
+}

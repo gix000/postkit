@@ -1,9 +1,18 @@
-# PostKit panel for Premiere Pro — 1.0
+# PostKit panel for Premiere Pro — 1.1
 
 A CEP panel for Premiere Pro 2022 and newer (Windows and Mac). The home screen is the
 **AI editor**: you say what you want, it looks at the video (transcript, pauses, four stills),
 plans with only the tools the job needs, shows you the plan and a few colour looks, then
-performs it on a copy of the sequence. Around it are 20 tools:
+performs it on a copy of the sequence.
+
+**Start from video files** (1.1): pick one video or a few clips, optional music, a format
+(9:16, 1:1, 16:9) and a length. PostKit imports them, builds and reframes the sequence,
+and listens: if someone is talking it runs the full AI edit; if it's footage, it scores every
+moment (light, sharpness, motion, shot changes — `js/lib/footage.js`), lets the AI choose the
+order, title, ending, transitions and look (`/api/panel/ai/montage`), and cuts the best moments
+to the music's beat. A footage-only sequence gets the same montage from “Plan the edit”.
+
+Around it are 20 tools:
 
 | Group | Tool | Runs |
 | --- | --- | --- |

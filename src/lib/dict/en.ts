@@ -33,6 +33,7 @@ export const en = {
     ai: {
       name: "AI editor",
       body: "Tell it what you want in plain words. It looks at the video and uses only what the job needs: it transcribes, cuts the repeats and silences, opens on a strong hook, builds animated scenes, drops captions and sounds on the word, and grades the colour — showing you a few looks to pick from first. It picks the style from the kind of video, or from “Your taste” if you set it once. It shows you the plan before it cuts anything, and it works on a copy of the sequence, so your original stays exactly as it was.",
+      files: "Or just give it a video. Pick one file or a few raw clips (and music if you like), choose vertical, square or horizontal, and press one button: PostKit builds the sequence, reframes it, and either does the full edit when someone is talking, or cuts a montage of the best moments to the beat of your music — with titles, transitions, sounds and a grade.",
     },
     groups: [
       {

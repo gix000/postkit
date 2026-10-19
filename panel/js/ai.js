@@ -15,6 +15,7 @@
     "Reel in Lebanese style, bold yellow captions, lots of energy",
   ];
   const cost = (seconds) => 12 + 4 * Math.ceil(Math.max(1, seconds) / 60);
+  PK.ai = PK.ai || {};
 
   // ── taste ────────────────────────────────────────────────
   const TASTE_DEFAULT = { pace: "auto", captions: "auto", words: "auto", accent: "", font: "", graphics: "auto", sfx: "auto", color: "auto", zoom: "auto", hook: "auto", notes: "" };
@@ -323,15 +324,15 @@
 
   // ── the home screen ──────────────────────────────────────
   function mountHome(root) {
-    const ask = h("textarea#ai-ask", { rows: 3, placeholder: "Tell it what you want, in plain words…", dir: "auto" });
+    const ask = h("textarea#ai-ask", { rows: 3, placeholder: "Tell it what you want, in plain words — or leave it empty for a complete edit", dir: "auto" });
     const chips = h("div.chips.examples");
     EXAMPLES.forEach((e) => chips.append(h("button.chip", { type: "button", on: { click: () => { ask.value = e; ask.focus(); } } }, e)));
-    const costLine = h("p.muted.small.cost");
+    const costLine = h("p.muted.small.cost.seq-only");
     const res = resultLine();
     const planBtn = button("Plan the edit", "primary", () => startPlan());
     const tasteBtn = h("button.secondary.icon-label", { type: "button", html: PK.ui.ICONS.taste + "<span>Your taste</span>", on: { click: () => PK.emit("open:taste") } });
     const off = note("");
-    const homeBox = h("div.ai-box", h("h1", "What should I edit?"), ask, chips, h("div.actions", tasteBtn, planBtn), costLine, off, res);
+    const homeBox = h("div.ai-box", h("h1", "What should I edit?"), ask, chips, h("div.actions.seq-only", tasteBtn, planBtn), costLine, off, res);
 
     const planBox = h("div.ai-plan", { hidden: true });
     const runBox = h("div.ai-run", { hidden: true });
@@ -356,23 +357,90 @@
     updateCost();
 
     let ctx = null, plan = null;
+    const DEFAULT_ASK = "Do the complete edit for social media: cut the pauses and retakes, open on a hook, captions, zooms, a few graphics and sounds, and a colour grade.";
+
+    /** Looks at the sequence and asks the server for a plan. */
+    async function requestPlan(instruction, onStep) {
+      ctx = await gather(onStep || ((s) => PK.status(s, true)));
+      (onStep || PK.status)("Planning the edit…", true);
+      const data = await PK.api("/api/panel/ai/plan", {
+        instruction: instruction || DEFAULT_ASK,
+        taste: tasteForAI(),
+        video: { name: ctx.info.name, duration: ctx.info.duration || 0, fps: ctx.info.fps, width: ctx.info.width, height: ctx.info.height, cameras: ctx.info.tracks.video.filter((t) => t.clips).length, hasMusic: state.tracks.music >= 0 },
+        transcript: ctx.transcript ? { language: ctx.transcript.language, segments: ctx.transcript.segments.map((s) => ({ id: s.id, start: +s.start.toFixed(2), end: +s.end.toFixed(2), text: s.text })) } : null,
+        pauses: ctx.pauses || undefined,
+        frames: ctx.frames,
+        catalog: catalog(),
+      });
+      plan = data.plan;
+      return data;
+    }
+
     async function startPlan() {
-      if (!ask.value.trim()) { ask.focus(); return result(res, "Tell it what you want first — or pick one of the examples.", "err"); }
+      let montage = false;
       await PK.run(res, "Getting ready…", async () => {
-        ctx = await gather((s) => PK.status(s, true));
-        PK.status("Planning the edit…", true);
-        const data = await PK.api("/api/panel/ai/plan", {
-          instruction: ask.value.trim(),
-          taste: tasteForAI(),
-          video: { name: ctx.info.name, duration: ctx.info.duration || 0, fps: ctx.info.fps, width: ctx.info.width, height: ctx.info.height, cameras: ctx.info.tracks.video.filter((t) => t.clips).length, hasMusic: state.tracks.music >= 0 },
-          transcript: ctx.transcript ? { language: ctx.transcript.language, segments: ctx.transcript.segments.map((s) => ({ id: s.id, start: +s.start.toFixed(2), end: +s.end.toFixed(2), text: s.text })) } : null,
-          pauses: ctx.pauses || undefined,
-          frames: ctx.frames,
-          catalog: catalog(),
-        });
-        plan = data.plan;
+        // Footage with no talking gets a montage cut to the beat instead of a talking-head plan.
+        if (PK.features().transcribe !== false && PK.autoedit && PK.autoedit.montageCurrent) {
+          await PK.loadSequence();
+          const t = await PK.needTranscript().catch(() => null);
+          if (t && t.words.length < 12) montage = true;
+        }
+        if (montage) return;
+        const data = await requestPlan(ask.value.trim());
         await showPlan(data);
       }, [planBtn]);
+      if (montage) await PK.autoedit.montageCurrent();
+    }
+
+    /** The running view: a list of steps that tick off. */
+    function runView(title) {
+      runBox.innerHTML = "";
+      const steps = h("ul.run-steps");
+      const prog = h("p.result");
+      const done = button("Back to the editor", "secondary", () => { runBox.hidden = true; homeBox.hidden = false; });
+      done.hidden = true;
+      const heading = h("h1", title || "Editing…");
+      runBox.append(heading, steps, prog, done);
+      homeBox.hidden = true;
+      planBox.hidden = true;
+      runBox.hidden = false;
+      runBox.scrollIntoView({ block: "start" });
+      const log = (label) => {
+        const li = h("li.busy", h("span.run-label", label), h("span.run-note"));
+        steps.append(li);
+        return { done(msg, kind) { li.className = kind; li.querySelector(".run-note").textContent = msg ? ` — ${msg}` : ""; } };
+      };
+      /** A step around an async function: ticks green, or red with the reason. */
+      const step = async (label, fn, { fatal = false } = {}) => {
+        const li = log(label);
+        try {
+          const msg = await fn();
+          li.done(msg || "", "ok");
+          return true;
+        } catch (err) {
+          li.done(err.message || String(err), "err");
+          if (fatal) throw err;
+          return false;
+        }
+      };
+      return {
+        log, step, prog, heading,
+        finish(text, kind) {
+          heading.textContent = "Done";
+          const failed = steps.querySelectorAll("li.err").length;
+          result(prog, text + (failed ? ` ${plural(failed, "step")} didn't work — see above.` : ""), failed ? "" : kind || "ok");
+          done.hidden = false;
+        },
+        fail() { heading.textContent = "Stopped"; done.hidden = false; },
+      };
+    }
+
+    /** Every step of the plan, the recommended look, no questions. */
+    async function runPlan(view) {
+      const on = {};
+      for (const key of STEP_ORDER) if (plan[key] !== undefined && plan[key] !== null && plan[key] !== false && describe(plan, key, ctx)) on[key] = true;
+      const look = plan.color && L.looks.LOOKS[plan.color.recommended] ? plan.color.recommended : plan.color && plan.color.looks ? plan.color.looks.find((id) => L.looks.LOOKS[id]) : null;
+      return execute(plan, on, ctx, look, view.log);
     }
 
     async function showPlan(data) {
@@ -430,33 +498,23 @@
         h("div.actions", back, go),
       );
       homeBox.hidden = true;
+      runBox.hidden = true;
       planBox.hidden = false;
       planBox.scrollIntoView({ block: "start" });
 
       async function doIt() {
-        runBox.innerHTML = "";
-        const steps = h("ul.run-steps");
-        const prog = h("p.result");
-        const done = button("Back to the editor", "secondary", () => { runBox.hidden = true; homeBox.hidden = false; });
-        done.hidden = true;
-        runBox.append(h("h1", "Editing…"), steps, prog, done);
-        planBox.hidden = true;
-        runBox.hidden = false;
-        const log = (label) => {
-          const li = h("li.busy", h("span.run-label", label), h("span.run-note"));
-          steps.append(li);
-          return { done(msg, kind) { li.className = kind; li.querySelector(".run-note").textContent = msg ? ` — ${msg}` : ""; } };
-        };
-        await PK.run(prog, "Editing…", async () => {
-          const dup = await execute(plan, on, ctx, look, log);
-          runBox.querySelector("h1").textContent = "Done";
-          const failed = steps.querySelectorAll("li.err").length;
-          result(prog, `Edited on “${dup.name}”. Your original sequence is untouched.${failed ? ` ${plural(failed, "step")} didn't work — see above.` : ""}`, failed ? "" : "ok");
+        const view = runView("Editing…");
+        await PK.run(view.prog, "Editing…", async () => {
+          const dup = await execute(plan, on, ctx, look, view.log);
+          view.finish(`Edited on “${dup.name}”. Your original sequence is untouched.`);
         });
-        done.hidden = false;
+        if (view.heading.textContent !== "Done") view.fail();
       }
     }
+
+    PK.ai.home = { homeBox, ask, res, requestPlan, showPlan, runPlan, runView, get plan() { return plan; } };
+    PK.emit("ai:home", PK.ai.home);
   }
 
-  PK.ai = { mountHome, tasteView, execute, catalog, cost };
+  Object.assign(PK.ai, { mountHome, tasteView, execute, catalog, cost, tasteForAI });
 })();

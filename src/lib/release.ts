@@ -3,9 +3,9 @@
 // and every download after that gets a short-lived signed link to it.
 // To publish a new version: put the zip in releases/ and change the version here.
 export const release = {
-  version: "1.0.0",
+  version: "1.1.0",
   bucket: "releases",
-  path: "panel/PostKit-panel-1.0.0.zip",
-  fileName: "PostKit-panel-1.0.0.zip",
-  bundled: "releases/PostKit-panel-1.0.0.zip",
+  path: "panel/PostKit-panel-1.1.0.zip",
+  fileName: "PostKit-panel-1.1.0.zip",
+  bundled: "releases/PostKit-panel-1.1.0.zip",
 };

@@ -48,6 +48,7 @@ export default function Home() {
           <div className="tools__ai">
             <h3>{t.tools.ai.name}</h3>
             <p>{t.tools.ai.body}</p>
+            <p>{t.tools.ai.files}</p>
           </div>
           {t.tools.groups.map((group) => (
             <div key={group.name} className="tools__group">

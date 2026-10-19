@@ -4,7 +4,7 @@
   const PK = window.PK;
   const { h, ICONS, trackSelect } = PK.ui;
   const { $, L, state } = PK;
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
   const GROUPS = ["Edit", "Text & graphics", "Audio", "Colour", "Library"];
 
   // ── views ────────────────────────────────────────────────

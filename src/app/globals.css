@@ -618,6 +618,11 @@ svg {
 }
 .tools__ai p {
   margin: 0;
+}
+.tools__ai p + p {
+  margin-top: 12px;
+}
+.tools__ai p {
   color: var(--cream-dim);
   font-size: var(--step-1);
 }

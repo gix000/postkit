@@ -3,9 +3,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
+  { href: "/create", label: "Create" },
   { href: "/models", label: "Models" },
   { href: "/datasets", label: "Datasets" },
-  { href: "/playground", label: "Playground" },
 ];
 
 export default function NavLinks() {

@@ -43,10 +43,11 @@ export function taskLabel(id?: string | null): string {
   );
 }
 
-/** Which playground mode can run a model with this task, if any. */
-export function playgroundMode(task?: string | null): "chat" | "image" | null {
+/** Which Create mode can run a model with this task, if any. */
+export function createMode(task?: string | null): "chat" | "photo" | "video" | null {
   if (task === "text-generation" || task === "image-text-to-text") return "chat";
-  if (task === "text-to-image") return "image";
+  if (task === "text-to-image") return "photo";
+  if (task === "text-to-video") return "video";
   return null;
 }
 

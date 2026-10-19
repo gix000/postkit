@@ -58,7 +58,7 @@ export default function RepoRow({ r }: { r: RowData }) {
             </span>
           )}
           {r.likes !== undefined && (
-            <span className="inline-flex items-center gap-1 tabular-nums" title={`${r.likes} likes on the Hub`}>
+            <span className="inline-flex items-center gap-1 tabular-nums" title={`${r.likes} likes`}>
               <Heart />
               {compact(r.likes)}
             </span>

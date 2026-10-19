@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
+import Logo from "@/components/Logo";
 
 export const metadata: Metadata = {
-  title: { default: "PostKit — open models and datasets", template: "%s · PostKit" },
-  description: "Find open models and datasets, publish your own, and run them in the browser.",
+  title: { default: "PostKit — create photos and videos with AI", template: "%s · PostKit" },
+  description: "Create photos and videos from a prompt, explore open models, and publish your own.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -23,13 +24,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <footer className="border-t border-rule mt-24">
           <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-8 text-sm text-muted flex flex-wrap gap-x-6 gap-y-2 justify-between">
-            <span>PostKit Hub</span>
-            <span>
-              Hub data from the public{" "}
-              <a className="underline underline-offset-2" href="https://huggingface.co/docs/hub/api" rel="noreferrer">
-                Hugging Face API
-              </a>
-            </span>
+            <span className="flex items-center gap-2"><Logo size={18} glow={false} /> PostKit</span>
+            <span>Create photos and videos with open AI models.</span>
           </div>
         </footer>
       </body>

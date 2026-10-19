@@ -25,7 +25,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <div className="mx-auto max-w-[420px] px-4 pt-16 sm:pt-24">
       <h1 className="text-4xl font-semibold tracking-tight">Sign in to PostKit</h1>
-      <p className="text-muted mt-2 mb-8">Publish models and datasets, save repos to your profile, and use the playground.</p>
+      <p className="text-muted mt-2 mb-8">Create photos and videos, save models to your profile, and publish your own.</p>
       <LoginForm next={next} />
     </div>
   );

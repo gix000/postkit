@@ -2,62 +2,77 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-type Mode = "chat" | "image";
+export type Mode = "photo" | "video" | "chat";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_SUGGESTIONS = ["meta-llama/Llama-3.1-8B-Instruct", "Qwen/Qwen2.5-72B-Instruct", "mistralai/Mistral-7B-Instruct-v0.3"];
-const IMAGE_SUGGESTIONS = ["black-forest-labs/FLUX.1-schnell", "stabilityai/stable-diffusion-xl-base-1.0"];
+const PHOTO_SUGGESTIONS = ["black-forest-labs/FLUX.1-schnell", "black-forest-labs/FLUX.1-dev", "stabilityai/stable-diffusion-xl-base-1.0"];
+const VIDEO_SUGGESTIONS = ["Wan-AI/Wan2.1-T2V-14B", "Lightricks/LTX-Video", "tencent/HunyuanVideo"];
 
-export default function Playground({ initialMode, initialModel, locked }: { initialMode: Mode; initialModel?: string; locked: boolean }) {
+const MODES: { id: Mode; label: string }[] = [
+  { id: "photo", label: "Photo" },
+  { id: "video", label: "Video" },
+  { id: "chat", label: "Chat" },
+];
+
+export default function Studio({
+  initialMode,
+  initialModel,
+  initialPrompt,
+  locked,
+}: {
+  initialMode: Mode;
+  initialModel?: string;
+  initialPrompt?: string;
+  locked: boolean;
+}) {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [chatModel, setChatModel] = useState(initialMode === "chat" && initialModel ? initialModel : CHAT_SUGGESTIONS[0]);
-  const [imageModel, setImageModel] = useState(initialMode === "image" && initialModel ? initialModel : IMAGE_SUGGESTIONS[0]);
+  const [photoModel, setPhotoModel] = useState(initialMode === "photo" && initialModel ? initialModel : PHOTO_SUGGESTIONS[0]);
+  const [videoModel, setVideoModel] = useState(initialMode === "video" && initialModel ? initialModel : VIDEO_SUGGESTIONS[0]);
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-8">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-[32px] font-semibold tracking-tight leading-none">Playground</h1>
-          <p className="text-muted mt-2 max-w-[60ch]">
-            Runs through Hugging Face inference providers. Not every model is served; if one fails, pick another.
-          </p>
+          <h1 className="text-[40px] font-bold tracking-tight leading-none">Create</h1>
+          <p className="text-muted mt-2 max-w-[60ch]">Describe what you want and pick a model. If a model is busy or unavailable, try another one.</p>
         </div>
-        <div className="flex gap-1 rounded-lg border border-rule bg-surface p-1" role="tablist" aria-label="Playground mode">
-          {(["chat", "image"] as Mode[]).map((m) => (
+        <div className="glass flex gap-1 rounded-full p-1" role="tablist" aria-label="What to create">
+          {MODES.map((m) => (
             <button
-              key={m}
+              key={m.id}
               role="tab"
-              aria-selected={mode === m}
-              onClick={() => setMode(m)}
-              className={`h-8 px-4 rounded-md text-sm font-medium ${mode === m ? "bg-ink text-paper" : "text-muted hover:text-ink"}`}
+              aria-selected={mode === m.id}
+              onClick={() => setMode(m.id)}
+              className={`h-9 px-5 rounded-full text-sm font-semibold ${mode === m.id ? "btn-neon" : "text-muted hover:text-ink"}`}
             >
-              {m === "chat" ? "Chat" : "Image"}
+              {m.label}
             </button>
           ))}
         </div>
       </div>
 
       {locked ? (
-        <div className="rounded-lg border border-rule bg-surface px-6 py-10">
-          <p className="font-medium">Sign in to run models.</p>
-          <p className="text-sm text-muted mt-1">Each run uses inference credits, so the playground is for signed-in users.</p>
-          <Link
-            href="/login?next=/playground"
-            className="mt-4 inline-flex h-10 items-center rounded-md bg-ink text-paper px-4 text-sm font-medium"
-          >
+        <div className="glass rounded-2xl px-6 py-10">
+          <p className="font-semibold text-lg">Sign in to create.</p>
+          <p className="text-sm text-muted mt-1">It&apos;s free. Every photo and video uses AI credits, so creating is for signed-in members.</p>
+          <Link href="/login?next=/create" className="btn-neon mt-5 inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold">
             Sign in
           </Link>
         </div>
       ) : mode === "chat" ? (
         <Chat model={chatModel} setModel={setChatModel} />
+      ) : mode === "photo" ? (
+        <MediaGen key="photo" kind="photo" model={photoModel} setModel={setPhotoModel} initialPrompt={initialPrompt} />
       ) : (
-        <ImageGen model={imageModel} setModel={setImageModel} />
+        <MediaGen key="video" kind="video" model={videoModel} setModel={setVideoModel} initialPrompt={initialPrompt} />
       )}
     </div>
   );
 }
 
-function ModelPicker({ value, onChange, suggestions, id }: { value: string; onChange: (v: string) => void; suggestions: string[]; id: string }) {
+function ModelPicker({ value, onChange, suggestions, id, browseHref }: { value: string; onChange: (v: string) => void; suggestions: string[]; id: string; browseHref: string }) {
   return (
     <div>
       <label htmlFor={id} className="text-sm font-medium">
@@ -78,8 +93,8 @@ function ModelPicker({ value, onChange, suggestions, id }: { value: string; onCh
       </datalist>
       <p className="text-xs text-muted mt-1">
         Type any model id, or{" "}
-        <Link href="/models?task=text-generation" className="underline underline-offset-2">
-          find one in Models
+        <Link href={browseHref} className="underline underline-offset-2">
+          browse models
         </Link>
         .
       </p>
@@ -168,7 +183,7 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
       <div className="space-y-5">
-        <ModelPicker id="chat-model" value={model} onChange={setModel} suggestions={CHAT_SUGGESTIONS} />
+        <ModelPicker id="chat-model" value={model} onChange={setModel} suggestions={CHAT_SUGGESTIONS} browseHref="/models?task=text-generation" />
         <div>
           <label htmlFor="system" className="text-sm font-medium">
             System prompt
@@ -259,7 +274,7 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
               Stop
             </button>
           ) : (
-            <button disabled={!input.trim()} className="h-11 px-4 rounded-md bg-cobalt text-cobalt-ink text-sm font-medium disabled:opacity-40">
+            <button disabled={!input.trim()} className="btn-neon h-11 px-4 rounded-md text-sm font-semibold disabled:opacity-40">
               Send
             </button>
           )}
@@ -269,25 +284,43 @@ function Chat({ model, setModel }: { model: string; setModel: (v: string) => voi
   );
 }
 
-function ImageGen({ model, setModel }: { model: string; setModel: (v: string) => void }) {
-  const [prompt, setPrompt] = useState("");
-  const [images, setImages] = useState<{ src: string; prompt: string }[]>([]);
+function MediaGen({
+  kind,
+  model,
+  setModel,
+  initialPrompt,
+}: {
+  kind: "photo" | "video";
+  model: string;
+  setModel: (v: string) => void;
+  initialPrompt?: string;
+}) {
+  const [prompt, setPrompt] = useState(initialPrompt ?? "");
+  const [items, setItems] = useState<{ src: string; prompt: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isVideo = kind === "video";
 
   async function generate() {
     if (!prompt.trim() || busy) return;
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch("/api/image", {
+      const res = await fetch(isVideo ? "/api/video" : "/api/image", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ model, prompt }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Image generation failed.");
-      setImages((prev) => [{ src: data.image, prompt }, ...prev].slice(0, 12));
+      const type = res.headers.get("content-type") ?? "";
+      let src: string;
+      if (type.startsWith("video/")) {
+        src = URL.createObjectURL(await res.blob());
+      } else {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Generation failed.");
+        src = isVideo ? data.video : data.image;
+      }
+      setItems((prev) => [{ src, prompt }, ...prev].slice(0, 12));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -296,7 +329,7 @@ function ImageGen({ model, setModel }: { model: string; setModel: (v: string) =>
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
       <form
         className="space-y-5"
         onSubmit={(e) => {
@@ -304,40 +337,67 @@ function ImageGen({ model, setModel }: { model: string; setModel: (v: string) =>
           generate();
         }}
       >
-        <ModelPicker id="image-model" value={model} onChange={setModel} suggestions={IMAGE_SUGGESTIONS} />
         <div>
-          <label htmlFor="prompt" className="text-sm font-medium">
+          <label htmlFor={`${kind}-prompt`} className="text-sm font-medium">
             Prompt
           </label>
           <textarea
-            id="prompt"
+            id={`${kind}-prompt`}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={5}
-            placeholder="A ceramic coffee cup on a balcony rail, morning light, Beirut rooftops behind"
-            className="mt-1 w-full rounded-md border border-rule bg-surface px-3 py-2 text-sm focus:outline-none focus:border-cobalt"
+            placeholder={
+              isVideo
+                ? "Slow pan across Beirut rooftops at golden hour, pigeons taking off"
+                : "A ceramic coffee cup on a balcony rail, morning light, Beirut rooftops behind"
+            }
+            className="mt-1 w-full rounded-xl border border-rule bg-surface px-3 py-2.5 text-[15px] focus:outline-none focus:border-cobalt"
           />
         </div>
-        <button disabled={busy || !prompt.trim()} className="h-10 w-full rounded-md bg-cobalt text-cobalt-ink text-sm font-medium disabled:opacity-40">
-          {busy ? "Generating…" : "Generate image"}
+        <ModelPicker
+          id={`${kind}-model`}
+          value={model}
+          onChange={setModel}
+          suggestions={isVideo ? VIDEO_SUGGESTIONS : PHOTO_SUGGESTIONS}
+          browseHref={isVideo ? "/models?task=text-to-video" : "/models?task=text-to-image"}
+        />
+        <button disabled={busy || !prompt.trim()} className="btn-neon h-12 w-full rounded-full text-[15px] font-semibold disabled:opacity-40">
+          {busy ? (isVideo ? "Making your video… this can take a few minutes" : "Making your photo…") : isVideo ? "Create video" : "Create photo"}
         </button>
         {error && <p className="text-sm text-danger">{error}</p>}
       </form>
 
       <div>
-        {images.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-rule min-h-[50vh] grid place-items-center text-muted px-6 text-center">
-            {busy ? "Generating your first image…" : "Generated images appear here. They aren't stored, so download the ones you want to keep."}
+        {items.length === 0 ? (
+          <div className="relative overflow-hidden rounded-2xl border border-rule min-h-[50vh] grid place-items-center px-6 text-center">
+            <div className="neon-field opacity-60" aria-hidden="true" />
+            <p className="relative z-10 text-muted max-w-[40ch]">
+              {busy
+                ? isVideo
+                  ? "Your video is rendering. Keep this tab open."
+                  : "Your photo is on its way…"
+                : isVideo
+                  ? "Your videos appear here. Download the ones you want to keep."
+                  : "Your photos appear here. They aren't saved, so download the ones you want to keep."}
+            </p>
           </div>
         ) : (
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {images.map((img, i) => (
-              <li key={i} className="rounded-lg border border-rule bg-surface overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={img.src} alt={img.prompt} className="w-full aspect-square object-cover" />
+            {items.map((it, i) => (
+              <li key={it.src} className="rounded-2xl border border-rule bg-surface overflow-hidden">
+                {isVideo ? (
+                  <video src={it.src} controls loop playsInline className="w-full aspect-video bg-black" />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={it.src} alt={it.prompt} className="w-full aspect-square object-cover" />
+                )}
                 <div className="p-3 flex items-start justify-between gap-3">
-                  <p className="text-sm text-muted line-clamp-2">{img.prompt}</p>
-                  <a href={img.src} download={`postkit-${i + 1}.png`} className="text-sm text-cobalt underline underline-offset-2 shrink-0">
+                  <p className="text-sm text-muted line-clamp-2">{it.prompt}</p>
+                  <a
+                    href={it.src}
+                    download={`postkit-${i + 1}.${isVideo ? "mp4" : "png"}`}
+                    className="text-sm text-cobalt underline underline-offset-2 shrink-0"
+                  >
                     Download
                   </a>
                 </div>

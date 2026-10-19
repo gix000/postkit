@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import RepoShell, { CodeBlock, FileTable, Panel, Stat } from "@/components/RepoShell";
+import RepoShell, { FileTable, Panel, Stat } from "@/components/RepoShell";
 import Markdown from "@/components/Markdown";
 import SaveButton from "@/components/SaveButton";
 import PreviewTable from "@/components/PreviewTable";
 import { fileBase, fileUrl, getDataset, getDatasetPreview, getReadme } from "@/lib/hf";
 import { ago, bytes, compact, first } from "@/lib/format";
 import { taskLabel } from "@/lib/tasks";
-import { datasetSnippet } from "@/lib/snippets";
 import { getViewer } from "@/lib/supabase/server";
 import { isSaved, saveCount } from "@/lib/community";
 import { supabaseEnabled } from "@/lib/supabase/config";
@@ -48,20 +47,13 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
         tasks.length > 0 && <span className="text-ink">{tasks.slice(0, 3).join(", ")}</span>,
         sizeTag && `${sizeTag} rows`,
         license && `License: ${license}`,
-        ds.gated && "Gated: accept terms on Hugging Face to download",
+        ds.gated && "Gated: the author requires accepting terms to download",
       ]}
       actions={
         <>
           {supabaseEnabled && (
             <SaveButton refId={ref} kind="dataset" label={ds.id} path={path} initialSaved={saved} count={count} signedIn={Boolean(viewer)} />
           )}
-          <a
-            href={`https://huggingface.co/datasets/${ds.id}`}
-            rel="noreferrer"
-            className="inline-flex h-9 items-center rounded-md border border-rule bg-surface px-3 text-sm font-medium hover:border-ink"
-          >
-            View on Hugging Face
-          </a>
         </>
       }
       tabs={[
@@ -74,12 +66,9 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
         <>
           <Panel title="Stats">
             <Stat label="Downloads (30 days)" value={compact(ds.downloads)} />
-            <Stat label="Likes on Hugging Face" value={compact(ds.likes)} />
+            <Stat label="Likes" value={compact(ds.likes)} />
             {size ? <Stat label="Repo size" value={bytes(size)} /> : null}
             <Stat label="Updated" value={ago(ds.lastModified) || "—"} />
-          </Panel>
-          <Panel title="Load this dataset">
-            <CodeBlock code={datasetSnippet(ds.id)} />
           </Panel>
         </>
       }

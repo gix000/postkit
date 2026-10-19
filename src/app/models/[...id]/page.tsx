@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import RepoShell, { CodeBlock, FileTable, Panel, Stat } from "@/components/RepoShell";
+import RepoShell, { FileTable, Panel, Stat } from "@/components/RepoShell";
 import Markdown from "@/components/Markdown";
 import SaveButton from "@/components/SaveButton";
 import { fileBase, fileUrl, getModel, getReadme } from "@/lib/hf";
 import { ago, bytes, compact, first, params as fmtParams } from "@/lib/format";
-import { playgroundMode, taskLabel } from "@/lib/tasks";
-import { inferenceSnippet, modelSnippet } from "@/lib/snippets";
+import { createMode, taskLabel } from "@/lib/tasks";
 import { getViewer } from "@/lib/supabase/server";
 import { isSaved, saveCount } from "@/lib/community";
 import { supabaseEnabled } from "@/lib/supabase/config";
@@ -29,7 +28,7 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
   const [readme, viewer] = await Promise.all([tab === "card" ? getReadme("model", model.id) : null, getViewer()]);
   const [saved, count] = supabaseEnabled ? await Promise.all([isSaved(viewer?.id, ref), saveCount(ref)]) : [false, 0];
 
-  const mode = playgroundMode(model.pipeline_tag);
+  const mode = createMode(model.pipeline_tag);
   const license = (model.cardData?.license as string | undefined) ?? model.tags?.find((t) => t.startsWith("license:"))?.slice(8);
   const size = model.siblings?.reduce((s, f) => s + (f.size ?? 0), 0);
 
@@ -42,7 +41,7 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
         model.library_name,
         fmtParams(model.safetensors?.total),
         license && `License: ${license}`,
-        model.gated && "Gated: accept terms on Hugging Face to download",
+        model.gated && "Gated: the author requires accepting terms to download",
       ]}
       actions={
         <>
@@ -51,19 +50,12 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
           )}
           {mode && (
             <Link
-              href={`/playground?mode=${mode}&model=${encodeURIComponent(model.id)}`}
-              className="inline-flex h-9 items-center rounded-md bg-cobalt text-cobalt-ink px-3 text-sm font-medium hover:opacity-90"
+              href={`/create?mode=${mode}&model=${encodeURIComponent(model.id)}`}
+              className="btn-neon inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold"
             >
-              Try in Playground
+              {mode === "chat" ? "Chat with this model" : mode === "video" ? "Create a video" : "Create a photo"}
             </Link>
           )}
-          <a
-            href={`https://huggingface.co/${model.id}`}
-            rel="noreferrer"
-            className="inline-flex h-9 items-center rounded-md border border-rule bg-surface px-3 text-sm font-medium hover:border-ink"
-          >
-            View on Hugging Face
-          </a>
         </>
       }
       tabs={[
@@ -75,18 +67,9 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
         <>
           <Panel title="Stats">
             <Stat label="Downloads (30 days)" value={compact(model.downloads)} />
-            <Stat label="Likes on Hugging Face" value={compact(model.likes)} />
+            <Stat label="Likes" value={compact(model.likes)} />
             {size ? <Stat label="Repo size" value={bytes(size)} /> : null}
             <Stat label="Updated" value={ago(model.lastModified) || "—"} />
-          </Panel>
-          <Panel title="Use this model">
-            <CodeBlock code={modelSnippet(model.id, model.pipeline_tag, model.library_name)} />
-            {mode === "chat" && (
-              <>
-                <p className="text-sm text-muted mt-3 mb-2">Or call it through an inference provider:</p>
-                <CodeBlock code={inferenceSnippet(model.id)} />
-              </>
-            )}
           </Panel>
         </>
       }

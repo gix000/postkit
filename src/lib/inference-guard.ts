@@ -11,16 +11,18 @@ const MAX_PER_WINDOW = Number(process.env.PLAYGROUND_RATE_PER_MIN ?? 12);
  * - when accounts are on, only signed-in users can run models;
  * - every caller gets a small per-minute budget (per instance, best effort).
  */
-export async function guardInference(ip: string): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+export async function guardInference(ip: string): Promise<{ ok: true; userId?: string } | { ok: false; status: number; error: string }> {
   if (!process.env.HF_TOKEN) {
-    return { ok: false, status: 503, error: "The playground isn't configured. Add HF_TOKEN to the server environment." };
+    return { ok: false, status: 503, error: "Creating isn't switched on yet. The site owner needs to add an AI token." };
   }
   let key = `ip:${ip}`;
+  let userId: string | undefined;
   if (supabaseEnabled) {
     const sb = await createClient();
     const user = sb ? (await sb.auth.getUser()).data.user : null;
-    if (!user) return { ok: false, status: 401, error: "Sign in to run models in the playground." };
+    if (!user) return { ok: false, status: 401, error: "Sign in to create." };
     key = `u:${user.id}`;
+    userId = user.id;
   }
   const now = Date.now();
   const recent = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS);
@@ -29,7 +31,7 @@ export async function guardInference(ip: string): Promise<{ ok: true } | { ok: f
   }
   recent.push(now);
   hits.set(key, recent);
-  return { ok: true };
+  return { ok: true, userId };
 }
 
 export function clientIp(h: Headers): string {

@@ -118,7 +118,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
             <div className="flex gap-1" role="group" aria-label="Source">
               {[
                 { id: "all", label: "All" },
-                { id: "hub", label: "Hugging Face" },
+                { id: "hub", label: "Public" },
                 { id: "community", label: "Community" },
               ].map((s) => {
                 const on = source === s.id;

@@ -351,3 +351,199 @@ function pk_zoomClear(vIndex) {
 function pk_ping() {
   return pk_ok({ version: app.version });
 }
+
+// ── markers & playhead ─────────────────────────────────────
+var PK_TICKS = 254016000000;
+
+/** markersJson: [{time, name, comment, color}] — color is Premiere's 0–7 marker colour index. */
+function pk_markers(markersJson) {
+  try {
+    var seq = pk_seq();
+    var list = pk_parse(markersJson);
+    for (var i = 0; i < list.length; i++) {
+      var m = seq.markers.createMarker(list[i].time);
+      if (list[i].name) m.name = list[i].name;
+      if (list[i].comment) m.comments = list[i].comment;
+      if (list[i].color !== undefined && typeof m.setColorByIndex === "function") m.setColorByIndex(list[i].color);
+    }
+    return pk_ok({ added: list.length });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+function pk_seek(seconds) {
+  try {
+    pk_seq().setPlayerPosition(String(Math.round(seconds * PK_TICKS)));
+    return pk_ok({});
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+// ── project cleanup ────────────────────────────────────────
+function pk_walk(bin, binPath, out) {
+  for (var i = 0; i < bin.children.numItems; i++) {
+    var item = bin.children[i];
+    if (item.type === ProjectItemType.BIN) {
+      pk_walk(item, binPath ? binPath + "/" + item.name : item.name, out);
+    } else {
+      var media = "";
+      try { media = item.getMediaPath ? item.getMediaPath() : ""; } catch (e) { media = ""; }
+      out.push({
+        nodeId: item.nodeId,
+        name: item.name,
+        path: media || "",
+        isSequence: typeof item.isSequence === "function" ? item.isSequence() : false,
+        bin: binPath,
+        ref: item
+      });
+    }
+  }
+  return out;
+}
+
+function pk_projectItems() {
+  try {
+    var all = pk_walk(app.project.rootItem, "", []);
+    for (var i = 0; i < all.length; i++) delete all[i].ref;
+    return pk_ok({ items: all });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+/** movesJson: [{nodeId, to}] — moves each item into a top-level bin, creating bins as needed. */
+function pk_cleanup(movesJson) {
+  try {
+    var moves = pk_parse(movesJson);
+    var root = app.project.rootItem;
+    var bins = {};
+    for (var b = 0; b < root.children.numItems; b++) {
+      if (root.children[b].type === ProjectItemType.BIN) bins[root.children[b].name] = root.children[b];
+    }
+    var byId = {};
+    var all = pk_walk(root, "", []);
+    for (var i = 0; i < all.length; i++) byId[all[i].nodeId] = all[i].ref;
+    var moved = 0;
+    for (var m = 0; m < moves.length; m++) {
+      var item = byId[moves[m].nodeId];
+      if (!item) continue;
+      if (!bins[moves[m].to]) bins[moves[m].to] = root.createBin(moves[m].to);
+      item.moveBin(bins[moves[m].to]);
+      moved++;
+    }
+    return pk_ok({ moved: moved });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+// ── motion presets on selected clips ───────────────────────
+function pk_selectedVideo(seq) {
+  var sel = seq.getSelection();
+  var out = [];
+  for (var i = 0; i < sel.length; i++) if (sel[i].mediaType === "Video") out.push(sel[i]);
+  out.sort(function (a, b) { return a.start.seconds - b.start.seconds; });
+  return out;
+}
+
+function pk_selectedClips() {
+  try {
+    var clips = pk_selectedVideo(pk_seq());
+    var out = [];
+    for (var i = 0; i < clips.length; i++) out.push({ name: clips[i].name, start: clips[i].start.seconds, end: clips[i].end.seconds });
+    return pk_ok({ clips: out });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+function pk_param(clip, matchName, displayName, index) {
+  for (var i = 0; i < clip.components.numItems; i++) {
+    var comp = clip.components[i];
+    if (comp.matchName === matchName) {
+      for (var j = 0; j < comp.properties.numItems; j++) {
+        if (comp.properties[j].displayName === displayName) return comp.properties[j];
+      }
+      return comp.properties.numItems > index ? comp.properties[index] : null;
+    }
+  }
+  return null;
+}
+
+/**
+ * plansJson: one plan per selected video clip (same order as pk_selectedClips):
+ * {scale:[{time,value}], position:[{time,value:[x,y]}], rotation:[...], opacity:[...]} in sequence seconds.
+ */
+function pk_applyKeys(plansJson) {
+  try {
+    var seq = pk_seq();
+    var plans = pk_parse(plansJson);
+    var clips = pk_selectedVideo(seq);
+    var map = {
+      scale: ["AE.ADBE Motion", "Scale", 1],
+      position: ["AE.ADBE Motion", "Position", 0],
+      rotation: ["AE.ADBE Motion", "Rotation", 4],
+      opacity: ["AE.ADBE Opacity", "Opacity", 0]
+    };
+    var written = 0;
+    for (var c = 0; c < clips.length && c < plans.length; c++) {
+      var clip = clips[c];
+      for (var key in plans[c]) {
+        if (!plans[c].hasOwnProperty(key) || !map[key]) continue;
+        var p = pk_param(clip, map[key][0], map[key][1], map[key][2]);
+        if (!p) continue;
+        p.setTimeVarying(true);
+        var keys = plans[c][key];
+        for (var k = 0; k < keys.length; k++) {
+          var t = clip.inPoint.seconds + (keys[k].time - clip.start.seconds);
+          p.addKey(t);
+          p.setValueAtKey(t, keys[k].value, true);
+          written++;
+        }
+      }
+    }
+    return pk_ok({ keys: written, clips: Math.min(clips.length, plans.length) });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+// ── library: drop a file at the playhead ───────────────────
+function pk_insertFile(filePath, type, index) {
+  try {
+    var seq = pk_seq();
+    var item = pk_findItemByPath(app.project.rootItem, filePath);
+    if (!item) {
+      if (!app.project.importFiles([filePath], true, app.project.getInsertionBin(), false)) throw "Premiere couldn't import that file.";
+      item = pk_findItemByPath(app.project.rootItem, filePath);
+      if (!item) throw "The file was imported but couldn't be found in the project.";
+    }
+    var track = pk_track(seq, type, index);
+    var at = seq.getPlayerPosition();
+    try {
+      track.overwriteClip(item, at);
+    } catch (e1) {
+      track.overwriteClip(item, at.seconds);
+    }
+    return pk_ok({ name: item.name, at: at.seconds });
+  } catch (e) {
+    return pk_err(e);
+  }
+}
+
+// ── safe zones: grab the frame under the playhead ──────────
+function pk_exportFrame(filePath) {
+  try {
+    pk_seq();
+    app.enableQE();
+    var qs = qe.project.getActiveSequence();
+    qs.exportFramePNG(qs.CTI.timecode, filePath);
+    var f = new File(filePath);
+    var g = new File(filePath + ".png");
+    return pk_ok({ path: f.exists ? filePath : g.exists ? filePath + ".png" : filePath });
+  } catch (e) {
+    return pk_err(e);
+  }
+}

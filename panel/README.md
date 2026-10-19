@@ -1,16 +1,21 @@
 # PostKit panel for Premiere Pro
 
-A CEP panel for Premiere Pro 2022 and newer (Windows and Mac). Version 0.1 has:
+A CEP panel for Premiere Pro 2022 and newer (Windows and Mac). Version 0.2 has:
 
 | Tool | What it does | Where it runs |
 | --- | --- | --- |
 | Sign-in | Email code; licence token checked offline, refreshed daily | postkitlb.com API |
 | Smart cut | Finds pauses with ffmpeg and ripple-deletes them on a copy of the sequence | Local |
-| Transcription | Word-timed transcript of the speech track | Server (Groq Whisper) |
-| Captions | 1–3 word captions as an SRT on a new caption track | Local |
+| Transcription & captions | Word-timed transcript; 1–3 word captions on a new caption track | Server (Groq Whisper) + local |
 | Auto zoom | Scale keyframes on the camera track, one change per sentence | Local |
+| Search & markers | Jump to any spoken word, YouTube chapters, beat markers on the music | Local |
+| Motion presets | 11 moves (pop in, slide, spin, shake, fades…) as keyframes, 3 strengths | Local |
+| Your library | Your own folders of SFX, transitions and overlays; one click to the playhead | Local |
+| Safe zones | The frame under the playhead with TikTok, Reels or Shorts UI drawn over it | Local |
+| Project cleanup | Files loose project items into bins by type, plan shown first | Local |
 
-Caption styles (.mogrt templates) and safe-zone overlays come next.
+Next: sound effects, automatic SFX, b-roll, studio voice (need ElevenLabs and Pexels keys),
+then the AI editor, motion gallery, animated titles, multicam, curve editor and tracking.
 
 ## Install (testing)
 

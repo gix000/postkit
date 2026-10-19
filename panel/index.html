@@ -8,6 +8,7 @@
   </head>
   <body>
     <header class="top">
+      <button id="home-btn" class="back" hidden aria-label="All tools">‹ Tools</button>
       <span class="mark">PostKit<i aria-hidden="true"></i></span>
       <button id="account-btn" class="link" hidden>Account</button>
     </header>
@@ -30,27 +31,25 @@
       </form>
     </section>
 
-    <!-- Main -->
-    <section id="view-main" class="view" hidden>
-      <div class="source">
-        <div class="row">
-          <strong id="seq-name">No sequence open</strong>
-          <button class="link" id="refresh" title="Reload the active sequence">Refresh</button>
-        </div>
+    <!-- Tool list -->
+    <section id="view-home" class="view" hidden>
+      <p class="seq-line"><span class="muted">Sequence</span> <strong id="seq-name">No sequence open</strong> <button class="link" id="refresh">Refresh</button></p>
+      <ul class="tools" id="tool-list" role="list"></ul>
+    </section>
+
+    <!-- One view per tool. data-needs lists the track pickers it shows. -->
+    <section id="view-tool" class="view" hidden>
+      <h1 id="tool-title"></h1>
+      <div class="source" id="source">
         <div class="grid2">
-          <label>Speech track<select id="a-track"></select></label>
-          <label>Camera track<select id="v-track"></select></label>
+          <label data-pick="speech">Speech track<select id="a-track"></select></label>
+          <label data-pick="camera">Camera track<select id="v-track"></select></label>
+          <label data-pick="music">Music track<select id="m-track"></select></label>
         </div>
       </div>
 
-      <nav class="tabs" role="tablist">
-        <button role="tab" data-tab="cut" aria-selected="true">Smart cut</button>
-        <button role="tab" data-tab="captions" aria-selected="false">Captions</button>
-        <button role="tab" data-tab="zoom" aria-selected="false">Auto zoom</button>
-      </nav>
-
       <!-- Smart cut -->
-      <div class="tab" data-panel="cut">
+      <div class="tool" data-tool="cut" data-needs="speech camera" hidden>
         <p class="muted">Finds the pauses on the speech track and removes them from a copy of the sequence. Your original stays untouched.</p>
         <label>Silence below <output id="thr-out">-35 dB</output>
           <input id="thr" type="range" min="-55" max="-20" step="1" value="-35" />
@@ -68,8 +67,8 @@
         <p class="result" id="cut-result"></p>
       </div>
 
-      <!-- Captions -->
-      <div class="tab" data-panel="captions" hidden>
+      <!-- Captions (and transcription) -->
+      <div class="tool" data-tool="captions" data-needs="speech" hidden>
         <div class="grid2">
           <label>Language
             <select id="lang">
@@ -96,7 +95,7 @@
       </div>
 
       <!-- Auto zoom -->
-      <div class="tab" data-panel="zoom" hidden>
+      <div class="tool" data-tool="zoom" data-needs="camera" hidden>
         <p class="muted">Changes the framing with each sentence of the transcript, as keyframes on the camera track you can still edit.</p>
         <div class="grid2">
           <label>Style
@@ -114,6 +113,81 @@
           <button id="zoom" class="primary">Apply zoom</button>
         </div>
         <p class="result" id="zoom-result"></p>
+      </div>
+
+      <!-- Search & markers -->
+      <div class="tool" data-tool="search" data-needs="music" hidden>
+        <h2>Find a word</h2>
+        <form id="search-form" class="search-row">
+          <input id="search-q" type="search" placeholder="Any word or phrase" dir="auto" />
+          <button class="secondary" type="submit">Find</button>
+        </form>
+        <ul id="search-hits" class="hits" role="list"></ul>
+        <h2>YouTube chapters</h2>
+        <div class="actions">
+          <button id="chapters" class="secondary">Make chapters</button>
+          <button id="chapters-mark" class="secondary" disabled>Add as markers</button>
+        </div>
+        <textarea id="chapters-text" rows="5" readonly hidden></textarea>
+        <h2>Beat markers</h2>
+        <label>Sensitivity
+          <select id="beat-sens">
+            <option value="0.7">Main beats only</option>
+            <option value="1" selected>Normal</option>
+            <option value="1.5">Every hit</option>
+          </select>
+        </label>
+        <button id="beats" class="primary block">Mark the beats</button>
+        <p class="result" id="search-result"></p>
+      </div>
+
+      <!-- Motion presets -->
+      <div class="tool" data-tool="presets" hidden>
+        <p class="muted">Select clips on the timeline, then pick a motion. It's written as real keyframes you can still change.</p>
+        <div class="segmented" role="radiogroup" aria-label="Strength">
+          <label><input type="radio" name="strength" value="subtle" /> Subtle</label>
+          <label><input type="radio" name="strength" value="medium" checked /> Medium</label>
+          <label><input type="radio" name="strength" value="strong" /> Strong</label>
+        </div>
+        <div class="preset-grid" id="preset-grid"></div>
+        <p class="result" id="preset-result"></p>
+      </div>
+
+      <!-- Your Library -->
+      <div class="tool" data-tool="library" hidden>
+        <div class="actions">
+          <button id="lib-add" class="secondary">Add a folder</button>
+          <button id="lib-rescan" class="secondary">Rescan</button>
+        </div>
+        <p class="muted small" id="lib-folders"></p>
+        <input id="lib-q" type="search" placeholder="Search your library" />
+        <div class="chips" id="lib-cats"></div>
+        <div class="grid2">
+          <label>Audio goes on<select id="lib-a"></select></label>
+          <label>Video goes on<select id="lib-v"></select></label>
+        </div>
+        <ul id="lib-list" class="lib" role="list"></ul>
+        <p class="result" id="lib-result"></p>
+      </div>
+
+      <!-- Safe zones -->
+      <div class="tool" data-tool="safe" hidden>
+        <p class="muted">Shows the frame under the playhead the way each app shows it. Nothing is added to your video.</p>
+        <div class="segmented" role="radiogroup" aria-label="Platform" id="safe-platforms"></div>
+        <button id="safe-check" class="primary block">Check this frame</button>
+        <canvas id="safe-canvas" class="safe-canvas" hidden></canvas>
+        <p class="result" id="safe-result"></p>
+      </div>
+
+      <!-- Project cleanup -->
+      <div class="tool" data-tool="cleanup" hidden>
+        <p class="muted">Files every loose item in the project into a bin by type: Video, Audio, Images, Graphics, Sequences. Your own bins are left as they are.</p>
+        <div class="actions">
+          <button id="clean-scan" class="secondary">Show the plan</button>
+          <button id="clean-apply" class="primary" disabled>Tidy the project</button>
+        </div>
+        <ul id="clean-plan" class="plain" role="list"></ul>
+        <p class="result" id="clean-result"></p>
       </div>
     </section>
 

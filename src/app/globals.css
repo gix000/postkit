@@ -1176,3 +1176,13 @@ svg {
   margin-top: 10px;
   color: var(--cream-dim);
 }
+
+.install-steps {
+  margin: 18px 0 0;
+  padding-inline-start: 20px;
+  color: var(--cream-dim);
+  font-size: 0.95rem;
+}
+.install-steps li + li {
+  margin-top: 6px;
+}

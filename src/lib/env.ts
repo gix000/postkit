@@ -34,8 +34,4 @@ export const serverEnv = {
   }),
   licensePrivateKey: () => required("LICENSE_PRIVATE_KEY").replace(/\\n/g, "\n"),
   licensePublicKey: () => required("LICENSE_PUBLIC_KEY").replace(/\\n/g, "\n"),
-  downloads: () => ({
-    win: process.env.DOWNLOAD_URL_WIN ?? "",
-    mac: process.env.DOWNLOAD_URL_MAC ?? "",
-  }),
 };

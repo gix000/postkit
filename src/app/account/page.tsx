@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { fill, formatDate, t } from "@/lib/i18n";
 import { createUserClient, getUser } from "@/lib/supabase/server";
 import { ITEMS } from "@/lib/plans";
-import { serverEnv, site } from "@/lib/env";
+import { site } from "@/lib/env";
+import { release } from "@/lib/release";
 import { BuyButton } from "@/components/BuyButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { removeDevice, signOut } from "./actions";
@@ -27,7 +28,6 @@ export default async function AccountPage() {
   ]);
 
   const active = !!sub && new Date(sub.expires_at) > new Date();
-  const downloads = serverEnv.downloads();
   const allowed = (sub?.devices_allowed as number | undefined) ?? 1;
   const planName = sub ? (a.plan.names[sub.plan] ?? sub.plan) : "";
 
@@ -70,22 +70,17 @@ export default async function AccountPage() {
           <section className="card" aria-labelledby="dl-h">
             <h2 id="dl-h">{a.download.title}</h2>
             {!active && <p className="muted">{a.download.locked}</p>}
-            {active && !downloads.win && !downloads.mac && <p className="muted">{a.download.soon}</p>}
-            {active && (downloads.win || downloads.mac) && (
+            {active && (
               <>
-                <p className="muted">{a.download.body}</p>
-                <div className="actions">
-                  {downloads.win && (
-                    <a className="btn btn--primary" href={downloads.win}>
-                      {a.download.win}
-                    </a>
-                  )}
-                  {downloads.mac && (
-                    <a className="btn btn--primary" href={downloads.mac}>
-                      {a.download.mac}
-                    </a>
-                  )}
-                </div>
+                {/* A plain link: the route redirects to a short-lived file URL. */}
+                <a className="btn btn--primary" href="/api/download">
+                  {fill(a.download.button, { version: release.version })}
+                </a>
+                <ol className="install-steps">
+                  {a.download.steps.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
               </>
             )}
           </section>

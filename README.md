@@ -75,5 +75,5 @@ Errors come back as `{ error, message }`: `no_plan` / `plan_expired` (402), `dev
 ## Switching things on later
 
 - **AI credits** — set `NEXT_PUBLIC_AI_EDITOR=1` to show the credit pack and balance. Plans already grant credits.
-- **Downloads** — set `DOWNLOAD_URL_WIN` / `DOWNLOAD_URL_MAC`; they show only to active subscribers.
+- **Downloads** — upload the panel zip to the private Supabase Storage bucket `releases` (under `panel/`) and update `src/lib/release.ts`. `/api/download` gives active subscribers a 60-second signed link.
 - **Prices** — edit `src/lib/plans.ts`; the pricing section and checkout both read from it.

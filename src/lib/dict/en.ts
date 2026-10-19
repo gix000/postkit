@@ -132,11 +132,14 @@ export const en = {
     },
     download: {
       title: "Download",
-      body: "Run the installer, restart Premiere, then open Window → Extensions → PostKit and sign in with this email.",
-      win: "Download for Windows",
-      mac: "Download for Mac",
-      locked: "Downloads appear here once your plan is active.",
-      soon: "The installer link isn't published yet. We'll email you when it is.",
+      button: "Download PostKit {version}",
+      steps: [
+        "Unzip the file and open the install folder.",
+        "Mac: right-click install-mac.command → Open. Windows: double-click install-win.bat.",
+        "Restart Premiere Pro and open Window → Extensions → PostKit.",
+        "Sign in with this email.",
+      ],
+      locked: "The download appears here once your plan is active.",
     },
     devices: {
       title: "Computers",

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { InferenceClient } from "@huggingface/inference";
 import { clientIp, guardInference, validModelId } from "@/lib/inference-guard";
 import {
+  CLOUDFLARE,
   CURATED,
   CUTOUT_MODEL,
   SIZES,
@@ -15,6 +16,7 @@ import {
 import { CreditsError, refund, spend } from "@/lib/credits";
 import { saveCreation } from "@/lib/creations";
 import { toEnglishPrompt } from "@/lib/translate";
+import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
 
 // Videos can take a few minutes. Vercel stops the function at your plan's limit.
 export const maxDuration = 300;
@@ -24,7 +26,28 @@ const NEEDS_IMAGE: Tool[] = ["edit", "animate", "upscale", "cutout"];
 const NEEDS_PROMPT: Tool[] = ["photo", "edit", "video"];
 const MAX_IMAGE_BYTES = 4_000_000;
 
-type Body = { tool?: unknown; model?: unknown; prompt?: unknown; size?: unknown; preset?: unknown; image?: unknown };
+type Body = {
+  tool?: unknown;
+  model?: unknown;
+  prompt?: unknown;
+  size?: unknown;
+  preset?: unknown;
+  image?: unknown;
+  /** Same photo under 512 px, for Cloudflare's FLUX.2 editing. */
+  imageSmall?: unknown;
+  /** Original photo size, so edits keep its shape. */
+  imageWidth?: unknown;
+  imageHeight?: unknown;
+};
+
+/** Output size for an edit: the photo's shape, about 1 megapixel, in steps of 16. */
+function editSize(w: unknown, h: unknown) {
+  const W = typeof w === "number" && w > 0 ? w : 1024;
+  const H = typeof h === "number" && h > 0 ? h : 1024;
+  const scale = Math.min(1920 / Math.max(W, H), Math.sqrt((1024 * 1024) / (W * H)));
+  const r = (n: number) => Math.max(256, Math.min(1920, Math.round((n * scale) / 16) * 16));
+  return { w: r(W), h: r(H) };
+}
 
 function fail(error: string, status: number, extra?: Record<string, unknown>) {
   return NextResponse.json({ error, ...extra }, { status });
@@ -101,20 +124,53 @@ export async function POST(req: NextRequest) {
   try {
     let out: Blob;
     if (tool === "photo") {
-      out = (await client.textToImage(
-        {
-          model,
-          inputs: styled,
-          provider: "auto",
-          parameters: { width: dims.w, height: dims.h, image_size: dims.falPreset },
-        },
-        { outputType: "blob" },
-      )) as Blob;
+      const hfPhoto = async (m: string) =>
+        (await client.textToImage(
+          { model: m, inputs: styled, provider: "auto", parameters: { width: dims.w, height: dims.h, image_size: dims.falPreset } },
+          { outputType: "blob" },
+        )) as Blob;
+      let cf = CLOUDFLARE[model];
+      // Flux Fast only makes squares; other sizes go to Flux 2 Klein on Cloudflare.
+      if (cf?.squareOnly && size !== "square") cf = CLOUDFLARE["cloudflare/flux-2-klein-4b"];
+      out = await firstOf([
+        cf && cloudflareReady()
+          ? () =>
+              runCloudflareImage({
+                model: cf.cf,
+                multipart: cf.multipart,
+                prompt: styled,
+                width: dims.w,
+                height: dims.h,
+                steps: cf.cf.endsWith("flux-2-dev") ? 24 : undefined,
+              })
+          : null,
+        () => hfPhoto(cf ? cf.hf : model),
+        cf ? () => hfPhoto("black-forest-labs/FLUX.1-schnell") : null,
+      ]);
     } else if (tool === "edit") {
-      out = await client.imageToImage({ model, inputs: image!, provider: "auto", parameters: { prompt: styled } });
+      const cf = CLOUDFLARE[model];
+      const small = dataUrlToBlob(body.imageSmall);
+      const out_ = editSize(body.imageWidth, body.imageHeight);
+      const hfEdit = (m: string) => client.imageToImage({ model: m, inputs: image!, provider: "auto", parameters: { prompt: styled } });
+      out = await firstOf([
+        cf?.edits && small && cloudflareReady()
+          ? () =>
+              runCloudflareImage({
+                model: cf.cf,
+                multipart: true,
+                prompt: styled,
+                image: small,
+                width: out_.w,
+                height: out_.h,
+                steps: cf.cf.endsWith("flux-2-dev") ? 24 : undefined,
+              })
+          : null,
+        () => hfEdit(cf ? cf.hf : model),
+        cf ? () => hfEdit("Qwen/Qwen-Image-Edit-2509") : null,
+      ]);
     } else if (tool === "upscale") {
-      out = await firstThatWorks(UPSCALE_MODELS, (m) =>
-        client.imageToImage({ model: m, inputs: image!, provider: "auto", parameters: { prompt: UPSCALE_PROMPT } }),
+      out = await firstOf(
+        UPSCALE_MODELS.map((m) => () => client.imageToImage({ model: m, inputs: image!, provider: "auto", parameters: { prompt: UPSCALE_PROMPT } })),
       );
     } else if (tool === "video") {
       out = await client.textToVideo({
@@ -164,11 +220,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function firstThatWorks(models: string[], run: (model: string) => Promise<Blob>): Promise<Blob> {
+/** Tries each way to make the image in order and returns the first that works. */
+async function firstOf(attempts: (null | undefined | false | (() => Promise<Blob>))[]): Promise<Blob> {
   let last: unknown;
-  for (const m of models) {
+  for (const run of attempts) {
+    if (!run) continue;
     try {
-      return await run(m);
+      return await run();
     } catch (e) {
       last = e;
     }

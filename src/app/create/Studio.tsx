@@ -15,7 +15,7 @@ import {
   type SizeId,
   type Tool,
 } from "@/lib/catalog";
-import { applyMask, prepareUpload, urlToUpload } from "@/lib/image-client";
+import { applyMask, prepareUpload, smallCopy, urlToUpload } from "@/lib/image-client";
 import { createClient as browserSupabase } from "@/lib/supabase/browser";
 import { setShared } from "@/app/creation-actions";
 
@@ -182,6 +182,7 @@ function MediaGen({
     const runModel = runTool === "upscale" || runTool === "cutout" ? undefined : model;
     const runKind: "photo" | "video" = runTool === "video" || runTool === "animate" ? "video" : "photo";
     try {
+      const editExtras = runTool === "edit" && image ? await smallCopy(image).catch(() => null) : null;
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -192,6 +193,9 @@ function MediaGen({
           size,
           preset,
           image: runTool === "photo" || runTool === "video" ? undefined : image,
+          imageSmall: editExtras?.small,
+          imageWidth: editExtras?.width,
+          imageHeight: editExtras?.height,
         }),
       });
       const type = res.headers.get("content-type") ?? "";

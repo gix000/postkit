@@ -50,3 +50,16 @@ export async function applyMask(photoDataUrl: string, maskDataUrl: string): Prom
   mask.close();
   return await new Promise<Blob>((resolve, reject) => c.toBlob((b) => (b ? resolve(b) : reject(new Error("png"))), "image/png"));
 }
+
+/** A copy of the photo under 512 px (Cloudflare's FLUX.2 limit) plus the original size. */
+export async function smallCopy(dataUrl: string, maxSide = 500): Promise<{ small: string; width: number; height: number }> {
+  const bmp = await loadBitmap(await fetch(dataUrl).then((r) => r.blob()));
+  const { width, height } = bmp;
+  const scale = Math.min(1, maxSide / Math.max(width, height));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(width * scale));
+  c.height = Math.max(1, Math.round(height * scale));
+  c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+  bmp.close();
+  return { small: c.toDataURL("image/jpeg", 0.92), width, height };
+}

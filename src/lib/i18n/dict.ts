@@ -142,9 +142,9 @@ const en = {
     starting: "Opening Whish…",
     costTitle: "What things cost",
     costs: {
-      photoFast: "Photo (Flux Fast, Z Photoreal)",
+      photoFast: "Photo (Flux 2 Klein, Flux Fast)",
       photo: "Photo (other models)",
-      edit: "Edit your photo",
+      edit: "Edit your photo (Flux 2 Klein Edit: 2)",
       upscale: "Upscale",
       cutout: "Remove background",
       video: "Video",
@@ -406,9 +406,9 @@ const ar: Dict = {
     starting: "نفتح Whish…",
     costTitle: "كم يكلّف كل شيء",
     costs: {
-      photoFast: "صورة (Flux Fast وZ Photoreal)",
+      photoFast: "صورة (Flux 2 Klein وFlux Fast)",
       photo: "صورة (نماذج أخرى)",
-      edit: "تعديل صورتك",
+      edit: "تعديل صورتك (Flux 2 Klein Edit: 2)",
       upscale: "تكبير الدقة",
       cutout: "إزالة الخلفية",
       video: "فيديو",

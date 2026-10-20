@@ -12,43 +12,76 @@ export type Kind = "photo" | "edit" | "video" | "animate" | "chat";
 /** What a generation charges for. */
 export type Tool = "photo" | "edit" | "video" | "animate" | "upscale" | "cutout";
 
-export type ModelPick = { id: string; name: string; note: Text; cheap?: boolean };
+export type ModelPick = { id: string; name: string; note: Text; cheap?: boolean; cost?: number };
+
+/**
+ * Flux models that run on Cloudflare Workers AI (free daily allowance, then ~$0.0006 a photo).
+ * Ids look like "cloudflare/<model>". If Cloudflare is busy or the allowance is used up,
+ * the same model runs on Hugging Face instead (hf), then a safe default.
+ */
+export const CLOUDFLARE: Record<string, { cf: string; hf: string; multipart: boolean; squareOnly?: boolean; edits: boolean }> = {
+  "cloudflare/flux-2-klein-4b": { cf: "@cf/black-forest-labs/flux-2-klein-4b", hf: "black-forest-labs/FLUX.2-klein-4B", multipart: true, edits: true },
+  "cloudflare/flux-1-schnell": { cf: "@cf/black-forest-labs/flux-1-schnell", hf: "black-forest-labs/FLUX.1-schnell", multipart: false, squareOnly: true, edits: false },
+  "cloudflare/flux-2-klein-9b": { cf: "@cf/black-forest-labs/flux-2-klein-9b", hf: "black-forest-labs/FLUX.2-klein-9B", multipart: true, edits: true },
+  "cloudflare/flux-2-dev": { cf: "@cf/black-forest-labs/flux-2-dev", hf: "black-forest-labs/FLUX.2-dev", multipart: true, edits: true },
+};
 
 export const CURATED: Record<Kind, ModelPick[]> = {
   photo: [
     {
-      id: "black-forest-labs/FLUX.1-schnell",
-      name: "Flux Fast",
-      note: { en: "Quick, sharp, great all-round", ar: "سريع وحاد ومناسب لكل شيء" },
+      id: "cloudflare/flux-2-klein-4b",
+      name: "Flux 2 Klein",
+      note: { en: "Fast and sharp, every size", ar: "سريع وحاد، بكل المقاسات" },
       cheap: true,
+    },
+    {
+      id: "cloudflare/flux-1-schnell",
+      name: "Flux Fast",
+      note: { en: "Quickest, great all-round", ar: "الأسرع، ومناسب لكل شيء" },
+      cheap: true,
+    },
+    {
+      id: "cloudflare/flux-2-klein-9b",
+      name: "Flux 2 Klein Plus",
+      note: { en: "More detail and better text", ar: "تفاصيل أكثر ونصوص أوضح" },
+    },
+    {
+      id: "cloudflare/flux-2-dev",
+      name: "Flux 2 Pro",
+      note: { en: "Best Flux quality, a little slower", ar: "أفضل جودة Flux، أبطأ قليلًا" },
     },
     {
       id: "Tongyi-MAI/Z-Image-Turbo",
       name: "Z Photoreal",
       note: { en: "Realistic photos in seconds", ar: "صور واقعية خلال ثوانٍ" },
-      cheap: true,
     },
     {
       id: "Qwen/Qwen-Image",
       name: "Qwen Poster",
       note: { en: "Best with text, posters and signs", ar: "الأفضل للنصوص والملصقات واللافتات" },
     },
-    {
-      id: "black-forest-labs/FLUX.1-dev",
-      name: "Flux Pro",
-      note: { en: "More detail, a little slower", ar: "تفاصيل أكثر، وأبطأ قليلًا" },
-    },
   ],
   edit: [
+    {
+      id: "cloudflare/flux-2-klein-4b",
+      name: "Flux 2 Klein Edit",
+      note: { en: "Fast edits, keeps your product", ar: "تعديل سريع يحافظ على منتجك" },
+      cost: 2,
+    },
+    {
+      id: "cloudflare/flux-2-klein-9b",
+      name: "Flux 2 Klein Plus Edit",
+      note: { en: "Cleaner detail on faces and text", ar: "تفاصيل أنظف للوجوه والنصوص" },
+    },
+    {
+      id: "cloudflare/flux-2-dev",
+      name: "Flux 2 Pro Edit",
+      note: { en: "Best Flux edits, a little slower", ar: "أفضل تعديل Flux، أبطأ قليلًا" },
+    },
     {
       id: "Qwen/Qwen-Image-Edit-2509",
       name: "Qwen Edit",
       note: { en: "Follows instructions, keeps faces", ar: "ينفّذ التعليمات ويحافظ على الوجوه" },
-    },
-    {
-      id: "black-forest-labs/FLUX.1-Kontext-dev",
-      name: "Flux Kontext",
-      note: { en: "Restyle, relight, change the scene", ar: "غيّر الأسلوب والإضاءة والمشهد" },
     },
   ],
   video: [
@@ -123,7 +156,10 @@ export const CUTOUT_MODEL = "briaai/RMBG-2.0";
 export const COST: Record<Tool, number> = { photo: 2, edit: 3, video: 15, animate: 15, upscale: 3, cutout: 2 };
 
 export function costFor(tool: Tool, model?: string): number {
-  if (tool === "photo" && model && CURATED.photo.some((p) => p.id === model && p.cheap)) return 1;
+  const kind = tool === "photo" || tool === "edit" || tool === "video" || tool === "animate" ? tool : null;
+  const pick = kind && model ? CURATED[kind].find((p) => p.id === model) : undefined;
+  if (pick?.cost) return pick.cost;
+  if (tool === "photo" && pick?.cheap) return 1;
   return COST[tool];
 }
 

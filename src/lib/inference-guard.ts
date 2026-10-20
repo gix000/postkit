@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "./supabase/server";
 import { supabaseEnabled } from "./supabase/config";
+import { cloudflareReady } from "./cloudflare";
 
 const hits = new Map<string, number[]>();
 const WINDOW_MS = 60_000;
@@ -12,7 +13,7 @@ const MAX_PER_WINDOW = Number(process.env.PLAYGROUND_RATE_PER_MIN ?? 12);
  * - every caller gets a small per-minute budget (per instance, best effort).
  */
 export async function guardInference(ip: string): Promise<{ ok: true; userId?: string } | { ok: false; status: number; error: string }> {
-  if (!process.env.HF_TOKEN) {
+  if (!process.env.HF_TOKEN && !cloudflareReady()) {
     return { ok: false, status: 503, error: "Creating isn't switched on yet. The site owner needs to add an AI token." };
   }
   let key = `ip:${ip}`;

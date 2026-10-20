@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "./I18n";
+import Segmented from "./Segmented";
 
 /** The home page's main action: type a prompt, pick photo or video, go to Create. */
 export default function HeroPrompt() {
@@ -12,7 +13,7 @@ export default function HeroPrompt() {
 
   return (
     <form
-      className="glass rounded-3xl p-2 sm:p-2.5"
+      className="glass rounded-[28px] p-2 sm:p-2.5"
       onSubmit={(e) => {
         e.preventDefault();
         const p = new URLSearchParams({ mode: kind });
@@ -39,20 +40,16 @@ export default function HeroPrompt() {
         className="w-full resize-none bg-transparent px-4 pt-3 pb-2 text-lg sm:text-xl placeholder:text-muted focus:outline-none"
       />
       <div className="flex items-center justify-between gap-2 px-1.5 pb-1">
-        <div className="flex gap-1 rounded-full bg-paper/60 p-1" role="radiogroup" aria-label={t.home.promptLabel}>
-          {(["photo", "video"] as const).map((k) => (
-            <button
-              key={k}
-              type="button"
-              role="radio"
-              aria-checked={kind === k}
-              onClick={() => setKind(k)}
-              className={`h-9 px-4 rounded-full text-sm font-semibold ${kind === k ? "bg-ink text-paper" : "text-muted hover:text-ink"}`}
-            >
-              {k === "photo" ? t.home.photo : t.home.video}
-            </button>
-          ))}
-        </div>
+        <Segmented
+          label={t.home.promptLabel}
+          value={kind}
+          onChange={setKind}
+          options={[
+            { id: "photo", label: t.home.photo },
+            { id: "video", label: t.home.video },
+          ]}
+          className="w-[180px]"
+        />
         <button className="tap btn-neon h-11 px-6 rounded-full text-[15px] font-semibold">{t.home.create}</button>
       </div>
     </form>

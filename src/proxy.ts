@@ -18,10 +18,11 @@ export async function proxy(request: NextRequest) {
       },
     },
   });
-  await supabase.auth.getUser();
+  // Refreshes an expiring session; verifies the token locally when possible.
+  await supabase.auth.getClaims();
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/search|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/search|api/models|api/health|showcase|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2)$).*)"],
 };

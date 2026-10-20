@@ -3,6 +3,9 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ModelChooser from "@/components/ModelChooser";
+import Segmented from "@/components/Segmented";
+import Viewer, { type ViewItem } from "@/components/Viewer";
+import { haptic, useToast } from "@/components/Toast";
 import { useT } from "@/components/I18n";
 import {
   CURATED,
@@ -58,19 +61,7 @@ export default function Studio({
           <h1 className="text-[40px] font-bold tracking-tight leading-none">{t.create.title}</h1>
           <p className="text-muted mt-2 max-w-[60ch]">{t.create.sub}</p>
         </div>
-        <div className="glass flex gap-1 rounded-full p-1" role="tablist" aria-label={t.create.title}>
-          {tabs.map((m) => (
-            <button
-              key={m.id}
-              role="tab"
-              aria-selected={tab === m.id}
-              onClick={() => setTab(m.id)}
-              className={`h-9 px-5 rounded-full text-sm font-semibold ${tab === m.id ? "btn-neon" : "text-muted hover:text-ink"}`}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
+        <Segmented role="tablist" tone="neon" size="lg" label={t.create.title} options={tabs} value={tab} onChange={setTab} className="w-full sm:w-[320px]" />
       </div>
 
       {locked ? (
@@ -147,6 +138,17 @@ function MediaGen({
   const [busy, setBusy] = useState<Tool | null>(null);
   const [error, setError] = useState<{ text: string; needCredits?: boolean } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+  const [viewing, setViewing] = useState<ViewItem | null>(null);
+  const [started, setStarted] = useState<number | null>(null);
+  const [now, setNow] = useState(0);
+
+  // A seconds counter while something is being made.
+  useEffect(() => {
+    if (!started) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [started]);
 
   // A photo arriving from a URL (Library "Animate", or a result card).
   useEffect(() => {
@@ -179,6 +181,9 @@ function MediaGen({
     if (runTool !== "photo" && runTool !== "video" && !image) return;
     setBusy(runTool);
     setError(null);
+    setStarted(Date.now());
+    setNow(Date.now());
+    haptic(8);
     const runModel = runTool === "upscale" || runTool === "cutout" ? undefined : model;
     const runKind: "photo" | "video" = runTool === "video" || runTool === "animate" ? "video" : "photo";
     try {
@@ -226,11 +231,14 @@ function MediaGen({
           ...prev,
         ]);
       }
+      toast(t.create.saved);
+      haptic(18);
       router.refresh();
     } catch {
       setError({ text: lang === "ar" ? "تعذّر الاتصال. حاول مجددًا." : "Couldn't connect. Try again." });
     } finally {
       setBusy(null);
+      setStarted(null);
     }
   }
 
@@ -260,20 +268,15 @@ function MediaGen({
         {/* Start from text or a photo */}
         <div>
           <p className="text-sm font-medium mb-2">{t.create.startFrom}</p>
-          <div className="glass grid grid-cols-2 gap-1 rounded-full p-1" role="radiogroup" aria-label={t.create.startFrom}>
-            {(["text", "photo"] as const).map((s) => (
-              <button
-                key={s}
-                type="button"
-                role="radio"
-                aria-checked={source === s}
-                onClick={() => setSource(s)}
-                className={`h-9 rounded-full text-sm font-semibold ${source === s ? "bg-ink text-paper" : "text-muted hover:text-ink"}`}
-              >
-                {s === "text" ? t.create.fromPrompt : t.create.fromPhoto}
-              </button>
-            ))}
-          </div>
+          <Segmented
+            label={t.create.startFrom}
+            value={source}
+            onChange={setSource}
+            options={[
+              { id: "text", label: t.create.fromPrompt },
+              { id: "photo", label: t.create.fromPhoto },
+            ]}
+          />
         </div>
 
         {usesPhoto && (
@@ -333,6 +336,27 @@ function MediaGen({
             className="mt-1 w-full rounded-2xl border border-rule bg-surface px-3 py-2.5 text-[15px] focus:outline-none focus:border-cobalt"
           />
           <p className="text-xs text-muted mt-1">{t.create.arabicOk}</p>
+          {!prompt.trim() && (
+            <div className="mt-3">
+              <p className="text-xs text-muted mb-1.5">{t.create.ideas}</p>
+              <div className="flex gap-1.5 overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap pb-1">
+                {t.create.ideaList[pickerKind as "photo" | "edit" | "video" | "animate"].map((idea) => (
+                  <button
+                    key={idea}
+                    type="button"
+                    dir="auto"
+                    onClick={() => {
+                      setPrompt(idea);
+                      haptic(6);
+                    }}
+                    className="glass shrink-0 max-w-[260px] truncate rounded-full px-3.5 py-2 text-[13px] text-muted hover:text-ink"
+                  >
+                    {idea}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {showSize && (
@@ -354,10 +378,12 @@ function MediaGen({
 
         <ModelChooser kind={pickerKind} value={model} onChange={(id) => setModels((m) => ({ ...m, [pickerKind]: id }))} />
 
-        <button disabled={mainDisabled} className="tap btn-neon h-12 w-full rounded-full text-[15px] font-semibold disabled:opacity-40 flex items-center justify-center gap-2">
-          {busy === tool ? (isVideo ? t.create.makingVideo : t.create.makingPhoto) : mainLabel}
-          {busy !== tool && <span className="opacity-70 font-medium">· {t.create.credit(mainCost)}</span>}
-        </button>
+        <div className="sticky z-30 bottom-[calc(env(safe-area-inset-bottom)+92px)] md:bottom-4 -mx-2 p-2 rounded-full glass-float glass-strong md:static md:m-0 md:p-0 md:bg-transparent md:border-0 md:shadow-none md:backdrop-blur-none">
+          <button disabled={mainDisabled} className="tap btn-neon h-12 w-full rounded-full text-[15px] font-semibold disabled:opacity-40 flex items-center justify-center gap-2">
+            {busy === tool ? (isVideo ? t.create.makingVideo : t.create.makingPhoto) : mainLabel}
+            {busy !== tool && <span className="opacity-70 font-medium">· {t.create.credit(mainCost)}</span>}
+          </button>
+        </div>
         {error && (
           <p className="text-sm text-danger" role="alert">
             {error.text}{" "}
@@ -372,28 +398,37 @@ function MediaGen({
       </form>
 
       <div>
-        {items.length === 0 ? (
-          <div className="relative overflow-hidden rounded-2xl border border-rule min-h-[50vh] grid place-items-center px-6 text-center">
+        {items.length === 0 && !busy ? (
+          <div className="relative overflow-hidden rounded-[28px] border border-rule min-h-[50vh] grid place-items-center px-6 text-center">
             <div className="neon-field opacity-60" aria-hidden="true" />
-            <p className="relative z-10 text-muted max-w-[40ch]">
-              {busy ? (isVideo ? t.create.busyVideo : t.create.busyPhoto) : isVideo ? t.create.emptyVideo : t.create.emptyPhoto}
-            </p>
+            <p className="relative z-10 text-muted max-w-[40ch]">{isVideo ? t.create.emptyVideo : t.create.emptyPhoto}</p>
           </div>
         ) : (
           <>
-            {busy && (
-              <div className="mb-4 rounded-2xl border border-rule p-4 flex items-center gap-3 text-sm text-muted" role="status">
-                <span className="skel h-8 w-8 rounded-full" />
-                {isVideo ? t.create.busyVideo : t.create.busyPhoto}
-              </div>
-            )}
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {busy && (
+                <li className="rise rounded-[24px] overflow-hidden border border-rule" role="status">
+                  <div
+                    className="making grid place-items-center"
+                    style={{ aspectRatio: busy === "video" || busy === "animate" ? SIZES[size].ratio.replace(":", " / ") : showSize ? SIZES[size].ratio.replace(":", " / ") : "1 / 1" }}
+                  >
+                    <div className="relative z-10 text-center px-4">
+                      <p className="font-semibold">{isVideo ? t.create.busyVideo : t.create.busyPhoto}</p>
+                      <p className="mt-1 text-sm text-ink/70 tabular-nums">{started ? t.create.elapsed(Math.max(0, Math.round((now - started) / 1000))) : ""}</p>
+                    </div>
+                  </div>
+                </li>
+              )}
               {items.map((it, i) => (
                 <ResultCard
                   key={it.url}
                   item={it}
                   index={i}
-                  onShared={(shared) => setItems((prev) => prev.map((x) => (x.url === it.url ? { ...x, shared } : x)))}
+                  onView={() => setViewing({ url: it.url, kind: it.kind, prompt: it.prompt })}
+                  onShared={(shared) => {
+                    setItems((prev) => prev.map((x) => (x.url === it.url ? { ...x, shared } : x)));
+                    toast(shared ? t.create.sharedToast : t.create.unsharedToast);
+                  }}
                   onEdit={() => {
                     setImage(null);
                     setSource("photo");
@@ -404,12 +439,15 @@ function MediaGen({
                 />
               ))}
             </ul>
-            <Link href="/library" className="inline-block mt-4 text-sm text-cobalt underline underline-offset-2">
-              {t.create.library}
-            </Link>
+            {items.length > 0 && (
+              <Link href="/library" className="inline-block mt-4 text-sm text-cobalt underline underline-offset-2">
+                {t.create.library}
+              </Link>
+            )}
           </>
         )}
       </div>
+      <Viewer item={viewing} onClose={() => setViewing(null)} />
     </div>
   );
 }
@@ -476,12 +514,14 @@ function Chips({
 function ResultCard({
   item,
   index,
+  onView,
   onShared,
   onEdit,
   onAnimate,
 }: {
   item: Result;
   index: number;
+  onView: () => void;
   onShared: (shared: boolean) => void;
   onEdit: () => void;
   onAnimate: () => void;
@@ -491,16 +531,18 @@ function ResultCard({
   const isVideo = item.kind === "video";
   const action = "tap h-9 px-3 rounded-full text-[13px] font-medium border border-rule hover:border-ink/40";
   return (
-    <li className="rounded-2xl border border-rule bg-surface overflow-hidden">
+    <li className="rise rounded-[24px] border border-rule bg-surface overflow-hidden">
       {isVideo ? (
-        <video src={item.url} controls loop playsInline className="w-full aspect-video bg-black" />
+        <video src={item.url} controls loop playsInline autoPlay muted className="w-full bg-black" />
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.url}
-          alt={item.prompt}
-          className="w-full aspect-square object-contain bg-[repeating-conic-gradient(#1c1013_0_25%,#140b0d_0_50%)] bg-[length:20px_20px]"
-        />
+        <button type="button" onClick={onView} aria-label={t.create.view} className="block w-full group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.url}
+            alt={item.prompt}
+            className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.02] bg-[repeating-conic-gradient(#1c1013_0_25%,#140b0d_0_50%)] bg-[length:20px_20px]"
+          />
+        </button>
       )}
       <div className="p-3 space-y-2">
         {item.prompt && <p className="text-sm text-muted line-clamp-2" dir="auto">{item.prompt}</p>}

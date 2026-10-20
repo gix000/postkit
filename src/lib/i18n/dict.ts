@@ -29,6 +29,7 @@ const en = {
     searching: "Searching…",
   },
   home: {
+    badge: "New · Flux 2 photos from 1 credit",
     title: "Create photos and videos.",
     sub: "Describe it or start from your own photo. Pick a size and a style, and PostKit makes it in seconds.",
     photoPlaceholder: "A neon-lit street market in Beirut at night, rain on the asphalt",
@@ -101,6 +102,38 @@ const en = {
     needCredits: (n: number) => `You need ${n} credits for this.`,
     getCredits: "Get credits",
     balance: (n: number) => `${n} credits left`,
+    ideas: "Need an idea? Tap one",
+    ideaList: {
+      photo: [
+        "Iced latte on a marble café table in Gemmayzeh, soft morning light",
+        "Minimal perfume bottle on wet black stone, lime and pink rim lights",
+        "Fresh manoushe on a wooden board, top-down, menu style",
+        "Sunset over Raouché rocks, cinematic, golden haze",
+      ],
+      edit: [
+        "Put it on a marble counter with soft morning light",
+        "Change the background to a clean white studio",
+        "Make it night with neon reflections",
+        "Turn it into a watercolor illustration",
+      ],
+      video: [
+        "Slow drone shot over Byblos harbour at golden hour",
+        "Steam rising from a cup of coffee, macro, slow motion",
+        "Neon-lit Beirut street in the rain, camera moving forward",
+        "Waves crashing on Raouché rocks at sunset",
+      ],
+      animate: [
+        "Slow push-in, gentle wind, soft light flicker",
+        "The product turns slowly, studio lights glint",
+        "Hair and clothes move gently in the breeze",
+        "Steam rises, camera orbits slightly",
+      ],
+    } as Record<"photo" | "edit" | "video" | "animate", string[]>,
+    saved: "Saved to your Library",
+    sharedToast: "Shared to Explore",
+    unsharedToast: "Removed from Explore",
+    elapsed: (s: number) => `${s}s`,
+    view: "View full size",
   },
   chat: {
     model: "Model",
@@ -293,6 +326,7 @@ const ar: Dict = {
     searching: "جارٍ البحث…",
   },
   home: {
+    badge: "جديد · صور Flux 2 ابتداءً من رصيد واحد",
     title: "أنشئ صورًا وفيديوهات.",
     sub: "صِف ما تريد أو ابدأ من صورتك. اختر المقاس والأسلوب، وPostKit يصنعها خلال ثوانٍ.",
     photoPlaceholder: "سوق شعبي مضاء بالنيون في بيروت ليلًا، والمطر على الإسفلت",
@@ -365,6 +399,38 @@ const ar: Dict = {
     needCredits: (n: number) => `تحتاج ${n} رصيدًا لهذا.`,
     getCredits: "اشترِ رصيدًا",
     balance: (n: number) => `متبقٍ ${n} رصيد`,
+    ideas: "تحتاج فكرة؟ اضغط على واحدة",
+    ideaList: {
+      photo: [
+        "لاتيه مثلّج على طاولة رخام في مقهى في الجميزة، ضوء صباحي ناعم",
+        "زجاجة عطر بسيطة على حجر أسود مبلّل، إضاءة جانبية خضراء ووردية",
+        "منقوشة طازجة على لوح خشبي، من الأعلى، بأسلوب قائمة طعام",
+        "غروب فوق صخرة الروشة، سينمائي، ضباب ذهبي",
+      ],
+      edit: [
+        "ضعها على رخامة مع إضاءة صباحية ناعمة",
+        "غيّر الخلفية إلى استوديو أبيض نظيف",
+        "اجعلها ليلًا مع انعكاسات نيون",
+        "حوّلها إلى رسم بالألوان المائية",
+      ],
+      video: [
+        "لقطة درون بطيئة فوق ميناء جبيل وقت الغروب",
+        "بخار يتصاعد من فنجان قهوة، لقطة قريبة بالحركة البطيئة",
+        "شارع في بيروت مضاء بالنيون تحت المطر، الكاميرا تتقدّم",
+        "أمواج تتكسّر على صخرة الروشة عند الغروب",
+      ],
+      animate: [
+        "اقتراب بطيء، نسيم خفيف، وميض ضوء ناعم",
+        "المنتج يدور ببطء وتلمع أضواء الاستوديو",
+        "الشعر والملابس تتحرك بلطف مع النسيم",
+        "بخار يتصاعد والكاميرا تدور قليلًا",
+      ],
+    },
+    saved: "حُفظ في مكتبتك",
+    sharedToast: "تمت المشاركة في استكشف",
+    unsharedToast: "أُزيل من استكشف",
+    elapsed: (s: number) => `${s} ث`,
+    view: "عرض بالحجم الكامل",
   },
   chat: {
     model: "النموذج",

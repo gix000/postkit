@@ -19,15 +19,15 @@ export function Bolt({ size = 14 }: { size?: number }) {
 
 /** Floating liquid-glass bar on top; on phones, a glass tab bar at the bottom. */
 export default async function Header() {
-  const [{ t }, viewer] = await Promise.all([getT(), getViewer()]);
-  const balance = viewer ? await getBalance() : null;
+  // All three run at once; each is fetched only once per request.
+  const [{ t }, viewer, balance] = await Promise.all([getT(), getViewer(), getBalance()]);
   const profileHref = viewer ? (viewer.profile ? `/u/${viewer.profile.username}` : "/settings") : "/login";
   const initial = (viewer?.profile?.display_name || viewer?.profile?.username || viewer?.email || "?").slice(0, 1);
 
   return (
     <>
       <header className="sticky top-0 z-40 px-3 sm:px-4 pt-3">
-        <div className="glass glass-strong mx-auto max-w-[1240px] h-14 rounded-full ps-4 pe-2 flex items-center gap-3">
+        <div className="relative glass-float glass-strong glass-edge mx-auto max-w-[1240px] h-14 rounded-full ps-4 pe-2 flex items-center gap-3">
           <Link href="/" className="tap flex items-center gap-2 font-semibold tracking-tight text-[17px] shrink-0 rounded-full">
             <Logo size={24} />
             PostKit

@@ -3,7 +3,26 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Logo from "@/components/Logo";
 import { I18nProvider, LangSwitch } from "@/components/I18n";
+import { ToastProvider } from "@/components/Toast";
 import { getT } from "@/lib/i18n/server";
+import localFont from "next/font/local";
+
+// Self-hosted: no request to Google, preloaded, with size-matched fallbacks so text doesn't jump.
+const bricolage = localFont({ src: "../fonts/bricolage.woff2", weight: "200 800", variable: "--font-bricolage", display: "swap" });
+const naskh = localFont({
+  src: "../fonts/naskh-arabic.woff2",
+  weight: "400 700",
+  variable: "--font-naskh",
+  display: "swap",
+  preload: false,
+});
+const jbmono = localFont({
+  src: "../fonts/jetbrains-mono.woff2",
+  weight: "100 800",
+  variable: "--font-jbmono",
+  display: "swap",
+  preload: false,
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { lang } = await getT();
@@ -23,9 +42,10 @@ export const viewport: Viewport = { viewportFit: "cover", themeColor: "#0d0303" 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { lang, t } = await getT();
   return (
-    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} className="h-full">
+    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} className={`h-full ${bricolage.variable} ${naskh.variable} ${jbmono.variable}`}>
       <body className="min-h-full flex flex-col">
         <I18nProvider lang={lang}>
+          <ToastProvider>
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-3 focus:z-50 focus:bg-surface focus:px-3 focus:py-2"
@@ -45,6 +65,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               <LangSwitch />
             </div>
           </footer>
+          </ToastProvider>
         </I18nProvider>
       </body>
     </html>

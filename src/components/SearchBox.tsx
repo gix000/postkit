@@ -107,7 +107,7 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
         <div
           id={listId}
           role="listbox"
-          className="glass glass-solid absolute inset-x-0 top-full mt-2 z-50 rounded-2xl overflow-hidden"
+          className="glass-float glass-solid absolute inset-x-0 top-full mt-2 z-50 rounded-2xl overflow-hidden"
         >
           {visible.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted">{loading ? t.search.searching : t.search.none}</p>

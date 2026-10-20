@@ -1,6 +1,7 @@
 import "server-only";
 import { createAdminClient } from "./supabase/admin";
-import { createClient } from "./supabase/server";
+import { cache } from "react";
+import { createClient, getSessionUser } from "./supabase/server";
 
 export class CreditsError extends Error {
   constructor(public code: "insufficient" | "unavailable") {
@@ -9,16 +10,13 @@ export class CreditsError extends Error {
 }
 
 /** Current balance, read with the visitor's own session (RLS: their rows only). */
-export async function getBalance(): Promise<number | null> {
-  const sb = await createClient();
-  if (!sb) return null;
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+export const getBalance = cache(async (): Promise<number | null> => {
+  const user = await getSessionUser();
   if (!user) return null;
-  const { data } = await sb.from("credit_ledger").select("delta").eq("user_id", user.id);
+  const sb = await createClient();
+  const { data } = await sb!.from("credit_ledger").select("delta").eq("user_id", user.id);
   return (data ?? []).reduce((sum, r) => sum + (r.delta as number), 0);
-}
+});
 
 export type LedgerRow = { id: number; delta: number; reason: string; created_at: string };
 

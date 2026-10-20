@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "./supabase/server";
+import { createClient, getSessionUser } from "./supabase/server";
 
 export const CREATIONS_BUCKET = "creations";
 
@@ -53,12 +53,9 @@ export async function saveCreation(
 }
 
 export async function listMine(kind?: "photo" | "video", limit = 60): Promise<Creation[]> {
-  const sb = await createClient();
-  if (!sb) return [];
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+  const user = await getSessionUser();
   if (!user) return [];
+  const sb = (await createClient())!;
   let q = sb.from("creations").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(limit);
   if (kind) q = q.eq("kind", kind);
   const { data } = await q;

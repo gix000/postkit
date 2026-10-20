@@ -50,7 +50,7 @@ function Dot() {
 /** App-style bottom bar on phones: thumbs reach it, and it floats over content as liquid glass. */
 export default function TabBar({ signedIn }: { signedIn: boolean }) {
   const path = usePathname();
-  const { t } = useT();
+  const { lang, t } = useT();
   const tabs: Tab[] = [
     { href: "/", label: t.nav.home, icon: Home },
     { href: "/explore", label: t.nav.explore, icon: Compass },
@@ -62,9 +62,27 @@ export default function TabBar({ signedIn }: { signedIn: boolean }) {
     <nav
       aria-label="Main"
       style={{ bottom: "max(12px, env(safe-area-inset-bottom))" }}
-      className="md:hidden fixed inset-x-3 z-50 glass glass-strong rounded-[28px] px-2 py-1.5"
+      className="md:hidden fixed inset-x-3 z-50 glass-float glass-strong glass-edge rounded-[28px] px-2 py-1.5"
     >
-      <ul className="grid grid-cols-5 items-end">
+      <ul className="relative grid grid-cols-5 items-end">
+        {(() => {
+          const i = tabs.findIndex((tab) => (tab.href === "/" ? path === "/" : path === tab.href || path.startsWith(tab.href + "/")));
+          const show = i >= 0 && !tabs[i].primary;
+          return (
+            <span
+              aria-hidden="true"
+              className="lens lens-dim"
+              style={{
+                top: 2,
+                bottom: 2,
+                insetInlineStart: 0,
+                width: "20%",
+                opacity: show ? 1 : 0,
+                transform: `translateX(${(lang === "ar" ? -1 : 1) * Math.max(i, 0) * 100}%) scale(${show ? 1 : 0.6})`,
+              }}
+            />
+          );
+        })()}
         {tabs.map((tab) => {
           const active = tab.href === "/" ? path === "/" : path === tab.href || path.startsWith(tab.href + "/");
           return (
@@ -72,12 +90,12 @@ export default function TabBar({ signedIn }: { signedIn: boolean }) {
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`tap relative flex flex-col items-center gap-0.5 rounded-2xl px-1 py-1 text-[11px] font-medium whitespace-nowrap ${active ? "text-ink" : "text-muted"}`}
+                className={`tap relative z-10 flex flex-col items-center gap-0.5 rounded-2xl px-1 py-1 text-[11px] font-medium whitespace-nowrap ${active ? "text-ink" : "text-muted"}`}
               >
                 {tab.primary ? (
                   <span className="btn-neon grid place-items-center h-11 w-11 -mt-5 rounded-full shadow-[0_0_24px_rgba(187,239,31,0.45)]">{tab.icon}</span>
                 ) : (
-                  <span className={`grid place-items-center h-8 w-12 rounded-full ${active ? "bg-ink/10" : ""}`}>{tab.icon}</span>
+                  <span className={`grid place-items-center h-8 w-12 rounded-full transition-transform duration-300 ${active ? "scale-110" : ""}`}>{tab.icon}</span>
                 )}
                 {tab.label}
                 <Dot />

@@ -1,9 +1,11 @@
 import "server-only";
+import { cache } from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseEnabled } from "./config";
 
-export async function createClient() {
+/** One Supabase client per request, shared by every component that asks. */
+export const createClient = cache(async () => {
   if (!supabaseEnabled) return null;
   const store = await cookies();
   return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -18,7 +20,7 @@ export async function createClient() {
       },
     },
   });
-}
+});
 
 export type Profile = {
   id: string;
@@ -28,13 +30,23 @@ export type Profile = {
   avatar_url: string | null;
 };
 
-export async function getViewer(): Promise<{ id: string; email?: string; profile: Profile | null } | null> {
+/**
+ * Who is signed in. Verifies the session token locally (no trip to the auth
+ * server) and runs once per request however many components call it.
+ */
+export const getSessionUser = cache(async (): Promise<{ id: string; email?: string } | null> => {
   const sb = await createClient();
   if (!sb) return null;
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
+  const { data } = await sb.auth.getClaims();
+  const claims = data?.claims;
+  if (!claims?.sub) return null;
+  return { id: claims.sub, email: typeof claims.email === "string" ? claims.email : undefined };
+});
+
+export const getViewer = cache(async (): Promise<{ id: string; email?: string; profile: Profile | null } | null> => {
+  const user = await getSessionUser();
   if (!user) return null;
-  const { data: profile } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+  const sb = await createClient();
+  const { data: profile } = await sb!.from("profiles").select("*").eq("id", user.id).maybeSingle();
   return { id: user.id, email: user.email, profile: (profile as Profile) ?? null };
-}
+});

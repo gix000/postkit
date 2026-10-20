@@ -3,6 +3,8 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useT } from "./I18n";
 import { deleteCreation, setShared } from "@/app/creation-actions";
+import Viewer, { type ViewItem } from "./Viewer";
+import { useToast } from "./Toast";
 
 export type GridItem = {
   id: string;
@@ -28,13 +30,21 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
   const { t } = useT();
   const [list, setList] = useState(items);
   const [pending, start] = useTransition();
+  const [viewing, setViewing] = useState<ViewItem | null>(null);
+  const toast = useToast();
   const btn = "tap h-8 px-3 rounded-full text-[12px] font-medium bg-paper/70 backdrop-blur border border-ink/15 hover:border-ink/40";
 
   return (
+    <>
     <ul className="columns-2 md:columns-3 xl:columns-4 gap-3 [column-fill:_balance]">
       {list.map((it) => (
-        <li key={it.id} className="mb-3 break-inside-avoid rounded-2xl overflow-hidden border border-rule bg-surface group">
-          <div className="relative">
+        <li key={it.id} className="rise mb-3 break-inside-avoid rounded-[22px] overflow-hidden border border-rule bg-surface group">
+          <button
+            type="button"
+            onClick={() => setViewing({ url: it.url, kind: it.kind, prompt: it.prompt })}
+            aria-label={t.create.view}
+            className="relative block w-full overflow-hidden"
+          >
             {it.kind === "video" ? (
               <video src={it.url} muted loop playsInline autoPlay preload="metadata" className="w-full block bg-black" />
             ) : (
@@ -43,7 +53,7 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
                 src={it.url}
                 alt={it.prompt ?? ""}
                 loading="lazy"
-                className="w-full block bg-[repeating-conic-gradient(#1c1013_0_25%,#140b0d_0_50%)] bg-[length:20px_20px]"
+                className="w-full block transition-transform duration-500 group-hover:scale-[1.03] bg-[repeating-conic-gradient(#1c1013_0_25%,#140b0d_0_50%)] bg-[length:20px_20px]"
               />
             )}
             {it.is_public && mine && (
@@ -51,7 +61,7 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
                 {t.create.shared}
               </span>
             )}
-          </div>
+          </button>
           <div className="p-2.5 space-y-2">
             {it.prompt && (
               <p className="text-[13px] text-muted line-clamp-2" dir="auto">
@@ -87,7 +97,10 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
                   onClick={() =>
                     start(async () => {
                       const res = await setShared(it.id, !it.is_public);
-                      if (res.ok) setList((l) => l.map((x) => (x.id === it.id ? { ...x, is_public: !x.is_public } : x)));
+                      if (res.ok) {
+                        setList((l) => l.map((x) => (x.id === it.id ? { ...x, is_public: !x.is_public } : x)));
+                        toast(it.is_public ? t.create.unsharedToast : t.create.sharedToast);
+                      }
                     })
                   }
                   className={`${btn} ${it.is_public ? "border-cobalt text-cobalt" : ""}`}
@@ -116,5 +129,7 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
         </li>
       ))}
     </ul>
+    <Viewer item={viewing} onClose={() => setViewing(null)} />
+    </>
   );
 }

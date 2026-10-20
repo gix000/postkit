@@ -12,6 +12,7 @@ import {
   isSize,
   presetSuffix,
   type Tool,
+  modelEnabled,
 } from "@/lib/catalog";
 import { CreditsError, refund, spend } from "@/lib/credits";
 import { saveCreation } from "@/lib/creations";
@@ -44,8 +45,9 @@ type Body = {
 function editSize(w: unknown, h: unknown) {
   const W = typeof w === "number" && w > 0 ? w : 1024;
   const H = typeof h === "number" && h > 0 ? h : 1024;
-  const scale = Math.min(1920 / Math.max(W, H), Math.sqrt((1024 * 1024) / (W * H)));
-  const r = (n: number) => Math.max(256, Math.min(1920, Math.round((n * scale) / 16) * 16));
+  // Longest side 1024: keeps every edit within 4 Cloudflare tiles.
+  const scale = 1024 / Math.max(W, H);
+  const r = (n: number) => Math.max(256, Math.min(1024, Math.floor((n * scale) / 16) * 16));
   return { w: r(W), h: r(H) };
 }
 
@@ -94,6 +96,9 @@ export async function POST(req: NextRequest) {
 
   const model = body.model === undefined || body.model === "" ? defaultModel(tool) : body.model;
   if (!validModelId(model)) return fail("Pick a model from the list.", 400);
+  if ((tool === "photo" || tool === "edit") && !modelEnabled(model)) {
+    return fail("This model isn't switched on yet. Pick Flux 2 Klein.", 400, { code: "model_off" });
+  }
 
   const rawPrompt = typeof body.prompt === "string" ? body.prompt.trim().slice(0, 2000) : "";
   if (NEEDS_PROMPT.includes(tool) && !rawPrompt) return fail("Describe what you want first.", 400);
@@ -218,8 +223,8 @@ export async function POST(req: NextRequest) {
         { detail: msg.slice(0, 300), refunded: cost, code: "daily_limit" },
       );
     }
-    if (!hasHF && !CLOUDFLARE[model] && tool !== "edit") {
-      return fail("This model isn't switched on yet. Pick a Flux model. Your credits were returned.", 503, { refunded: cost });
+    if (!hasHF && (tool === "video" || tool === "animate" || tool === "upscale" || tool === "cutout")) {
+      return fail("This tool is coming soon. Your credits were returned.", 503, { refunded: cost });
     }
     const notServed = /not supported|no provider|not found|404|model .* is not|unknown model/i.test(msg);
     return fail(

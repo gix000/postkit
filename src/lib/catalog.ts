@@ -19,14 +19,31 @@ export type ModelPick = { id: string; name: string; note: Text; cheap?: boolean;
  * Ids look like "cloudflare/<model>". If Cloudflare is busy or the allowance is used up,
  * the same model runs on Hugging Face instead (hf), then a safe default.
  */
-export const CLOUDFLARE: Record<string, { cf: string; hf: string; multipart: boolean; squareOnly?: boolean; edits: boolean }> = {
+export const CLOUDFLARE: Record<string, { cf: string; hf: string; multipart: boolean; squareOnly?: boolean; edits: boolean; paid?: boolean }> = {
   "cloudflare/flux-2-klein-4b": { cf: "@cf/black-forest-labs/flux-2-klein-4b", hf: "black-forest-labs/FLUX.2-klein-4B", multipart: true, edits: true },
   "cloudflare/flux-1-schnell": { cf: "@cf/black-forest-labs/flux-1-schnell", hf: "black-forest-labs/FLUX.1-schnell", multipart: false, squareOnly: true, edits: false },
-  "cloudflare/flux-2-klein-9b": { cf: "@cf/black-forest-labs/flux-2-klein-9b", hf: "black-forest-labs/FLUX.2-klein-9B", multipart: true, edits: true },
-  "cloudflare/flux-2-dev": { cf: "@cf/black-forest-labs/flux-2-dev", hf: "black-forest-labs/FLUX.2-dev", multipart: true, edits: true },
+  "cloudflare/flux-2-klein-9b": { cf: "@cf/black-forest-labs/flux-2-klein-9b", hf: "black-forest-labs/FLUX.2-klein-9B", multipart: true, edits: true, paid: true },
+  "cloudflare/flux-2-dev": { cf: "@cf/black-forest-labs/flux-2-dev", hf: "black-forest-labs/FLUX.2-dev", multipart: true, edits: true, paid: true },
 };
 
-export const CURATED: Record<Kind, ModelPick[]> = {
+/**
+ * What's switched on. Klein Plus (~1,360 neurons a photo) and Pro (~3,600) would use up
+ * Cloudflare's free 10,000 a day in a handful of photos, so they only show on the paid plan.
+ * Hugging Face models only show once a token is added.
+ */
+export const ENABLED = {
+  cloudflarePaid: process.env.NEXT_PUBLIC_CLOUDFLARE_PAID === "1",
+  huggingface: process.env.NEXT_PUBLIC_HF_READY === "1",
+};
+
+/** True when this model can actually run with what's switched on. */
+export function modelEnabled(id: string) {
+  const cf = CLOUDFLARE[id];
+  if (cf) return !cf.paid || ENABLED.cloudflarePaid;
+  return ENABLED.huggingface;
+}
+
+const ALL_CURATED: Record<Kind, ModelPick[]> = {
   photo: [
     {
       id: "cloudflare/flux-2-klein-4b",
@@ -137,6 +154,14 @@ export const CURATED: Record<Kind, ModelPick[]> = {
   ],
 };
 
+/** The models people can pick, minus anything not switched on (each list keeps at least its first model). */
+export const CURATED = Object.fromEntries(
+  (Object.entries(ALL_CURATED) as [Kind, ModelPick[]][]).map(([k, list]) => {
+    const on = list.filter((m) => modelEnabled(m.id));
+    return [k, on.length ? on : list];
+  }),
+) as Record<Kind, ModelPick[]>;
+
 /** Hub task each picker searches when people open "More models". */
 export const KIND_TASK: Record<Kind, string> = {
   photo: "text-to-image",
@@ -166,9 +191,9 @@ export function costFor(tool: Tool, model?: string): number {
 export type SizeId = "square" | "portrait" | "story" | "wide";
 export const SIZES: Record<SizeId, { label: Text; ratio: string; w: number; h: number; falPreset: string }> = {
   square: { label: { en: "Square", ar: "مربع" }, ratio: "1:1", w: 1024, h: 1024, falPreset: "square_hd" },
-  portrait: { label: { en: "Post", ar: "منشور" }, ratio: "4:5", w: 896, h: 1152, falPreset: "portrait_4_3" },
-  story: { label: { en: "Story", ar: "ستوري" }, ratio: "9:16", w: 768, h: 1344, falPreset: "portrait_16_9" },
-  wide: { label: { en: "Wide", ar: "عريض" }, ratio: "16:9", w: 1344, h: 768, falPreset: "landscape_16_9" },
+  portrait: { label: { en: "Post", ar: "منشور" }, ratio: "4:5", w: 816, h: 1024, falPreset: "portrait_4_3" },
+  story: { label: { en: "Story", ar: "ستوري" }, ratio: "9:16", w: 576, h: 1024, falPreset: "portrait_16_9" },
+  wide: { label: { en: "Wide", ar: "عريض" }, ratio: "16:9", w: 1024, h: 576, falPreset: "landscape_16_9" },
 };
 export const PHOTO_SIZES: SizeId[] = ["square", "portrait", "story", "wide"];
 export const VIDEO_SIZES: SizeId[] = ["story", "wide", "square"];

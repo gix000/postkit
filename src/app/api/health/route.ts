@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { whishConfig } from "@/lib/whish";
-import { cloudflareReady } from "@/lib/cloudflare";
+import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
 
 /** Yes/no checks for the site owner. Shows nothing secret. */
-export async function GET() {
+export async function GET(req: Request) {
   const admin = createAdminClient();
   let credits: "ok" | "missing" | "error" = "missing";
   if (admin) {
@@ -26,8 +26,27 @@ export async function GET() {
       cloudflare = "unreachable";
     }
   }
+  // Owner-only test: makes one tiny picture to prove generation works end to end.
+  let probe: string | undefined;
+  const key = new URL(req.url).searchParams.get("probe");
+  if (key && process.env.HEALTH_KEY && key === process.env.HEALTH_KEY) {
+    const started = Date.now();
+    try {
+      const blob = await runCloudflareImage({
+        model: "@cf/black-forest-labs/flux-2-klein-4b",
+        multipart: true,
+        prompt: "a red apple on a table",
+        width: 256,
+        height: 256,
+      });
+      probe = `ok ${blob.size} bytes in ${Date.now() - started}ms`;
+    } catch (e) {
+      probe = `failed in ${Date.now() - started}ms: ${e instanceof Error ? e.message : String(e)}`.slice(0, 400);
+    }
+  }
   return NextResponse.json(
     {
+      probe,
       ai: Boolean(process.env.HF_TOKEN),
       cloudflare,
       credits,

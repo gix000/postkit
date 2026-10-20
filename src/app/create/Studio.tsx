@@ -31,6 +31,7 @@ export default function Studio({
   initialModel,
   initialPrompt,
   initialImage,
+  initialSize,
   locked,
   credits,
 }: {
@@ -38,6 +39,7 @@ export default function Studio({
   initialModel?: string;
   initialPrompt?: string;
   initialImage?: string;
+  initialSize?: string;
   locked: boolean;
   credits: number | null;
 }) {
@@ -80,6 +82,7 @@ export default function Studio({
           kind={tab}
           initialModel={initialTab === tab ? initialModel : undefined}
           initialPrompt={initialPrompt}
+          initialSize={initialTab === tab && initialSize && initialSize in SIZES ? (initialSize as SizeId) : undefined}
           initialImage={handoff?.tab === tab ? handoff.image : undefined}
           balance={balance}
           setBalance={setBalance}
@@ -100,6 +103,7 @@ function MediaGen({
   kind,
   initialModel,
   initialPrompt,
+  initialSize,
   initialImage,
   balance,
   setBalance,
@@ -108,6 +112,7 @@ function MediaGen({
   kind: "photo" | "video";
   initialModel?: string;
   initialPrompt?: string;
+  initialSize?: SizeId;
   initialImage?: string;
   balance: number | null;
   setBalance: (n: number) => void;
@@ -121,7 +126,7 @@ function MediaGen({
   const [image, setImage] = useState<string | null>(remoteStart ? null : (initialImage ?? null));
   const [loadingImage, setLoadingImage] = useState(remoteStart);
   const [prompt, setPrompt] = useState(initialPrompt ?? "");
-  const [size, setSize] = useState<SizeId>(isVideo ? "story" : "square");
+  const [size, setSize] = useState<SizeId>(initialSize ?? (isVideo ? "story" : "square"));
   const [preset, setPreset] = useState<PresetId>("none");
   const usesPhoto = source === "photo";
   const pickerKind = isVideo ? (usesPhoto ? "animate" : "video") : usesPhoto ? "edit" : "photo";

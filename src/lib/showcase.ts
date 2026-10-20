@@ -1,44 +1,49 @@
 /** Photos made with PostKit's own Flux 2 models, shown on the home page. Tap one to reuse its prompt. */
+const MODEL = "cloudflare/flux-2-klein-4b";
+
 export const SHOWCASE = [
   {
-    src: "/showcase/market.webp",
-    w: 640,
-    h: 853,
+    src: "/showcase/perfume.webp",
     prompt:
-      "A narrow Beirut street market at night, glowing abstract neon tubes in lime green and hot pink with no text, rain-soaked asphalt reflecting the lights, cinematic 35mm photograph",
+      "Luxury advertising photograph: a sculpted glass perfume bottle plunging into black water, a crown of droplets frozen mid-air around it, lime green and hot pink rim lights, high-speed photography, glossy reflections",
   },
   {
-    src: "/showcase/coffee.webp",
-    w: 640,
-    h: 853,
-    prompt: "Product photograph of a minimalist ceramic coffee cup on a balcony railing, soft morning light, blurred Beirut rooftops and the sea behind",
+    src: "/showcase/fruit.webp",
+    prompt:
+      "High-speed commercial photograph: pomegranates, figs and citrus slices bursting through swirling clouds of lime green and hot pink powder against pure black, juice droplets frozen in mid-air",
   },
   {
-    src: "/showcase/manoushe.webp",
-    w: 640,
-    h: 640,
-    prompt: "Top-down food photograph of a fresh za'atar manoushe on a rustic wooden board with tomatoes, mint and olives, restaurant menu style",
+    src: "/showcase/chrome.webp",
+    prompt:
+      "Fashion editorial photograph: a model in an iridescent liquid-chrome trench coat walking between giant ancient Roman columns at golden hour, wind in the fabric, dramatic low angle, 35mm film grain",
+  },
+  {
+    src: "/showcase/neon.webp",
+    prompt:
+      "Cinematic close-up portrait of a man in the rain at night, lime green and magenta neon light reflecting on wet skin, water droplets, shallow depth of field, moody",
+  },
+  {
+    src: "/showcase/coast.webp",
+    prompt:
+      "Aerial photograph of the Beirut coastline at blue hour, city lights glowing, long-exposure light trails along the seaside corniche, dramatic clouds over the Mediterranean",
+  },
+  {
+    src: "/showcase/cedar.webp",
+    prompt:
+      "Surreal epic landscape: a single ancient cedar tree on a floating rock island above a sea of clouds at sunrise, volumetric god rays, glowing mist, ultra detailed",
   },
   {
     src: "/showcase/sneaker.webp",
-    w: 640,
-    h: 640,
-    prompt: "Studio product shot of a futuristic white sneaker floating above a glossy black surface, lime green and hot pink rim lights",
+    prompt:
+      "Studio product shot of a futuristic white sneaker shattering into floating glossy fragments mid-air, lime green and hot pink rim lights, black background, advertising photography",
   },
   {
-    src: "/showcase/portrait.webp",
-    w: 640,
-    h: 853,
-    prompt: "Fashion editorial portrait of a young woman in a cream linen suit on a sunlit Beirut staircase painted in pastel colors, golden hour, 85mm",
+    src: "/showcase/dessert.webp",
+    prompt:
+      "Luxury dessert photography: a glossy mirror-glaze cake with pistachio and rose petals, a single gold leaf, dramatic side light on a black marble table, soft mist",
   },
-  {
-    src: "/showcase/interior.webp",
-    w: 640,
-    h: 440,
-    prompt: "Architectural interior photograph of a modern Lebanese living room with arched windows, warm stone walls, linen sofa, bright natural light",
-  },
-] as const;
+].map((s) => ({ ...s, w: 640, h: 853 }));
 
 export function showcaseHref(prompt: string) {
-  return `/create?${new URLSearchParams({ mode: "photo", prompt, model: "cloudflare/flux-2-klein-9b" })}`;
+  return `/create?${new URLSearchParams({ mode: "photo", prompt, model: MODEL, size: "portrait" })}`;
 }

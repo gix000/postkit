@@ -74,38 +74,44 @@ export default async function Home() {
         </div>
       </section>
 
-      {showcase.length > 0 && (
-        <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14">
-          <div className="flex items-baseline justify-between mb-3">
-            <h2 className="text-2xl font-bold tracking-tight">{t.home.fromExplore}</h2>
-            <Link href="/explore" className="text-sm text-cobalt underline underline-offset-2">
-              {t.home.exploreAll}
-            </Link>
-          </div>
-          <ul className="flex gap-3 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 snap-x">
-            {showcase.map((c) => (
-              <li key={c.id} className="snap-start shrink-0 w-[220px] sm:w-[260px]">
-                <Link
-                  href={`/create?mode=${c.kind}${c.prompt ? `&prompt=${encodeURIComponent(c.prompt)}` : ""}`}
-                  className="tap block rounded-2xl overflow-hidden border border-rule bg-surface"
-                >
-                  {c.kind === "video" ? (
-                    <video src={c.url} muted loop playsInline autoPlay preload="metadata" className="w-full aspect-[4/5] object-cover bg-black" />
+      <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14">
+        <div className="flex items-baseline justify-between mb-3">
+          <h2 className="text-2xl font-bold tracking-tight">{t.home.fromExplore}</h2>
+          <Link href="/explore" className="text-sm text-cobalt underline underline-offset-2">
+            {t.home.exploreAll}
+          </Link>
+        </div>
+        <ul className="flex gap-3 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 snap-x">
+          {[
+            ...showcase.map((c) => ({
+              key: c.id,
+              src: c.url,
+              video: c.kind === "video",
+              prompt: c.prompt ?? "",
+              href: `/create?mode=${c.kind}${c.prompt ? `&prompt=${encodeURIComponent(c.prompt)}` : ""}`,
+            })),
+            ...SHOWCASE.slice(4).map((s) => ({ key: s.src, src: s.src, video: false, prompt: s.prompt, href: showcaseHref(s.prompt) })),
+          ].map((c) => (
+            <li key={c.key} className="snap-start shrink-0 w-[220px] sm:w-[260px]">
+              <Link href={c.href} className="tap group block rounded-[22px] overflow-hidden glass p-1.5">
+                <span className="block overflow-hidden rounded-[17px]">
+                  {c.video ? (
+                    <video src={c.src} muted loop playsInline autoPlay preload="metadata" className="w-full aspect-[3/4] object-cover bg-black" />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.url} alt={c.prompt ?? ""} loading="lazy" className="w-full aspect-[4/5] object-cover" />
+                    <img src={c.src} alt={c.prompt} loading="lazy" decoding="async" className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
                   )}
-                  {c.prompt && (
-                    <span className="block p-2.5 text-[13px] text-muted line-clamp-2" dir="auto">
-                      {c.prompt}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                </span>
+                {c.prompt && (
+                  <span className="block px-2 pt-2 pb-1 text-[13px] text-muted line-clamp-2" dir="auto">
+                    {c.prompt}
+                  </span>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14 grid grid-cols-1 lg:grid-cols-2 gap-10">
         <ModelList title={t.home.photoModels} seeAll={t.home.seeAll} href="/models?task=text-to-image" items={photoModels.items} mode="photo" empty={[t.home.modelsDidntLoad, t.home.reload]} />

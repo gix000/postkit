@@ -33,6 +33,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
       initialTab={tab}
       initialModel={first(sp.model)}
       initialPrompt={first(sp.prompt)?.slice(0, 2000)}
+      initialSize={first(sp.size)}
       initialImage={safeImage(first(sp.from))}
       locked={supabaseEnabled && !viewer}
       credits={credits}

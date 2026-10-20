@@ -1,11 +1,13 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "./I18n";
 
 type Hit = { id: string; kind: "model" | "dataset"; href: string; source: "hub" | "community" };
 
 export default function SearchBox({ compact = false, autoFocus = false }: { compact?: boolean; autoFocus?: boolean }) {
   const router = useRouter();
+  const { t } = useT();
   const listId = useId();
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<Hit[]>([]);
@@ -75,7 +77,7 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
   return (
     <div ref={boxRef} className="relative">
       <label className="sr-only" htmlFor={`${listId}-input`}>
-        Search models and datasets
+        {t.search.label}
       </label>
       <input
         id={`${listId}-input`}
@@ -94,7 +96,7 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKey}
-        placeholder={compact ? "Search models, datasets…" : "Search models and datasets"}
+        placeholder={compact ? t.search.compact : t.search.label}
         className={
           compact
             ? "w-full h-9 rounded-full border border-rule bg-paper/50 px-4 text-sm placeholder:text-muted focus:outline-none focus:border-cobalt"
@@ -105,14 +107,14 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
         <div
           id={listId}
           role="listbox"
-          className="glass glass-solid absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl overflow-hidden"
+          className="glass glass-solid absolute inset-x-0 top-full mt-2 z-50 rounded-2xl overflow-hidden"
         >
           {visible.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-muted">{loading ? "Searching…" : "No matches. Press Enter to search all models."}</p>
+            <p className="px-4 py-3 text-sm text-muted">{loading ? t.search.searching : t.search.none}</p>
           ) : (
             [
-              { title: "Models", items: models },
-              { title: "Datasets", items: datasets },
+              { title: t.search.models, items: models },
+              { title: t.search.datasets, items: datasets },
             ].map((g) =>
               g.items.length ? (
                 <div key={g.title} className="py-1.5">
@@ -132,8 +134,8 @@ export default function SearchBox({ compact = false, autoFocus = false }: { comp
                         }}
                         className={`px-4 py-1.5 font-mono text-[13px] cursor-pointer flex items-center justify-between gap-3 ${i === active ? "bg-cobalt-soft" : ""}`}
                       >
-                        <span className="truncate">{h.id}</span>
-                        {h.source === "community" && <span className="font-sans text-xs text-cobalt shrink-0">Community</span>}
+                        <span className="truncate ltr">{h.id}</span>
+                        {h.source === "community" && <span className="font-sans text-xs text-cobalt shrink-0">{t.search.community}</span>}
                       </div>
                     );
                   })}

@@ -5,6 +5,7 @@ import { listCommunity, repoPath } from "@/lib/community";
 import { DATASET_TASKS } from "@/lib/tasks";
 import { first } from "@/lib/format";
 import { supabaseEnabled } from "@/lib/supabase/config";
+import { getT } from "@/lib/i18n/server";
 
 export const metadata: Metadata = { title: "Datasets" };
 
@@ -14,6 +15,7 @@ function taskFromTags(tags?: string[]) {
 
 export default async function DatasetsPage({ searchParams }: PageProps<"/datasets">) {
   const sp = await searchParams;
+  const { t } = await getT();
   const state = {
     search: first(sp.search)?.slice(0, 100),
     task: first(sp.task),
@@ -30,7 +32,7 @@ export default async function DatasetsPage({ searchParams }: PageProps<"/dataset
   return (
     <HubIndex
       base="/datasets"
-      title="Datasets"
+      title={t.hub.datasets}
       tasks={DATASET_TASKS}
       state={state}
       communityEnabled={supabaseEnabled}

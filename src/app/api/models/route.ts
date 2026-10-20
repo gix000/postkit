@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { listModels } from "@/lib/hf";
 
-const ALLOWED = new Set(["text-to-image", "text-to-video", "text-generation", "image-text-to-text"]);
+const ALLOWED = new Set(["text-to-image", "text-to-video", "image-to-image", "image-to-video", "text-generation", "image-text-to-text"]);
 
 /** Popular models for one task, for the model chooser's "More models" sheet. */
 export async function GET(req: NextRequest) {

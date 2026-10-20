@@ -1,6 +1,7 @@
 import Link from "next/link";
 import RepoRow, { type RowData } from "./RepoRow";
-import { MODEL_SORTS, type Task } from "@/lib/tasks";
+import { MODEL_SORTS, TASK_AR, type Task } from "@/lib/tasks";
+import { getT } from "@/lib/i18n/server";
 
 export type IndexState = {
   search?: string;
@@ -33,7 +34,9 @@ type Props = {
   communityEnabled: boolean;
 };
 
-export default function HubIndex({ base, title, tasks, state, community, hub, nextCursor, communityEnabled }: Props) {
+export default async function HubIndex({ base, title, tasks, state, community, hub, nextCursor, communityEnabled }: Props) {
+  const { lang, t: tr } = await getT();
+  const label = (task: Task) => (lang === "ar" ? TASK_AR[task.id] ?? task.label : task.label);
   const groups = Array.from(new Set(tasks.map((t) => t.group)));
   const source = state.source || "all";
   const showCommunity = communityEnabled && source !== "hub" && !state.cursor;
@@ -44,7 +47,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
     <>
         {groups.map((g) => (
         <div key={g} className="mb-4">
-          <p className="text-sm text-muted mb-1.5">{g}</p>
+          <p className="text-sm text-muted mb-1.5">{tr.hub.groups[g] ?? g}</p>
           <div className="flex flex-wrap gap-1.5">
             {tasks
               .filter((t) => t.group === g)
@@ -57,7 +60,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
                     aria-current={on ? "true" : undefined}
                     className={`tap rounded-full border px-3 py-1.5 text-[13px] leading-none ${on ? "bg-ink text-paper border-ink" : "border-rule bg-surface hover:border-ink"}`}
                   >
-                    {t.label}
+                    {label(t)}
                   </Link>
                 );
               })}
@@ -73,7 +76,8 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
         <h1 className="text-[32px] font-semibold tracking-tight leading-none mb-5">{title}</h1>
         <details className="lg:hidden glass rounded-2xl">
           <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium">
-            Filter by task{state.task ? `: ${tasks.find((t) => t.id === state.task)?.label ?? state.task}` : ""}
+            {tr.hub.filterByTask}
+            {state.task ? `: ${(() => { const f = tasks.find((x) => x.id === state.task); return f ? label(f) : state.task; })()}` : ""}
           </summary>
           <div className="px-4 pb-2">{chips}</div>
         </details>
@@ -86,16 +90,16 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
           {state.sort && <input type="hidden" name="sort" value={state.sort} />}
           {state.source && <input type="hidden" name="source" value={state.source} />}
           <label htmlFor="index-search" className="sr-only">
-            Filter by name
+            {tr.hub.filterPlaceholder(title)}
           </label>
           <input
             id="index-search"
             name="search"
             defaultValue={state.search}
-            placeholder={`Filter ${title.toLowerCase()} by name`}
+            placeholder={tr.hub.filterPlaceholder(lang === "ar" ? title : title.toLowerCase())}
             className="h-10 w-full sm:flex-1 rounded-xl border border-rule bg-surface px-3 text-[15px] placeholder:text-muted focus:outline-none focus:border-cobalt"
           />
-          <button className="tap h-10 rounded-full bg-ink text-paper px-4 text-sm font-medium hover:opacity-90">Search</button>
+          <button className="tap h-10 rounded-full bg-ink text-paper px-4 text-sm font-medium hover:opacity-90">{tr.hub.search}</button>
         </form>
 
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3 text-sm">
@@ -109,7 +113,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
                   aria-current={on ? "true" : undefined}
                   className={`tap whitespace-nowrap px-3 py-1.5 rounded-full ${on ? "bg-surface border border-rule text-ink font-medium" : "text-muted hover:text-ink border border-transparent"}`}
                 >
-                  {s.label}
+                  {tr.hub.sort[s.id] ?? s.label}
                 </Link>
               );
             })}
@@ -117,9 +121,9 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
           {communityEnabled && (
             <div className="flex gap-1" role="group" aria-label="Source">
               {[
-                { id: "all", label: "All" },
-                { id: "hub", label: "Public" },
-                { id: "community", label: "Community" },
+                { id: "all", label: tr.hub.source.all },
+                { id: "hub", label: tr.hub.source.hub },
+                { id: "community", label: tr.hub.source.community },
               ].map((s) => {
                 const on = source === s.id;
                 return (
@@ -139,11 +143,11 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
 
         {total === 0 ? (
           <div className="rounded-2xl border border-dashed border-rule px-6 py-10 text-center">
-            <p className="font-medium">Nothing matches these filters.</p>
+            <p className="font-medium">{tr.hub.nothing}</p>
             <p className="text-sm text-muted mt-1">
-              Clear the task filter or try a shorter name.{" "}
+              {tr.hub.nothingHint}{" "}
               <Link href={base} className="text-cobalt underline underline-offset-2">
-                Reset filters
+                {tr.hub.reset}
               </Link>
             </p>
           </div>
@@ -170,7 +174,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
           <nav className="flex justify-between mt-4 text-sm" aria-label="Pages">
             {state.cursor ? (
               <Link href={href(base, state, { cursor: undefined })} className="text-cobalt underline underline-offset-2">
-                Back to first page
+                {tr.hub.first}
               </Link>
             ) : (
               <span />
@@ -180,7 +184,7 @@ export default function HubIndex({ base, title, tasks, state, community, hub, ne
                 href={href(base, state, { cursor: nextCursor })}
                 className="tap inline-flex h-9 items-center rounded-full border border-rule bg-surface px-4 font-medium hover:border-ink"
               >
-                Next page
+                {tr.hub.next}
               </Link>
             )}
           </nav>

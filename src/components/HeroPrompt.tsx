@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "./I18n";
 
 /** The home page's main action: type a prompt, pick photo or video, go to Create. */
 export default function HeroPrompt() {
   const router = useRouter();
+  const { t } = useT();
   const [kind, setKind] = useState<"photo" | "video">("photo");
   const [prompt, setPrompt] = useState("");
 
@@ -19,11 +21,12 @@ export default function HeroPrompt() {
       }}
     >
       <label htmlFor="hero-prompt" className="sr-only">
-        Describe what to create
+        {t.home.promptLabel}
       </label>
       <textarea
         id="hero-prompt"
         rows={2}
+        dir="auto"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={(e) => {
@@ -32,11 +35,11 @@ export default function HeroPrompt() {
             e.currentTarget.form?.requestSubmit();
           }
         }}
-        placeholder={kind === "photo" ? "A neon-lit street market in Beirut at night, rain on the asphalt" : "A drone shot over the Jeita grotto, slow and cinematic"}
+        placeholder={kind === "photo" ? t.home.photoPlaceholder : t.home.videoPlaceholder}
         className="w-full resize-none bg-transparent px-4 pt-3 pb-2 text-lg sm:text-xl placeholder:text-muted focus:outline-none"
       />
       <div className="flex items-center justify-between gap-2 px-1.5 pb-1">
-        <div className="flex gap-1 rounded-full bg-paper/60 p-1" role="radiogroup" aria-label="What to create">
+        <div className="flex gap-1 rounded-full bg-paper/60 p-1" role="radiogroup" aria-label={t.home.promptLabel}>
           {(["photo", "video"] as const).map((k) => (
             <button
               key={k}
@@ -46,11 +49,11 @@ export default function HeroPrompt() {
               onClick={() => setKind(k)}
               className={`h-9 px-4 rounded-full text-sm font-semibold ${kind === k ? "bg-ink text-paper" : "text-muted hover:text-ink"}`}
             >
-              {k === "photo" ? "Photo" : "Video"}
+              {k === "photo" ? t.home.photo : t.home.video}
             </button>
           ))}
         </div>
-        <button className="tap btn-neon h-11 px-6 rounded-full text-[15px] font-semibold">Create</button>
+        <button className="tap btn-neon h-11 px-6 rounded-full text-[15px] font-semibold">{t.home.create}</button>
       </div>
     </form>
   );

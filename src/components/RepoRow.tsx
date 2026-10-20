@@ -1,6 +1,8 @@
+"use client";
 import Link from "next/link";
 import { ago, compact } from "@/lib/format";
 import { taskLabel } from "@/lib/tasks";
+import { useT } from "./I18n";
 
 export type RowData = {
   id: string;
@@ -31,12 +33,13 @@ function Heart() {
 
 /** One line in the index. Rows, not cards: the repo id is the thing people scan for. */
 export default function RepoRow({ r }: { r: RowData }) {
+  const { lang, t } = useT();
   const [owner, ...rest] = r.id.split("/");
   const name = rest.join("/");
   return (
     <li className="border-b border-rule last:border-b-0">
       <Link href={r.href} className="row-tap group grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-x-6 gap-y-1 px-4 py-3 hover:bg-surface">
-        <span className="font-mono text-[14px] leading-6 truncate">
+        <span className="font-mono text-[14px] leading-6 truncate ltr text-start">
           {name ? (
             <>
               <span className="text-muted">{owner}/</span>
@@ -47,12 +50,12 @@ export default function RepoRow({ r }: { r: RowData }) {
           )}
         </span>
         <span className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-muted sm:justify-end">
-          {r.community && <span className="text-cobalt font-medium">Community</span>}
-          {r.task && <span className="text-ink">{taskLabel(r.task)}</span>}
-          {r.gated && <span>Gated</span>}
-          {r.updated && <span className="hidden md:inline">Updated {ago(r.updated)}</span>}
+          {r.community && <span className="text-cobalt font-medium">{t.search.community}</span>}
+          {r.task && <span className="text-ink">{taskLabel(r.task, lang)}</span>}
+          {r.gated && <span>{lang === "ar" ? "مقيّد" : "Gated"}</span>}
+          {r.updated && <span className="hidden md:inline">{t.hub.updated} {ago(r.updated, lang)}</span>}
           {r.downloads !== undefined && (
-            <span className="inline-flex items-center gap-1 tabular-nums" title={`${r.downloads} downloads`}>
+            <span className="inline-flex items-center gap-1 tabular-nums" title={`${r.downloads} ${t.models.downloads}`}>
               <Download />
               {compact(r.downloads)}
             </span>

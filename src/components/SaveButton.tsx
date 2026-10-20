@@ -2,6 +2,7 @@
 import { useOptimistic, useTransition, useState } from "react";
 import Link from "next/link";
 import { toggleSave } from "@/app/actions";
+import { useT } from "./I18n";
 
 type Props = {
   refId: string;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export default function SaveButton({ refId, kind, label, path, initialSaved, count, signedIn }: Props) {
+  const { t } = useT();
   const [saved, setSaved] = useState(initialSaved);
   const [optimistic, setOptimistic] = useOptimistic(saved);
   const [pending, start] = useTransition();
@@ -27,7 +29,7 @@ export default function SaveButton({ refId, kind, label, path, initialSaved, cou
   if (!signedIn) {
     return (
       <Link href={`/login?next=${encodeURIComponent(path)}`} className={cls}>
-        Save <span className="text-muted">{shownCount}</span>
+        {t.repo.save} <span className="text-muted">{shownCount}</span>
       </Link>
     );
   }
@@ -49,7 +51,7 @@ export default function SaveButton({ refId, kind, label, path, initialSaved, cou
           })
         }
       >
-        {optimistic ? "Saved" : "Save"} <span className={optimistic ? "" : "text-muted"}>{shownCount}</span>
+        {optimistic ? t.repo.saved : t.repo.save} <span className={optimistic ? "" : "text-muted"}>{shownCount}</span>
       </button>
       {error && <span className="mt-1 text-xs text-danger">{error}</span>}
     </span>

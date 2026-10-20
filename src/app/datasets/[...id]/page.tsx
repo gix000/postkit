@@ -10,6 +10,7 @@ import { taskLabel } from "@/lib/tasks";
 import { getViewer } from "@/lib/supabase/server";
 import { isSaved, saveCount } from "@/lib/community";
 import { supabaseEnabled } from "@/lib/supabase/config";
+import { getT } from "@/lib/i18n/server";
 
 export async function generateMetadata({ params }: PageProps<"/datasets/[...id]">): Promise<Metadata> {
   const { id } = await params;
@@ -24,6 +25,7 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
 
   const ds = await getDataset(id);
   if (!ds) notFound();
+  const { lang, t: tr } = await getT();
 
   const ref = `hf:dataset:${ds.id}`;
   const path = `/datasets/${ds.id}`;
@@ -34,20 +36,20 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
   ]);
   const [saved, count] = supabaseEnabled ? await Promise.all([isSaved(viewer?.id, ref), saveCount(ref)]) : [false, 0];
 
-  const tasks = (ds.tags ?? []).filter((t) => t.startsWith("task_categories:")).map((t) => taskLabel(t.split(":")[1]));
+  const tasks = (ds.tags ?? []).filter((t) => t.startsWith("task_categories:")).map((t) => taskLabel(t.split(":")[1], lang));
   const license = ds.tags?.find((t) => t.startsWith("license:"))?.slice(8);
   const sizeTag = ds.tags?.find((t) => t.startsWith("size_categories:"))?.slice(16);
   const size = ds.siblings?.reduce((s, f) => s + (f.size ?? 0), 0);
 
   return (
     <RepoShell
-      kindLabel="Dataset"
+      kindLabel={tr.repo.dataset}
       id={ds.id}
       meta={[
         tasks.length > 0 && <span className="text-ink">{tasks.slice(0, 3).join(", ")}</span>,
-        sizeTag && `${sizeTag} rows`,
-        license && `License: ${license}`,
-        ds.gated && "Gated: the author requires accepting terms to download",
+        sizeTag && `${sizeTag} ${lang === "ar" ? "صف" : "rows"}`,
+        license && `${tr.repo.license}: ${license}`,
+        ds.gated && tr.repo.gated,
       ]}
       actions={
         <>
@@ -57,18 +59,18 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
         </>
       }
       tabs={[
-        { id: "card", label: "Dataset card", href: path },
-        { id: "preview", label: "Preview", href: `${path}?tab=preview` },
-        { id: "files", label: `Files${ds.siblings ? ` (${ds.siblings.length})` : ""}`, href: `${path}?tab=files` },
+        { id: "card", label: tr.repo.datasetCard, href: path },
+        { id: "preview", label: tr.repo.preview, href: `${path}?tab=preview` },
+        { id: "files", label: `${tr.repo.files}${ds.siblings ? ` (${ds.siblings.length})` : ""}`, href: `${path}?tab=files` },
       ]}
       activeTab={tab}
       aside={
         <>
-          <Panel title="Stats">
-            <Stat label="Downloads (30 days)" value={compact(ds.downloads)} />
-            <Stat label="Likes" value={compact(ds.likes)} />
-            {size ? <Stat label="Repo size" value={bytes(size)} /> : null}
-            <Stat label="Updated" value={ago(ds.lastModified) || "—"} />
+          <Panel title={tr.repo.stats}>
+            <Stat label={tr.repo.downloads} value={compact(ds.downloads)} />
+            <Stat label={tr.repo.likes} value={compact(ds.likes)} />
+            {size ? <Stat label={tr.repo.size} value={bytes(size)} /> : null}
+            <Stat label={tr.repo.updated} value={ago(ds.lastModified, lang) || "—"} />
           </Panel>
         </>
       }
@@ -88,8 +90,8 @@ export default async function DatasetPage({ params, searchParams }: PageProps<"/
         <Markdown source={readme} base={fileBase("dataset", ds.id)} />
       ) : (
         <div className="rounded-2xl border border-dashed border-rule px-6 py-10">
-          <p className="font-medium">This dataset has no card.</p>
-          <p className="text-sm text-muted mt-1">Open the Preview tab to see sample rows.</p>
+          <p className="font-medium">{tr.repo.noCard}</p>
+          <p className="text-sm text-muted mt-1">{tr.repo.noCardHint}</p>
         </div>
       )}
     </RepoShell>

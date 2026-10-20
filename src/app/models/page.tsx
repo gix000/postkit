@@ -5,11 +5,13 @@ import { listCommunity, repoPath } from "@/lib/community";
 import { MODEL_TASKS } from "@/lib/tasks";
 import { first } from "@/lib/format";
 import { supabaseEnabled } from "@/lib/supabase/config";
+import { getT } from "@/lib/i18n/server";
 
 export const metadata: Metadata = { title: "Models" };
 
 export default async function ModelsPage({ searchParams }: PageProps<"/models">) {
   const sp = await searchParams;
+  const { t } = await getT();
   const state = {
     search: first(sp.search)?.slice(0, 100),
     task: first(sp.task),
@@ -26,7 +28,7 @@ export default async function ModelsPage({ searchParams }: PageProps<"/models">)
   return (
     <HubIndex
       base="/models"
-      title="Models"
+      title={t.hub.models}
       tasks={MODEL_TASKS}
       state={state}
       communityEnabled={supabaseEnabled}

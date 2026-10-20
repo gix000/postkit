@@ -10,6 +10,7 @@ import { createMode, taskLabel } from "@/lib/tasks";
 import { getViewer } from "@/lib/supabase/server";
 import { isSaved, saveCount } from "@/lib/community";
 import { supabaseEnabled } from "@/lib/supabase/config";
+import { getT } from "@/lib/i18n/server";
 
 export async function generateMetadata({ params }: PageProps<"/models/[...id]">): Promise<Metadata> {
   const { id } = await params;
@@ -22,6 +23,7 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
 
   const model = await getModel(id);
   if (!model) notFound();
+  const { lang, t } = await getT();
 
   const ref = `hf:model:${model.id}`;
   const path = `/models/${model.id}`;
@@ -34,14 +36,14 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
 
   return (
     <RepoShell
-      kindLabel="Model"
+      kindLabel={t.repo.model}
       id={model.id}
       meta={[
-        model.pipeline_tag && <span className="text-ink">{taskLabel(model.pipeline_tag)}</span>,
+        model.pipeline_tag && <span className="text-ink">{taskLabel(model.pipeline_tag, lang)}</span>,
         model.library_name,
         fmtParams(model.safetensors?.total),
-        license && `License: ${license}`,
-        model.gated && "Gated: the author requires accepting terms to download",
+        license && `${t.repo.license}: ${license}`,
+        model.gated && t.repo.gated,
       ]}
       actions={
         <>
@@ -53,23 +55,23 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
               href={`/create?mode=${mode}&model=${encodeURIComponent(model.id)}`}
               className="tap btn-neon inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold"
             >
-              {mode === "chat" ? "Chat with this model" : mode === "video" ? "Create a video" : "Create a photo"}
+              {mode === "chat" ? t.repo.chatWith : mode === "video" ? t.repo.createVideo : mode === "animate" ? t.repo.animatePhoto : mode === "edit" ? t.repo.editPhoto : t.repo.createPhoto}
             </Link>
           )}
         </>
       }
       tabs={[
-        { id: "card", label: "Model card", href: path },
-        { id: "files", label: `Files${model.siblings ? ` (${model.siblings.length})` : ""}`, href: `${path}?tab=files` },
+        { id: "card", label: t.repo.modelCard, href: path },
+        { id: "files", label: `${t.repo.files}${model.siblings ? ` (${model.siblings.length})` : ""}`, href: `${path}?tab=files` },
       ]}
       activeTab={tab}
       aside={
         <>
-          <Panel title="Stats">
-            <Stat label="Downloads (30 days)" value={compact(model.downloads)} />
-            <Stat label="Likes" value={compact(model.likes)} />
-            {size ? <Stat label="Repo size" value={bytes(size)} /> : null}
-            <Stat label="Updated" value={ago(model.lastModified) || "—"} />
+          <Panel title={t.repo.stats}>
+            <Stat label={t.repo.downloads} value={compact(model.downloads)} />
+            <Stat label={t.repo.likes} value={compact(model.likes)} />
+            {size ? <Stat label={t.repo.size} value={bytes(size)} /> : null}
+            <Stat label={t.repo.updated} value={ago(model.lastModified, lang) || "—"} />
           </Panel>
         </>
       }
@@ -80,8 +82,8 @@ export default async function ModelPage({ params, searchParams }: PageProps<"/mo
         <Markdown source={readme} base={fileBase("model", model.id)} />
       ) : (
         <div className="rounded-2xl border border-dashed border-rule px-6 py-10">
-          <p className="font-medium">This model has no card.</p>
-          <p className="text-sm text-muted mt-1">Check the Files tab to see what the repo contains.</p>
+          <p className="font-medium">{t.repo.noCard}</p>
+          <p className="text-sm text-muted mt-1">{t.repo.noCardHint}</p>
         </div>
       )}
     </RepoShell>

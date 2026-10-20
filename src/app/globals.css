@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@fontsource-variable/bricolage-grotesque";
 @import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/noto-naskh-arabic";
 
 /*
   PostKit palette (neon luxe)
@@ -36,7 +37,7 @@
   --color-live: var(--live);
   --color-danger: var(--danger);
   --color-hot: var(--hot);
-  --font-sans: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Bricolage Grotesque Variable", "Noto Naskh Arabic Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 }
 
@@ -321,4 +322,20 @@ dialog.sheet::backdrop {
 @keyframes sheet-up {
   from { transform: translate3d(0, 24px, 0); opacity: 0; }
   to { transform: none; opacity: 1; }
+}
+
+/* ── Arabic ────────────────────────────────────────────────
+   Naskh needs more line height and no negative tracking; model ids stay left-to-right. */
+:lang(ar) body {
+  line-height: 1.75;
+}
+:lang(ar) h1,
+:lang(ar) h2,
+:lang(ar) h3 {
+  letter-spacing: 0 !important;
+  line-height: 1.3;
+}
+[dir="rtl"] .ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
 }

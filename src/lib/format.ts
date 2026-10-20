@@ -22,12 +22,12 @@ export function params(n: number | undefined | null): string {
   return `${Math.round(n / 1e3)}K params`;
 }
 
-export function ago(iso: string | undefined | null): string {
+export function ago(iso: string | undefined | null, lang: "en" | "ar" = "en"): string {
   if (!iso) return "";
   const then = new Date(iso).getTime();
   if (Number.isNaN(then)) return "";
   const s = Math.max(1, Math.round((Date.now() - then) / 1000));
-  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const rtf = new Intl.RelativeTimeFormat(lang === "ar" ? "ar-u-nu-latn" : "en", { numeric: "auto" });
   const steps: [number, Intl.RelativeTimeFormatUnit][] = [
     [60, "second"],
     [60, "minute"],

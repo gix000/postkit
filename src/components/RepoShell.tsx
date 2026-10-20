@@ -30,7 +30,7 @@ export default function RepoShell({
       <div className="border-b border-rule">
         <div className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-8">
           <p className="text-sm text-muted">{kindLabel}</p>
-          <h1 className="font-mono text-[22px] sm:text-[28px] leading-tight mt-1 break-all">
+          <h1 className="font-mono text-[22px] sm:text-[28px] leading-tight mt-1 break-all ltr text-start">
             {name ? (
               <>
                 <span className="text-muted">{owner}/</span>

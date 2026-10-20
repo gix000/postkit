@@ -141,7 +141,7 @@ function MediaGen({
   const tool: Tool = pickerKind as Tool;
   const [items, setItems] = useState<Result[]>([]);
   const [busy, setBusy] = useState<Tool | null>(null);
-  const [error, setError] = useState<{ text: string; needCredits?: boolean } | null>(null);
+  const [error, setError] = useState<{ text: string; needCredits?: boolean; detail?: string } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const [viewing, setViewing] = useState<ViewItem | null>(null);
@@ -219,7 +219,7 @@ function MediaGen({
       }
       const data = await res.json();
       if (!res.ok) {
-        setError({ text: data.error || "Error", needCredits: data.code === "insufficient" });
+        setError({ text: data.error || "Error", needCredits: data.code === "insufficient", detail: typeof data.detail === "string" ? data.detail : undefined });
         return;
       }
       if (typeof data.credits === "number") setBalance(data.credits);
@@ -390,14 +390,20 @@ function MediaGen({
           </button>
         </div>
         {error && (
-          <p className="text-sm text-danger" role="alert">
+          <div className="text-sm text-danger" role="alert">
             {error.text}{" "}
             {error.needCredits && (
               <Link href="/credits" className="underline underline-offset-2 text-cobalt font-semibold">
                 {t.create.getCredits}
               </Link>
             )}
-          </p>
+            {error.detail && (
+              <details className="mt-1.5 text-[12px] text-muted">
+                <summary className="cursor-pointer">{lang === "ar" ? "التفاصيل" : "Details"}</summary>
+                <span className="ltr block break-words font-mono mt-1">{error.detail}</span>
+              </details>
+            )}
+          </div>
         )}
         {balance !== null && <p className="text-xs text-muted">{t.create.balance(balance)}</p>}
       </form>

@@ -120,6 +120,7 @@ export async function POST(req: NextRequest) {
   const styled = [english, presetSuffix(body.preset, kind)].filter(Boolean).join(", ");
   const dims = SIZES[size];
   const client = new InferenceClient(process.env.HF_TOKEN);
+  const hasHF = Boolean(process.env.HF_TOKEN);
 
   try {
     let out: Blob;
@@ -144,8 +145,8 @@ export async function POST(req: NextRequest) {
                 steps: cf.cf.endsWith("flux-2-dev") ? 24 : undefined,
               })
           : null,
-        () => hfPhoto(cf ? cf.hf : model),
-        cf ? () => hfPhoto("black-forest-labs/FLUX.1-schnell") : null,
+        hasHF ? () => hfPhoto(cf ? cf.hf : model) : null,
+        hasHF && cf ? () => hfPhoto("black-forest-labs/FLUX.1-schnell") : null,
       ]);
     } else if (tool === "edit") {
       const cf = CLOUDFLARE[model];
@@ -165,8 +166,8 @@ export async function POST(req: NextRequest) {
                 steps: cf.cf.endsWith("flux-2-dev") ? 24 : undefined,
               })
           : null,
-        () => hfEdit(cf ? cf.hf : model),
-        cf ? () => hfEdit("Qwen/Qwen-Image-Edit-2509") : null,
+        hasHF ? () => hfEdit(cf ? cf.hf : model) : null,
+        hasHF && cf ? () => hfEdit("Qwen/Qwen-Image-Edit-2509") : null,
       ]);
     } else if (tool === "upscale") {
       out = await firstOf(
@@ -209,6 +210,17 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     await refund(userId, cost, tool);
     const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[generate] ${tool} ${model} failed: ${msg}`);
+    if (/daily free allocation|neurons|4006/i.test(msg)) {
+      return fail(
+        "Today's free photos are used up. They come back at 3am Beirut time. Your credits were returned.",
+        503,
+        { detail: msg.slice(0, 300), refunded: cost, code: "daily_limit" },
+      );
+    }
+    if (!hasHF && !CLOUDFLARE[model] && tool !== "edit") {
+      return fail("This model isn't switched on yet. Pick a Flux model. Your credits were returned.", 503, { refunded: cost });
+    }
     const notServed = /not supported|no provider|not found|404|model .* is not|unknown model/i.test(msg);
     return fail(
       notServed
@@ -220,16 +232,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/** Tries each way to make the image in order and returns the first that works. */
+/** Tries each way to make the image in order and returns the first that works. The error lists every failure. */
 async function firstOf(attempts: (null | undefined | false | (() => Promise<Blob>))[]): Promise<Blob> {
-  let last: unknown;
+  const errors: string[] = [];
   for (const run of attempts) {
     if (!run) continue;
     try {
       return await run();
     } catch (e) {
-      last = e;
+      errors.push(e instanceof Error ? e.message : String(e));
     }
   }
-  throw last instanceof Error ? last : new Error("No model worked");
+  throw new Error(errors.length ? errors.join(" | ") : "No way to make this is switched on");
 }

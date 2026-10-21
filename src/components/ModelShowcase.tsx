@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useT } from "./I18n";
 import Segmented from "./Segmented";
+import LazyVideo from "./LazyVideo";
 import type { ShowCard, ShowTab } from "@/lib/model-showcase";
 
 const TABS: Record<ShowTab, { en: string; ar: string }> = {
@@ -60,16 +61,7 @@ export default function ModelShowcase({ cards }: { cards: ShowCard[] }) {
             >
               <span className="relative block overflow-hidden rounded-[19px] aspect-[3/4] bg-black">
                 {c.video ? (
-                  <video
-                    src={c.video}
-                    poster={c.media}
-                    muted
-                    loop
-                    playsInline
-                    autoPlay
-                    preload="metadata"
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
+<LazyVideo src={c.video} poster={c.media} className="absolute inset-0 h-full w-full object-cover" />
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

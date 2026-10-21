@@ -28,6 +28,7 @@ export default function NavLinks() {
           <Link
             key={l.href}
             href={l.href}
+            prefetch={l.href === "/library" || l.href === "/credits" ? undefined : true}
             aria-current={active ? "page" : undefined}
             className={`tap relative px-3.5 py-1.5 rounded-full ${l.wide ? "hidden lg:inline-block" : ""} ${active ? "bg-ink/10 text-ink font-semibold" : "text-muted hover:text-ink hover:bg-ink/5"}`}
           >

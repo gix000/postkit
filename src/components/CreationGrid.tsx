@@ -5,6 +5,7 @@ import { useT } from "./I18n";
 import { deleteCreation, setShared } from "@/app/creation-actions";
 import Viewer, { type ViewItem } from "./Viewer";
 import { useToast } from "./Toast";
+import LazyVideo from "./LazyVideo";
 
 export type GridItem = {
   id: string;
@@ -46,7 +47,7 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
             className="relative block w-full overflow-hidden"
           >
             {it.kind === "video" ? (
-              <video src={it.url} muted loop playsInline autoPlay preload="metadata" className="w-full block bg-black" />
+              <LazyVideo src={it.url} sized className="w-full block bg-black" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img

@@ -28,8 +28,9 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
   const template = getTemplate(first(sp.template));
   const m = template?.mode ?? first(sp.mode);
   const tab: Tab = m === "video" || m === "animate" ? "video" : m === "chat" ? "chat" : "photo";
-  const viewer = supabaseEnabled ? await getViewer() : null;
-  const credits = viewer ? await getBalance() : null;
+  // Both read the same cached session, so they run side by side.
+  const [viewer, balance] = supabaseEnabled ? await Promise.all([getViewer(), getBalance()]) : [null, null];
+  const credits = viewer ? balance : null;
   return (
     <Studio
       initialTab={tab}

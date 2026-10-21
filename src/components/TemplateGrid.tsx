@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useT } from "./I18n";
+import LazyVideo from "./LazyVideo";
 import { costFor, type Tool } from "@/lib/catalog";
 import { CATEGORIES, templateHref, type Template, type TemplateCategory } from "@/lib/templates";
 
@@ -22,7 +23,7 @@ export function TemplateCard({ t, i = 0 }: { t: Template; i?: number }) {
     >
       <span className="relative block overflow-hidden rounded-[19px] aspect-[3/4] bg-black">
         {t.video ? (
-          <video src={t.video} poster={t.cover} muted loop playsInline autoPlay preload="metadata" className="absolute inset-0 h-full w-full object-cover" />
+          <LazyVideo src={t.video} poster={t.cover} className="absolute inset-0 h-full w-full object-cover" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={t.cover} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]" />

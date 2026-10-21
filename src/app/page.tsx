@@ -5,6 +5,7 @@ import { listPublic } from "@/lib/creations";
 import { getT } from "@/lib/i18n/server";
 import { SHOWCASE, showcaseHref } from "@/lib/showcase";
 import ModelShowcase from "@/components/ModelShowcase";
+import LazyVideo from "@/components/LazyVideo";
 import { showcaseCards } from "@/lib/model-showcase";
 import { TrustBar, HowItWorks, Faq, FinalCta } from "@/components/HomeSections";
 import { TemplateCard } from "@/components/TemplateGrid";
@@ -102,9 +103,9 @@ export default async function Home() {
         </ul>
       </section>
 
-      <HowItWorks lang={lang} />
+      <div className="cv"><HowItWorks lang={lang} /></div>
 
-      <ModelShowcase cards={showcaseCards()} />
+      <div className="cv"><ModelShowcase cards={showcaseCards()} /></div>
 
       <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14">
         <div className="flex items-baseline justify-between mb-3">
@@ -128,7 +129,7 @@ export default async function Home() {
               <Link href={c.href} className="tap group block rounded-[22px] overflow-hidden glass p-1.5">
                 <span className="block overflow-hidden rounded-[17px]">
                   {c.video ? (
-                    <video src={c.src} muted loop playsInline autoPlay preload="metadata" className="w-full aspect-[3/4] object-cover bg-black" />
+                    <LazyVideo src={c.src} className="w-full aspect-[3/4] object-cover bg-black" />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={c.src} alt={c.prompt} loading="lazy" decoding="async" className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
@@ -145,8 +146,8 @@ export default async function Home() {
         </ul>
       </section>
 
-      <Faq lang={lang} />
-      <FinalCta lang={lang} />
+      <div className="cv"><Faq lang={lang} /></div>
+      <div className="cv"><FinalCta lang={lang} /></div>
     </div>
   );
 }

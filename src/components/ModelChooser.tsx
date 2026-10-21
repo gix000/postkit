@@ -82,7 +82,7 @@ export default function ModelChooser({ kind, value, onChange }: { kind: Kind; va
       <dialog
         ref={dialog}
         onClose={() => setOpen(false)}
-        className="sheet glass-float glass-solid text-ink p-0 rounded-t-[28px] sm:rounded-[28px] w-full sm:max-w-[520px] max-h-[82vh]"
+        className="sheet glass-solid text-ink p-0 rounded-t-[28px] sm:rounded-[28px] w-full sm:max-w-[520px] max-h-[82vh]"
         onClick={(e) => {
           if (e.target === dialog.current) dialog.current?.close();
         }}

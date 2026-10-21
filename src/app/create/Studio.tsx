@@ -279,6 +279,8 @@ function MediaGen({
         return;
       }
       if (typeof data.credits === "number") setBalance(data.credits);
+      // New creation and balance: drop cached Library/Credits pages so they show it right away.
+      router.refresh();
       if (data.mask && image) {
         const png = await applyMask(image, data.mask);
         const saved = await saveCutoutFromBrowser(png);

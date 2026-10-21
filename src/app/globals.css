@@ -262,8 +262,8 @@ button:not(:disabled):active, .tap:active {
     0 12px 32px -16px rgba(0, 0, 0, 0.8);
 }
 .glass-float {
-  -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.05);
-  backdrop-filter: blur(24px) saturate(1.8) brightness(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
 }
 .glass-strong {
   background-color: rgba(26, 14, 17, 0.62);
@@ -392,10 +392,10 @@ button:not(:disabled):active, .tap:active {
 
 /* ── Page transitions (React <ViewTransition>) ──────────── */
 ::view-transition-old(.page-out) {
-  animation: 140ms ease-out both vt-fade-out;
+  animation: 90ms ease-out both vt-fade-out;
 }
 ::view-transition-new(.page-in) {
-  animation: 260ms cubic-bezier(0.2, 0.8, 0.2, 1) 60ms both vt-rise;
+  animation: 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both vt-rise;
 }
 @keyframes vt-fade-out {
   to { opacity: 0; }
@@ -406,7 +406,7 @@ button:not(:disabled):active, .tap:active {
 
 /* Gentle reveal for cards as they arrive. */
 .rise {
-  animation: rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: rise 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 @keyframes rise {
   from { opacity: 0; transform: translateY(14px) scale(0.98); }
@@ -424,9 +424,7 @@ dialog.sheet[open] {
 }
 dialog.sheet::backdrop,
 dialog.viewer::backdrop {
-  background: rgba(13, 3, 3, 0.6);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(8, 2, 3, 0.72);
 }
 @media (min-width: 640px) {
   dialog.sheet { margin: auto; }
@@ -479,3 +477,9 @@ dialog.viewer[open] {
 /* Scrolling inside a sheet never chains to the page behind it. */
 dialog.sheet *,
 dialog.viewer { overscroll-behavior: contain; }
+
+/* Below-the-fold sections skip layout and paint until they are about to scroll into view. */
+.cv {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}

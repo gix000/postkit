@@ -91,6 +91,7 @@ export default function TabBar({ signedIn }: { signedIn: boolean }) {
             <li key={tab.href} className="flex justify-center">
               <Link
                 href={tab.href}
+                prefetch={tab.href === "/library" || tab.href === "/credits" ? undefined : true}
                 aria-current={active ? "page" : undefined}
                 className={`tap relative z-10 flex flex-col items-center gap-0.5 rounded-2xl px-1 py-1 text-[11px] font-medium whitespace-nowrap ${active ? "text-ink" : "text-muted"}`}
               >

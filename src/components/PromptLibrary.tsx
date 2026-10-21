@@ -43,7 +43,7 @@ export default function PromptLibrary({ kind, onPick }: { kind: PromptKind; onPi
       <dialog
         ref={dialog}
         aria-label={ar ? "مكتبة الأفكار" : "Prompt library"}
-        className="sheet glass-float glass-solid text-ink p-0 rounded-t-[28px] sm:rounded-[28px] w-full sm:max-w-[620px] max-h-[86vh]"
+        className="sheet glass-solid text-ink p-0 rounded-t-[28px] sm:rounded-[28px] w-full sm:max-w-[620px] max-h-[86vh]"
         onClick={(e) => {
           if (e.target === dialog.current) dialog.current?.close();
         }}

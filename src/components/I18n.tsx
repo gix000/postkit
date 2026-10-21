@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { Lang } from "@/lib/catalog";
 import { DICTS, type Dict } from "@/lib/i18n/dict";
 
@@ -19,8 +19,11 @@ export function useT(): { lang: Lang; t: Dict } {
 export function LangSwitch({ className = "" }: { className?: string }) {
   const { lang, t } = useT();
   const router = useRouter();
+  const pathname = usePathname();
   const [pending, start] = useTransition();
   const next: Lang = lang === "ar" ? "en" : "ar";
+  // Landing pages have one URL per language, so switching goes to the twin page.
+  const twin = /^\/(ar\/)?use(\/|$)/.test(pathname) ? (next === "ar" ? `/ar${pathname.replace(/^\/ar/, "")}` : pathname.replace(/^\/ar/, "")) : null;
   return (
     <button
       type="button"
@@ -29,7 +32,7 @@ export function LangSwitch({ className = "" }: { className?: string }) {
       disabled={pending}
       onClick={() => {
         document.cookie = `lang=${next}; path=/; max-age=31536000; samesite=lax`;
-        start(() => router.refresh());
+        start(() => (twin ? router.push(twin) : router.refresh()));
       }}
       className={`h-10 px-3 rounded-full text-sm font-semibold text-muted hover:text-ink hover:bg-ink/5 ${pending ? "opacity-60" : ""} ${className}`}
     >

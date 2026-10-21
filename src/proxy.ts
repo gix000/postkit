@@ -8,6 +8,11 @@ export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_HUB_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_HUB_SUPABASE_ANON_KEY;
   // A long-lived device id, so the free welcome credits go to one account per phone or laptop.
+  // Search-engine landing pages have a fixed language: /use/… English, /ar/use/… Arabic.
+  const path = request.nextUrl.pathname;
+  request.headers.delete("x-pk-lang");
+  if (path === "/ar/use" || path.startsWith("/ar/use/")) request.headers.set("x-pk-lang", "ar");
+  else if (path === "/use" || path.startsWith("/use/")) request.headers.set("x-pk-lang", "en");
   const newDevice = request.cookies.has(DEVICE_COOKIE) ? null : crypto.randomUUID();
   if (newDevice) request.cookies.set(DEVICE_COOKIE, newDevice);
   const withDevice = (res: NextResponse) => {

@@ -137,25 +137,24 @@ export async function POST(req: NextRequest) {
   const hasHF = Boolean(process.env.HF_TOKEN);
 
   let tempPath: string | null = null;
+  let tempUrl: string | undefined;
+  const dims_ = { w: typeof body.imageWidth === "number" ? body.imageWidth : undefined, h: typeof body.imageHeight === "number" ? body.imageHeight : undefined };
+  /** Runs a Runpod model with the visitor's prompt (and photo, uploaded once). */
+  const viaRunpod = async (slug: string) => {
+    if (image && !tempUrl) {
+      const up = await uploadInput(userId, image);
+      tempPath = up.path;
+      tempUrl = up.url;
+    }
+    const input = runpodInput(slug, { prompt: styled || "natural, subtle motion, cinematic", size, imageUrl: tempUrl, ...dims_ });
+    const result = await runRunpod(slug, input);
+    return downloadResult(result.url, kind === "video" ? "video/mp4" : "image/jpeg");
+  };
   try {
     let out: Blob;
     if (isRunpod(model) && (tool === "photo" || tool === "edit" || tool === "video" || tool === "animate")) {
       if (!runpodReady()) throw new Error("Runpod key missing");
-      let imageUrl: string | undefined;
-      if (image) {
-        const up = await uploadInput(userId, image);
-        tempPath = up.path;
-        imageUrl = up.url;
-      }
-      const input = runpodInput(model.slice("runpod/".length), {
-        prompt: styled || "natural, subtle motion, cinematic",
-        size,
-        imageUrl,
-        w: typeof body.imageWidth === "number" ? body.imageWidth : undefined,
-        h: typeof body.imageHeight === "number" ? body.imageHeight : undefined,
-      });
-      const result = await runRunpod(model.slice("runpod/".length), input);
-      out = await downloadResult(result.url, kind === "video" ? "video/mp4" : "image/jpeg");
+      out = await viaRunpod(model.slice("runpod/".length));
     } else if (tool === "photo") {
       const hfPhoto = async (m: string) =>
         (await client.textToImage(
@@ -177,6 +176,8 @@ export async function POST(req: NextRequest) {
                 steps: cf.cf.endsWith("flux-2-dev") ? 24 : undefined,
               })
           : null,
+        // Cloudflare's free allowance ran out (or it's busy): a hosted model on Runpod, about half a cent.
+        cf && runpodReady() ? () => viaRunpod("z-image-turbo") : null,
         hasHF ? () => hfPhoto(cf ? cf.hf : model) : null,
         hasHF && cf ? () => hfPhoto("black-forest-labs/FLUX.1-schnell") : null,
       ]);
@@ -198,6 +199,7 @@ export async function POST(req: NextRequest) {
                 steps: cf.cf.endsWith("flux-2-dev") ? 24 : undefined,
               })
           : null,
+        cf && runpodReady() ? () => viaRunpod("qwen-image-edit-2511") : null,
         hasHF ? () => hfEdit(cf ? cf.hf : model) : null,
         hasHF && cf ? () => hfEdit("Qwen/Qwen-Image-Edit-2509") : null,
       ]);
@@ -243,7 +245,7 @@ export async function POST(req: NextRequest) {
     await refund(userId, cost, tool);
     const msg = e instanceof Error ? e.message : String(e);
     console.error(`[generate] ${tool} ${model} failed: ${msg}`);
-    if (/daily free allocation|neurons|4006/i.test(msg)) {
+    if (!runpodReady() && /daily free allocation|neurons|4006/i.test(msg)) {
       return fail(
         "Today's free photos are used up. They come back at 3am Beirut time. Your credits were returned.",
         503,

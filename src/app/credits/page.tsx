@@ -8,6 +8,7 @@ import { getViewer } from "@/lib/supabase/server";
 import { getT } from "@/lib/i18n/server";
 import { ago } from "@/lib/format";
 import { isOwner } from "@/app/admin/actions";
+import { welcomeStatus } from "@/lib/welcome";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -18,7 +19,18 @@ export default async function CreditsPage() {
   const [{ lang, t }, viewer] = await Promise.all([getT(), getViewer()]);
   const [balance, history] = viewer ? await Promise.all([getBalance(), getHistory()]) : [null, []];
   const payments = Boolean(WHATSAPP);
-  const owner = viewer ? await isOwner() : false;
+  const [owner, welcome] = viewer ? await Promise.all([isOwner(), welcomeStatus(viewer.id)]) : [false, null];
+  const ar = lang === "ar";
+  const welcomeNote =
+    welcome === "device"
+      ? ar
+        ? "الرصيد المجاني يُعطى مرة واحدة لكل جهاز، وقد حصل عليه حساب آخر على هذا الجهاز. اشترِ رصيدًا عبر واتساب للمتابعة."
+        : "Free credits are given once per device, and another account on this device already got them. Buy credits on WhatsApp to keep creating."
+      : welcome === "disposable"
+        ? ar
+          ? "الرصيد المجاني غير متاح لعناوين البريد المؤقتة. سجّل ببريدك العادي أو اشترِ رصيدًا عبر واتساب."
+          : "Free credits aren't available for temporary email addresses. Sign in with your usual email, or buy credits on WhatsApp."
+        : null;
   const packIds = Object.keys(PACKS) as PackId[];
 
   const costs: [string, number | null][] = [
@@ -44,6 +56,7 @@ export default async function CreditsPage() {
               Owner: add credits for a customer →
             </Link>
           )}
+          {welcomeNote && <p className="mt-5 max-w-[60ch] rounded-2xl border border-rule bg-surface/60 px-4 py-3 text-sm text-muted">{welcomeNote}</p>}
           {balance !== null && (
             <div className="glass inline-flex items-center gap-3 rounded-full ps-3 pe-6 py-2.5 mt-6">
               <span className="grid place-items-center h-10 w-10 rounded-full bg-cobalt text-cobalt-ink">

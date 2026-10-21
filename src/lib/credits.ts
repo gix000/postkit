@@ -2,6 +2,7 @@ import "server-only";
 import { createAdminClient } from "./supabase/admin";
 import { cache } from "react";
 import { createClient, getSessionUser } from "./supabase/server";
+import { claimWelcome } from "./welcome";
 
 export class CreditsError extends Error {
   constructor(public code: "insufficient" | "unavailable") {
@@ -14,7 +15,9 @@ export const getBalance = cache(async (): Promise<number | null> => {
   const user = await getSessionUser();
   if (!user) return null;
   const sb = await createClient();
-  const { data } = await sb!.from("credit_ledger").select("delta").eq("user_id", user.id);
+  const { data, error } = await sb!.from("credit_ledger").select("delta").eq("user_id", user.id);
+  // A brand-new account has no history yet: claim its welcome credits (once per person).
+  if (!error && data && data.length === 0) return claimWelcome(user.id, user.email);
   return (data ?? []).reduce((sum, r) => sum + (r.delta as number), 0);
 });
 

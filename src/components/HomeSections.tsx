@@ -71,8 +71,8 @@ const FAQ: { q: T; a: T }[] = [
   {
     q: { en: "How do credits work?", ar: "كيف يعمل الرصيد؟" },
     a: {
-      en: "Each creation costs a few credits, and the price is shown on the button before you tap. Most photos cost 1–3 credits; a 5-second video starts at 10. New accounts get free credits to try.",
-      ar: "كل إنشاء يكلّف بضعة أرصدة، والسعر ظاهر على الزر قبل الضغط. معظم الصور تكلّف 1–3 أرصدة، والفيديو من 5 ثوانٍ يبدأ من 10. الحسابات الجديدة تحصل على رصيد مجاني للتجربة.",
+      en: "Each creation costs a few credits, and the price is shown on the button before you tap. Most photos cost 1–3 credits; a 5-second video starts at 10. New accounts get free credits to try, once per person and device.",
+      ar: "كل إنشاء يكلّف بضعة أرصدة، والسعر ظاهر على الزر قبل الضغط. معظم الصور تكلّف 1–3 أرصدة، والفيديو من 5 ثوانٍ يبدأ من 10. الحسابات الجديدة تحصل على رصيد مجاني للتجربة، مرة واحدة لكل شخص وجهاز.",
     },
   },
   {

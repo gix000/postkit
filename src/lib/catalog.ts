@@ -34,12 +34,18 @@ export const CLOUDFLARE: Record<string, { cf: string; hf: string; multipart: boo
 export const ENABLED = {
   cloudflarePaid: process.env.NEXT_PUBLIC_CLOUDFLARE_PAID === "1",
   huggingface: process.env.NEXT_PUBLIC_HF_READY === "1",
+  runpod: process.env.NEXT_PUBLIC_RUNPOD_READY === "1",
 };
+
+/** Hosted models on Runpod Public Endpoints, billed per result. Ids look like "runpod/<endpoint>". */
+export const RUNPOD_PREFIX = "runpod/";
+export const isRunpod = (id: string) => id.startsWith(RUNPOD_PREFIX);
 
 /** True when this model can actually run with what's switched on. */
 export function modelEnabled(id: string) {
   const cf = CLOUDFLARE[id];
   if (cf) return !cf.paid || ENABLED.cloudflarePaid;
+  if (isRunpod(id)) return ENABLED.runpod;
   return ENABLED.huggingface;
 }
 
@@ -58,24 +64,40 @@ const ALL_CURATED: Record<Kind, ModelPick[]> = {
       cheap: true,
     },
     {
+      id: "runpod/z-image-turbo",
+      name: "Z Photoreal",
+      note: { en: "Realistic photos in seconds", ar: "صور واقعية خلال ثوانٍ" },
+      cost: 2,
+    },
+    {
+      id: "runpod/p-image-t2i",
+      name: "Pruna Instant",
+      note: { en: "Improves your prompt for you", ar: "يحسّن وصفك تلقائيًا" },
+      cost: 2,
+    },
+    {
+      id: "runpod/qwen-image-t2i",
+      name: "Qwen Poster",
+      note: { en: "Best with text, posters and signs", ar: "الأفضل للنصوص والملصقات واللافتات" },
+      cost: 2,
+    },
+    {
+      id: "runpod/seedream-v4-t2i",
+      name: "Seedream 2K",
+      note: { en: "Magazine quality, extra sharp", ar: "جودة مجلات وحدّة عالية" },
+      cost: 3,
+    },
+    {
       id: "cloudflare/flux-2-klein-9b",
       name: "Flux 2 Klein Plus",
       note: { en: "More detail and better text", ar: "تفاصيل أكثر ونصوص أوضح" },
+      cost: 2,
     },
     {
       id: "cloudflare/flux-2-dev",
       name: "Flux 2 Pro",
       note: { en: "Best Flux quality, a little slower", ar: "أفضل جودة Flux، أبطأ قليلًا" },
-    },
-    {
-      id: "Tongyi-MAI/Z-Image-Turbo",
-      name: "Z Photoreal",
-      note: { en: "Realistic photos in seconds", ar: "صور واقعية خلال ثوانٍ" },
-    },
-    {
-      id: "Qwen/Qwen-Image",
-      name: "Qwen Poster",
-      note: { en: "Best with text, posters and signs", ar: "الأفضل للنصوص والملصقات واللافتات" },
+      cost: 3,
     },
   ],
   edit: [
@@ -86,53 +108,62 @@ const ALL_CURATED: Record<Kind, ModelPick[]> = {
       cost: 2,
     },
     {
+      id: "runpod/qwen-image-edit-2511",
+      name: "Qwen Edit",
+      note: { en: "Follows instructions, keeps faces", ar: "ينفّذ التعليمات ويحافظ على الوجوه" },
+      cost: 3,
+    },
+    {
+      id: "runpod/p-image-edit",
+      name: "Pruna Edit",
+      note: { en: "Quick restyles and swaps", ar: "تغيير سريع للأسلوب والعناصر" },
+      cost: 3,
+    },
+    {
+      id: "runpod/seedream-v4-edit",
+      name: "Seedream Edit",
+      note: { en: "Sharp 2K edits, keeps your product", ar: "تعديل 2K حاد يحافظ على منتجك" },
+      cost: 3,
+    },
+    {
       id: "cloudflare/flux-2-klein-9b",
       name: "Flux 2 Klein Plus Edit",
       note: { en: "Cleaner detail on faces and text", ar: "تفاصيل أنظف للوجوه والنصوص" },
+      cost: 3,
     },
     {
       id: "cloudflare/flux-2-dev",
       name: "Flux 2 Pro Edit",
       note: { en: "Best Flux edits, a little slower", ar: "أفضل تعديل Flux، أبطأ قليلًا" },
-    },
-    {
-      id: "Qwen/Qwen-Image-Edit-2509",
-      name: "Qwen Edit",
-      note: { en: "Follows instructions, keeps faces", ar: "ينفّذ التعليمات ويحافظ على الوجوه" },
+      cost: 4,
     },
   ],
   video: [
     {
-      id: "Wan-AI/Wan2.2-T2V-A14B",
+      id: "runpod/p-video",
+      name: "Pruna Video",
+      note: { en: "5-second clips in seconds", ar: "مقاطع 5 ثوانٍ خلال لحظات" },
+      cost: 10,
+    },
+    {
+      id: "runpod/wan-2-6-t2v",
       name: "Wan Cinematic",
-      note: { en: "Smooth, film-like motion", ar: "حركة سلسة بطابع سينمائي" },
-    },
-    {
-      id: "Wan-AI/Wan2.2-TI2V-5B",
-      name: "Wan Quick",
-      note: { en: "Short clips, faster results", ar: "مقاطع قصيرة ونتائج أسرع" },
-    },
-    {
-      id: "Wan-AI/Wan2.1-T2V-14B",
-      name: "Wan Classic",
-      note: { en: "Detailed scenes, steady camera", ar: "مشاهد مفصّلة وكاميرا ثابتة" },
+      note: { en: "Film-like motion, 720p", ar: "حركة سينمائية بدقة 720p" },
+      cost: 25,
     },
   ],
   animate: [
     {
-      id: "Wan-AI/Wan2.2-I2V-A14B",
+      id: "runpod/p-video",
+      name: "Pruna Motion",
+      note: { en: "Brings your photo to life fast", ar: "يحرّك صورتك بسرعة" },
+      cost: 10,
+    },
+    {
+      id: "runpod/wan-2-2-i2v-720",
       name: "Wan Motion",
-      note: { en: "Natural movement from your photo", ar: "حركة طبيعية من صورتك" },
-    },
-    {
-      id: "Wan-AI/Wan2.1-I2V-14B-720P",
-      name: "Wan HD",
-      note: { en: "Sharper 720p clips", ar: "مقاطع أوضح بدقة 720p" },
-    },
-    {
-      id: "Lightricks/LTX-2",
-      name: "LTX",
-      note: { en: "Fast and lively", ar: "سريع ومليء بالحيوية" },
+      note: { en: "Natural movement, 720p", ar: "حركة طبيعية بدقة 720p" },
+      cost: 15,
     },
   ],
   chat: [

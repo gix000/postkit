@@ -9,8 +9,10 @@ import {
   UPSCALE_MODELS,
   UPSCALE_PROMPT,
   costFor,
+  isRunpod,
   isSize,
   presetSuffix,
+  type SizeId,
   type Tool,
   modelEnabled,
 } from "@/lib/catalog";
@@ -18,6 +20,9 @@ import { CreditsError, refund, spend } from "@/lib/credits";
 import { saveCreation } from "@/lib/creations";
 import { toEnglishPrompt } from "@/lib/translate";
 import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
+import { downloadResult, runRunpod, runpodReady } from "@/lib/runpod";
+import { createClient } from "@/lib/supabase/server";
+import { CREATIONS_BUCKET } from "@/lib/creations";
 
 // Videos can take a few minutes. Vercel stops the function at your plan's limit.
 export const maxDuration = 300;
@@ -96,8 +101,12 @@ export async function POST(req: NextRequest) {
 
   const model = body.model === undefined || body.model === "" ? defaultModel(tool) : body.model;
   if (!validModelId(model)) return fail("Pick a model from the list.", 400);
-  if ((tool === "photo" || tool === "edit") && !modelEnabled(model)) {
-    return fail("This model isn't switched on yet. Pick Flux 2 Klein.", 400, { code: "model_off" });
+  if (tool !== "upscale" && tool !== "cutout" && !modelEnabled(model)) {
+    return fail(
+      tool === "video" || tool === "animate" ? "Videos aren't switched on yet." : "This model isn't switched on yet. Pick Flux 2 Klein.",
+      400,
+      { code: "model_off" },
+    );
   }
 
   const rawPrompt = typeof body.prompt === "string" ? body.prompt.trim().slice(0, 2000) : "";
@@ -127,9 +136,27 @@ export async function POST(req: NextRequest) {
   const client = new InferenceClient(process.env.HF_TOKEN);
   const hasHF = Boolean(process.env.HF_TOKEN);
 
+  let tempPath: string | null = null;
   try {
     let out: Blob;
-    if (tool === "photo") {
+    if (isRunpod(model) && (tool === "photo" || tool === "edit" || tool === "video" || tool === "animate")) {
+      if (!runpodReady()) throw new Error("Runpod key missing");
+      let imageUrl: string | undefined;
+      if (image) {
+        const up = await uploadInput(userId, image);
+        tempPath = up.path;
+        imageUrl = up.url;
+      }
+      const input = runpodInput(model.slice("runpod/".length), {
+        prompt: styled || "natural, subtle motion, cinematic",
+        size,
+        imageUrl,
+        w: typeof body.imageWidth === "number" ? body.imageWidth : undefined,
+        h: typeof body.imageHeight === "number" ? body.imageHeight : undefined,
+      });
+      const result = await runRunpod(model.slice("runpod/".length), input);
+      out = await downloadResult(result.url, kind === "video" ? "video/mp4" : "image/jpeg");
+    } else if (tool === "photo") {
       const hfPhoto = async (m: string) =>
         (await client.textToImage(
           { model: m, inputs: styled, provider: "auto", parameters: { width: dims.w, height: dims.h, image_size: dims.falPreset } },
@@ -223,7 +250,7 @@ export async function POST(req: NextRequest) {
         { detail: msg.slice(0, 300), refunded: cost, code: "daily_limit" },
       );
     }
-    if (!hasHF && (tool === "video" || tool === "animate" || tool === "upscale" || tool === "cutout")) {
+    if (!hasHF && (tool === "upscale" || tool === "cutout")) {
       return fail("This tool is coming soon. Your credits were returned.", 503, { refunded: cost });
     }
     const notServed = /not supported|no provider|not found|404|model .* is not|unknown model/i.test(msg);
@@ -234,6 +261,87 @@ export async function POST(req: NextRequest) {
       502,
       { detail: msg.slice(0, 300), refunded: cost },
     );
+  } finally {
+    if (tempPath) await removeInput(tempPath);
+  }
+}
+
+/** Puts the visitor's photo somewhere Runpod can fetch it (their own folder, removed right after). */
+async function uploadInput(userId: string, image: Blob) {
+  const sb = await createClient();
+  if (!sb) throw new Error("storage unavailable");
+  const ext = image.type === "image/png" ? "png" : image.type === "image/webp" ? "webp" : "jpg";
+  const path = `${userId}/inputs/${crypto.randomUUID()}.${ext}`;
+  const { error } = await sb.storage.from(CREATIONS_BUCKET).upload(path, image, { contentType: image.type || "image/jpeg" });
+  if (error) throw new Error(`upload failed: ${error.message}`);
+  return { path, url: sb.storage.from(CREATIONS_BUCKET).getPublicUrl(path).data.publicUrl };
+}
+
+async function removeInput(path: string) {
+  const sb = await createClient();
+  await sb?.storage.from(CREATIONS_BUCKET).remove([path]).catch(() => {});
+}
+
+const ASPECT: Record<SizeId, string> = { square: "1:1", portrait: "3:4", story: "9:16", wide: "16:9" };
+
+/** Width*height that keeps the uploaded photo's shape with the long side at `long`. */
+function fitSize(w: number | undefined, h: number | undefined, long: number) {
+  const W = w && w > 0 ? w : 1;
+  const H = h && h > 0 ? h : 1;
+  const s = long / Math.max(W, H);
+  const r = (n: number) => Math.max(512, Math.round((n * s) / 16) * 16);
+  return `${r(W)}*${r(H)}`;
+}
+
+/** Each Runpod model's own input format. */
+function runpodInput(
+  slug: string,
+  c: { prompt: string; size: SizeId; imageUrl?: string; w?: number; h?: number },
+): Record<string, unknown> {
+  const tall = (c.w ?? 1) < (c.h ?? 1);
+  switch (slug) {
+    case "z-image-turbo":
+      return {
+        prompt: c.prompt,
+        size: { square: "1024*1024", portrait: "768*1024", story: "720*1280", wide: "1280*720" }[c.size],
+        output_format: "jpeg",
+      };
+    case "p-image-t2i":
+      return { prompt: c.prompt, aspect_ratio: ASPECT[c.size] };
+    case "qwen-image-t2i":
+      return { prompt: c.prompt, size: { square: "1024*1024", portrait: "896*1120", story: "720*1280", wide: "1280*720" }[c.size] };
+    case "seedream-v4-t2i":
+      return { prompt: c.prompt, size: { square: "2048*2048", portrait: "1632*2048", story: "1152*2048", wide: "2048*1152" }[c.size] };
+    case "qwen-image-edit-2511": {
+      const r = (c.w ?? 1) / (c.h ?? 1);
+      return { prompt: c.prompt, images: [c.imageUrl], size: r > 1.15 ? "1280*1024" : r < 0.87 ? "1024*1280" : "1024*1024", output_format: "jpeg" };
+    }
+    case "p-image-edit":
+      return { prompt: c.prompt, images: [c.imageUrl], aspect_ratio: "match_input_image" };
+    case "seedream-v4-edit":
+      return { prompt: c.prompt, images: [c.imageUrl], size: fitSize(c.w, c.h, 2048) };
+    case "p-video":
+      return c.imageUrl
+        ? { prompt: c.prompt, image: c.imageUrl, duration: 5, resolution: "720p" }
+        : { prompt: c.prompt, duration: 5, resolution: "720p", aspect_ratio: ASPECT[c.size] };
+    case "wan-2-6-t2v":
+      return { prompt: c.prompt, duration: 5, size: c.size === "wide" ? "1280*720" : "720*1280" };
+    case "wan-2-2-i2v-720":
+      return {
+        prompt: c.prompt,
+        image: c.imageUrl,
+        negative_prompt: "blurry, distorted, low quality",
+        duration: 5,
+        size: tall ? "720*1280" : "1280*720",
+        num_inference_steps: 30,
+        guidance: 5,
+        flow_shift: 5,
+        seed: -1,
+        enable_prompt_optimization: false,
+        enable_safety_checker: true,
+      };
+    default:
+      throw new Error(`Unknown Runpod model ${slug}`);
   }
 }
 

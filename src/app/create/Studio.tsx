@@ -192,7 +192,7 @@ function MediaGen({
     const runModel = runTool === "upscale" || runTool === "cutout" ? undefined : model;
     const runKind: "photo" | "video" = runTool === "video" || runTool === "animate" ? "video" : "photo";
     try {
-      const editExtras = runTool === "edit" && image ? await smallCopy(image).catch(() => null) : null;
+      const editExtras = (runTool === "edit" || runTool === "animate") && image ? await smallCopy(image).catch(() => null) : null;
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -203,7 +203,7 @@ function MediaGen({
           size,
           preset,
           image: runTool === "photo" || runTool === "video" ? undefined : image,
-          imageSmall: editExtras?.small,
+          imageSmall: runTool === "edit" ? editExtras?.small : undefined,
           imageWidth: editExtras?.width,
           imageHeight: editExtras?.height,
         }),

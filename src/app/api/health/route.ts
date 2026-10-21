@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { whishConfig } from "@/lib/whish";
 import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
+import { runpodBalance, runpodReady } from "@/lib/runpod";
 
 /** Yes/no checks for the site owner. Shows nothing secret. */
 export async function GET(req: Request) {
@@ -49,6 +50,7 @@ export async function GET(req: Request) {
       probe,
       ai: Boolean(process.env.HF_TOKEN),
       cloudflare,
+      runpod: runpodReady() ? { balance: await runpodBalance() } : "not set",
       credits,
       payments: w.ready ? w.mode : "not set",
     },

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { whishConfig } from "@/lib/whish";
 import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
-import { runpodBalance, runpodReady } from "@/lib/runpod";
+import { downloadResult, runRunpod, runpodBalance, runpodReady } from "@/lib/runpod";
 
 /** Yes/no checks for the site owner. Shows nothing secret. */
 export async function GET(req: Request) {
@@ -45,9 +45,21 @@ export async function GET(req: Request) {
       probe = `failed in ${Date.now() - started}ms: ${e instanceof Error ? e.message : String(e)}`.slice(0, 400);
     }
   }
+  let runpodProbe: string | undefined;
+  if (key && process.env.HEALTH_KEY && key === process.env.HEALTH_KEY && runpodReady()) {
+    const started = Date.now();
+    try {
+      const r = await runRunpod("z-image-turbo", { prompt: "a red apple on a table", size: "512*512", output_format: "jpeg" }, 60_000);
+      const blob = await downloadResult(r.url, "image/jpeg");
+      runpodProbe = `ok ${blob.size} bytes, $${r.cost ?? "?"}, ${Date.now() - started}ms`;
+    } catch (e) {
+      runpodProbe = `failed in ${Date.now() - started}ms: ${e instanceof Error ? e.message : String(e)}`.slice(0, 400);
+    }
+  }
   return NextResponse.json(
     {
       probe,
+      runpodProbe,
       ai: Boolean(process.env.HF_TOKEN),
       cloudflare,
       runpod: runpodReady() ? { balance: await runpodBalance() } : "not set",

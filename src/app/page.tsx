@@ -1,19 +1,12 @@
 import Link from "next/link";
 import HeroPrompt from "@/components/HeroPrompt";
-import RepoRow from "@/components/RepoRow";
 import Logo from "@/components/Logo";
-import { listModels } from "@/lib/hf";
 import { listPublic } from "@/lib/creations";
 import { getT } from "@/lib/i18n/server";
 import { SHOWCASE, showcaseHref } from "@/lib/showcase";
 
 export default async function Home() {
-  const [{ t }, photoModels, videoModels, showcase] = await Promise.all([
-    getT(),
-    listModels({ task: "text-to-image", limit: 6 }),
-    listModels({ task: "text-to-video", limit: 6 }),
-    listPublic(undefined, 8),
-  ]);
+  const [{ t }, showcase] = await Promise.all([getT(), listPublic(undefined, 8)]);
 
   const featureLinks = ["/create?mode=photo", "/create?mode=animate", "/create?mode=photo"];
 
@@ -113,49 +106,7 @@ export default async function Home() {
         </ul>
       </section>
 
-      <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14 grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <ModelList title={t.home.photoModels} seeAll={t.home.seeAll} href="/models?task=text-to-image" items={photoModels.items} mode="photo" empty={[t.home.modelsDidntLoad, t.home.reload]} />
-        <ModelList title={t.home.videoModels} seeAll={t.home.seeAll} href="/models?task=text-to-video" items={videoModels.items} mode="video" empty={[t.home.modelsDidntLoad, t.home.reload]} />
-      </section>
     </div>
   );
 }
 
-function ModelList({
-  title,
-  seeAll,
-  href,
-  items,
-  mode,
-  empty,
-}: {
-  title: string;
-  seeAll: string;
-  href: string;
-  items: { id: string; downloads?: number; likes?: number }[];
-  mode: "photo" | "video";
-  empty: [string, string];
-}) {
-  return (
-    <div>
-      <div className="flex items-baseline justify-between mb-3">
-        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-        <Link href={href} className="text-sm text-cobalt underline underline-offset-2">
-          {seeAll}
-        </Link>
-      </div>
-      {items.length ? (
-        <ul className="rounded-2xl border border-rule overflow-hidden">
-          {items.map((m) => (
-            <RepoRow key={m.id} r={{ id: m.id, href: `/create?mode=${mode}&model=${encodeURIComponent(m.id)}`, downloads: m.downloads, likes: m.likes }} />
-          ))}
-        </ul>
-      ) : (
-        <div className="rounded-2xl border border-dashed border-rule px-5 py-8 text-sm">
-          <p className="font-medium">{empty[0]}</p>
-          <p className="text-muted mt-1">{empty[1]}</p>
-        </div>
-      )}
-    </div>
-  );
-}

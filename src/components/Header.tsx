@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
-import SearchBox from "./SearchBox";
 import TabBar from "./TabBar";
 import { LangSwitch } from "./I18n";
 import { getViewer } from "@/lib/supabase/server";
@@ -32,23 +31,10 @@ export default async function Header() {
             <Logo size={24} />
             PostKit
           </Link>
-          <div className="hidden xl:block w-[260px]">
-            <SearchBox compact />
-          </div>
           <div className="hidden md:block">
             <NavLinks />
           </div>
           <div className="ms-auto flex items-center gap-1.5 shrink-0">
-            <Link
-              href="/models"
-              aria-label={t.nav.searchModels}
-              className="tap xl:hidden grid place-items-center h-10 w-10 rounded-full text-muted hover:text-ink"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <circle cx="11" cy="11" r="6.5" />
-                <path d="m16 16 4 4" strokeLinecap="round" />
-              </svg>
-            </Link>
             <LangSwitch className="inline-flex items-center px-2.5 sm:px-3" />
             {supabaseEnabled && viewer ? (
               <>

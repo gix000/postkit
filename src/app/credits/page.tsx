@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import BuyButton from "./BuyButton";
+import WhatsAppBuy, { WHATSAPP, whatsappLink } from "./WhatsAppBuy";
 import { Bolt } from "@/components/Header";
 import { COST, PACKS, type PackId } from "@/lib/catalog";
 import { getBalance, getHistory } from "@/lib/credits";
 import { getViewer } from "@/lib/supabase/server";
-import { whishConfig } from "@/lib/whish";
 import { getT } from "@/lib/i18n/server";
 import { ago } from "@/lib/format";
+import { isOwner } from "@/app/admin/actions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -17,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CreditsPage() {
   const [{ lang, t }, viewer] = await Promise.all([getT(), getViewer()]);
   const [balance, history] = viewer ? await Promise.all([getBalance(), getHistory()]) : [null, []];
-  const payments = whishConfig().ready;
+  const payments = Boolean(WHATSAPP);
+  const owner = viewer ? await isOwner() : false;
   const packIds = Object.keys(PACKS) as PackId[];
 
   const costs: [string, number | null][] = [
@@ -38,6 +39,11 @@ export default async function CreditsPage() {
         <div className="relative z-10 mx-auto max-w-[1240px] px-4 sm:px-6 pt-10 pb-12">
           <h1 className="text-[44px] sm:text-[64px] font-extrabold tracking-[-0.03em] leading-none">{t.credits.title}</h1>
           <p className="text-muted mt-3 max-w-[50ch]">{t.credits.sub}</p>
+          {owner && (
+            <Link href="/admin" className="tap inline-flex mt-4 h-10 items-center rounded-full px-4 text-sm font-semibold bg-hot text-ink">
+              Owner: add credits for a customer →
+            </Link>
+          )}
           {balance !== null && (
             <div className="glass inline-flex items-center gap-3 rounded-full ps-3 pe-6 py-2.5 mt-6">
               <span className="grid place-items-center h-10 w-10 rounded-full bg-cobalt text-cobalt-ink">
@@ -54,7 +60,7 @@ export default async function CreditsPage() {
 
       <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-10">
         <h2 className="text-2xl font-bold tracking-tight mb-4">{t.credits.packs}</h2>
-        {!payments && <p className="glass rounded-2xl px-4 py-3 text-sm mb-4">{t.credits.paymentsSoon}</p>}
+        <p className="text-muted text-sm mb-4 max-w-[60ch]">{payments ? t.credits.waNote : t.credits.paymentsSoon}</p>
         <ul className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {packIds.map((id) => {
             const p = PACKS[id];
@@ -85,7 +91,11 @@ export default async function CreditsPage() {
                       {t.credits.signInToBuy}
                     </Link>
                   ) : payments ? (
-                    <BuyButton pack={id} usd={p.usd} featured={featured} />
+                    <WhatsAppBuy
+                      href={whatsappLink(t.credits.waMessage(p.label[lang], p.credits, p.usd, viewer.email ?? viewer.profile?.username ?? ""))}
+                      label={t.credits.buy(p.usd)}
+                      featured={featured}
+                    />
                   ) : (
                     <button disabled className="w-full h-12 rounded-full bg-ink/20 text-muted text-[15px] font-semibold">
                       {t.credits.buy(p.usd)}

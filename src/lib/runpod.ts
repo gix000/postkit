@@ -20,6 +20,14 @@ type Output = { result?: string; image_url?: string; video_url?: string; cost?: 
  * Uses /run + /status so slow videos don't hit the 60-second sync limit.
  */
 export async function runRunpod(slug: string, input: Record<string, unknown>, timeoutMs = 270_000): Promise<{ url: string; cost?: number }> {
+  const out = (await runJob(slug, input, timeoutMs)) as Output | undefined;
+  const url = out?.result ?? out?.image_url ?? out?.video_url;
+  if (!url) throw new RunpodError(`Runpod returned no file: ${JSON.stringify(out ?? {}).slice(0, 200)}`);
+  return { url, cost: out?.cost };
+}
+
+/** Runs a job on any Runpod endpoint (public or our own) and returns its raw output. */
+export async function runJob(slug: string, input: Record<string, unknown>, timeoutMs = 270_000): Promise<unknown> {
   if (!runpodReady()) throw new RunpodError("Runpod not configured");
   const start = await fetch(`${BASE}/${slug}/run`, {
     method: "POST",
@@ -40,12 +48,7 @@ export async function runRunpod(slug: string, input: Record<string, unknown>, ti
     const res = await fetch(`${BASE}/${slug}/status/${job.id}`, { headers: headers(), signal: AbortSignal.timeout(20_000), cache: "no-store" });
     const s = await res.json().catch(() => null);
     if (!s) continue;
-    if (s.status === "COMPLETED") {
-      const out: Output | undefined = Array.isArray(s.output) ? s.output[0] : s.output;
-      const url = out?.result ?? out?.image_url ?? out?.video_url;
-      if (!url) throw new RunpodError(`Runpod returned no file: ${JSON.stringify(s.output ?? {}).slice(0, 200)}`);
-      return { url, cost: out?.cost };
-    }
+    if (s.status === "COMPLETED") return Array.isArray(s.output) ? s.output[0] : s.output;
     if (s.status === "FAILED" || s.status === "CANCELLED" || s.status === "TIMED_OUT") {
       throw new RunpodError(`Runpod ${s.status}: ${String(s.error ?? s.output?.error ?? "").slice(0, 200)}`);
     }
@@ -81,4 +84,23 @@ export async function runpodBalance(): Promise<number | null> {
   } catch {
     return null;
   }
+}
+
+/** Our own upscaler endpoint (Real-ESRGAN on a rented GPU, billed per second while it works). */
+export function upscalerReady() {
+  return runpodReady() && Boolean(process.env.RUNPOD_UPSCALE_ENDPOINT);
+}
+
+/** Enlarges a photo up to 4x, keeping the longest side at most 2560 px. */
+export async function runUpscale(image: Blob, width?: number, height?: number): Promise<Blob> {
+  const long = Math.max(width ?? 0, height ?? 0) || 1024;
+  const scale = Math.max(1.5, Math.min(4, Math.round((2560 / long) * 10) / 10));
+  const b64 = Buffer.from(await image.arrayBuffer()).toString("base64");
+  const out = (await runJob(process.env.RUNPOD_UPSCALE_ENDPOINT!, { source_image: b64, model: "RealESRGAN_x4plus", scale, face_enhance: false }, 150_000)) as
+    | { image?: string; status?: string; error?: string }
+    | undefined;
+  if (!out?.image) throw new RunpodError(`Upscaler returned nothing: ${JSON.stringify(out ?? {}).slice(0, 200)}`);
+  const bytes = Buffer.from(out.image.replace(/^data:[^,]+,/, ""), "base64");
+  const mime = bytes[0] === 0xff && bytes[1] === 0xd8 ? "image/jpeg" : "image/png";
+  return new Blob([bytes], { type: mime });
 }

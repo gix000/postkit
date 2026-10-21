@@ -20,7 +20,7 @@ import { CreditsError, refund, spend } from "@/lib/credits";
 import { saveCreation } from "@/lib/creations";
 import { toEnglishPrompt } from "@/lib/translate";
 import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
-import { downloadResult, runRunpod, runpodReady } from "@/lib/runpod";
+import { downloadResult, runRunpod, runUpscale, runpodReady, upscalerReady } from "@/lib/runpod";
 import { createClient } from "@/lib/supabase/server";
 import { CREATIONS_BUCKET } from "@/lib/creations";
 
@@ -204,9 +204,10 @@ export async function POST(req: NextRequest) {
         hasHF && cf ? () => hfEdit("Qwen/Qwen-Image-Edit-2509") : null,
       ]);
     } else if (tool === "upscale") {
-      out = await firstOf(
-        UPSCALE_MODELS.map((m) => () => client.imageToImage({ model: m, inputs: image!, provider: "auto", parameters: { prompt: UPSCALE_PROMPT } })),
-      );
+      out = await firstOf([
+        upscalerReady() ? () => runUpscale(image!, dims_.w, dims_.h) : null,
+        ...(hasHF ? UPSCALE_MODELS.map((m) => () => client.imageToImage({ model: m, inputs: image!, provider: "auto", parameters: { prompt: UPSCALE_PROMPT } })) : []),
+      ]);
     } else if (tool === "video") {
       out = await client.textToVideo({
         model,
@@ -252,7 +253,7 @@ export async function POST(req: NextRequest) {
         { detail: msg.slice(0, 300), refunded: cost, code: "daily_limit" },
       );
     }
-    if (!hasHF && (tool === "upscale" || tool === "cutout")) {
+    if (!hasHF && ((tool === "upscale" && !upscalerReady()) || tool === "cutout")) {
       return fail("This tool is coming soon. Your credits were returned.", 503, { refunded: cost });
     }
     const notServed = /not supported|no provider|not found|404|model .* is not|unknown model/i.test(msg);

@@ -17,10 +17,12 @@ const Spark = (
     <path d="M12 2.5c.7 4.6 3.4 7.6 9 9.5-5.6 1.9-8.3 4.9-9 9.5-.7-4.6-3.4-7.6-9-9.5 5.6-1.9 8.3-4.9 9-9.5Z" fill="currentColor" />
   </svg>
 );
-const Compass = (
+const Grid = (
   <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
-    <circle cx="12" cy="12" r="8.5" />
-    <path d="m15.5 8.5-2 5-5 2 2-5z" />
+    <rect x="4" y="4" width="7" height="9" rx="2" />
+    <rect x="13" y="4" width="7" height="5" rx="2" />
+    <rect x="13" y="11" width="7" height="9" rx="2" />
+    <rect x="4" y="15" width="7" height="5" rx="2" />
   </svg>
 );
 const Stack = (
@@ -53,7 +55,7 @@ export default function TabBar({ signedIn }: { signedIn: boolean }) {
   const { lang, t } = useT();
   const tabs: Tab[] = [
     { href: "/", label: t.nav.home, icon: Home },
-    { href: "/explore", label: t.nav.explore, icon: Compass },
+    { href: "/templates", label: lang === "ar" ? "القوالب" : "Templates", icon: Grid },
     { href: "/create", label: t.nav.create, icon: Spark, primary: true },
     { href: "/library", label: t.nav.library, icon: Stack },
     signedIn ? { href: "/credits", label: t.nav.credits, icon: BoltIcon } : { href: "/login", label: t.nav.signIn, icon: Person },

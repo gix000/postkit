@@ -1,4 +1,5 @@
 "use client";
+import type { Template } from "@/lib/templates";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,6 +33,8 @@ export default function Studio({
   initialPrompt,
   initialImage,
   initialSize,
+  initialSource,
+  template,
   locked,
   credits,
 }: {
@@ -40,10 +43,12 @@ export default function Studio({
   initialPrompt?: string;
   initialImage?: string;
   initialSize?: string;
+  initialSource?: "text" | "photo";
+  template?: Template;
   locked: boolean;
   credits: number | null;
 }) {
-  const { t } = useT();
+  const { lang, t } = useT();
   const [tab, setTab] = useState<Tab>(initialTab);
   const [chatModel, setChatModel] = useState(initialTab === "chat" && initialModel ? initialModel : CURATED.chat[0].id);
   const [balance, setBalance] = useState<number | null>(credits);
@@ -66,11 +71,32 @@ export default function Studio({
         <Segmented role="tablist" tone="neon" size="lg" label={t.create.title} options={tabs} value={tab} onChange={setTab} className="w-full sm:w-[320px]" />
       </div>
 
+      {template && (
+        <div className="glass rounded-[24px] p-3 sm:p-4 mb-6 flex items-center gap-4">
+          <span className="relative shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={template.cover} alt="" className="h-20 w-16 sm:h-24 sm:w-[72px] rounded-xl object-cover" />
+            {template.before && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={template.before} alt="" className="absolute -bottom-1.5 -end-2 h-9 w-7 rounded-md object-cover border border-white/50 shadow-lg" />
+            )}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs font-semibold uppercase tracking-wide text-cobalt">{lang === "ar" ? "قالب" : "Template"}</span>
+            <span className="block font-bold text-lg leading-tight">{template.name[lang]}</span>
+            <span className="block text-sm text-muted mt-0.5">{template.tip[lang]}</span>
+          </span>
+          <Link href="/templates" className="tap hidden sm:inline-flex h-10 items-center rounded-full px-4 text-sm font-medium border border-rule hover:border-ink/40 shrink-0">
+            {lang === "ar" ? "كل القوالب" : "All templates"}
+          </Link>
+        </div>
+      )}
+
       {locked ? (
         <div className="glass rounded-2xl px-6 py-10">
           <p className="font-semibold text-lg">{t.create.signInTitle}</p>
           <p className="text-sm text-muted mt-1">{t.create.signInBody}</p>
-          <Link href="/login?next=/create" className="tap btn-neon mt-5 inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold">
+          <Link href={`/login?next=${encodeURIComponent(template ? `/create?template=${template.id}` : "/create")}`} className="tap btn-neon mt-5 inline-flex h-11 items-center rounded-full px-6 text-sm font-semibold">
             {t.create.signIn}
           </Link>
         </div>
@@ -84,6 +110,7 @@ export default function Studio({
           initialPrompt={initialPrompt}
           initialSize={initialTab === tab && initialSize && initialSize in SIZES ? (initialSize as SizeId) : undefined}
           initialImage={handoff?.tab === tab ? handoff.image : undefined}
+          initialSource={initialTab === tab ? initialSource : undefined}
           balance={balance}
           setBalance={setBalance}
           onHandoff={(to, image) => {
@@ -105,6 +132,7 @@ function MediaGen({
   initialPrompt,
   initialSize,
   initialImage,
+  initialSource,
   balance,
   setBalance,
   onHandoff,
@@ -114,6 +142,7 @@ function MediaGen({
   initialPrompt?: string;
   initialSize?: SizeId;
   initialImage?: string;
+  initialSource?: "text" | "photo";
   balance: number | null;
   setBalance: (n: number) => void;
   onHandoff: (to: Tab, image: string) => void;
@@ -121,7 +150,7 @@ function MediaGen({
   const { lang, t } = useT();
   const router = useRouter();
   const isVideo = kind === "video";
-  const [source, setSource] = useState<"text" | "photo">(initialImage ? "photo" : "text");
+  const [source, setSource] = useState<"text" | "photo">(initialImage ? "photo" : (initialSource ?? "text"));
   const remoteStart = Boolean(initialImage && /^https?:/.test(initialImage));
   const [image, setImage] = useState<string | null>(remoteStart ? null : (initialImage ?? null));
   const [loadingImage, setLoadingImage] = useState(remoteStart);

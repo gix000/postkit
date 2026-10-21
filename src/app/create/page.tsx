@@ -5,6 +5,7 @@ import { getViewer } from "@/lib/supabase/server";
 import { supabaseEnabled } from "@/lib/supabase/config";
 import { getBalance } from "@/lib/credits";
 import { getT } from "@/lib/i18n/server";
+import { getTemplate } from "@/lib/templates";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -24,16 +25,19 @@ function safeImage(url?: string) {
 
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
   const sp = await searchParams;
-  const m = first(sp.mode);
+  const template = getTemplate(first(sp.template));
+  const m = template?.mode ?? first(sp.mode);
   const tab: Tab = m === "video" || m === "animate" ? "video" : m === "chat" ? "chat" : "photo";
   const viewer = supabaseEnabled ? await getViewer() : null;
   const credits = viewer ? await getBalance() : null;
   return (
     <Studio
       initialTab={tab}
-      initialModel={first(sp.model)}
-      initialPrompt={first(sp.prompt)?.slice(0, 2000)}
-      initialSize={first(sp.size)}
+      initialModel={template?.model ?? first(sp.model)}
+      initialPrompt={(template?.prompt ?? first(sp.prompt))?.slice(0, 2000)}
+      initialSize={template?.size ?? first(sp.size)}
+      initialSource={template ? template.needs : first(sp.source) === "photo" ? "photo" : undefined}
+      template={template}
       initialImage={safeImage(first(sp.from))}
       locked={supabaseEnabled && !viewer}
       credits={credits}

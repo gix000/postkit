@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Logo from "@/components/Logo";
 import { I18nProvider, LangSwitch } from "@/components/I18n";
@@ -57,12 +58,38 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             {children}
           </main>
           <footer className="hidden sm:block border-t border-rule mt-24">
-            <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-8 text-sm text-muted flex flex-wrap items-center gap-x-6 gap-y-2 justify-between">
-              <span className="flex items-center gap-2">
-                <Logo size={18} glow={false} /> PostKit
-              </span>
-              <span>{t.footer}</span>
-              <LangSwitch />
+            <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-10 grid grid-cols-2 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-8 text-sm">
+              <div className="col-span-2 md:col-span-1">
+                <span className="flex items-center gap-2 font-semibold text-[16px]">
+                  <Logo size={22} glow={false} /> PostKit
+                </span>
+                <p className="text-muted mt-2 max-w-[34ch]">{t.footer}</p>
+              </div>
+              <nav aria-label="Product" className="flex flex-col gap-2 text-muted">
+                <span className="text-ink font-semibold mb-1">{lang === "ar" ? "المنتج" : "Product"}</span>
+                <Link href="/create" className="hover:text-ink">{t.nav.create}</Link>
+                <Link href="/templates" className="hover:text-ink">{lang === "ar" ? "القوالب" : "Templates"}</Link>
+                <Link href="/#models" className="hover:text-ink">{t.nav.models}</Link>
+                <Link href="/explore" className="hover:text-ink">{t.nav.explore}</Link>
+              </nav>
+              <nav aria-label="Account" className="flex flex-col gap-2 text-muted">
+                <span className="text-ink font-semibold mb-1">{lang === "ar" ? "الحساب" : "Account"}</span>
+                <Link href="/library" className="hover:text-ink">{t.nav.library}</Link>
+                <Link href="/credits" className="hover:text-ink">{t.nav.credits}</Link>
+                <Link href="/#faq" className="hover:text-ink">{lang === "ar" ? "الأسئلة الشائعة" : "FAQ"}</Link>
+              </nav>
+              <div className="flex flex-col gap-2 text-muted">
+                <span className="text-ink font-semibold mb-1">{lang === "ar" ? "تواصل" : "Contact"}</span>
+                {process.env.NEXT_PUBLIC_WHATSAPP && (
+                  <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP}`} target="_blank" rel="noopener noreferrer" className="hover:text-ink">
+                    WhatsApp
+                  </a>
+                )}
+                <LangSwitch className="self-start" />
+              </div>
+            </div>
+            <div className="border-t border-rule">
+              <p className="mx-auto max-w-[1240px] px-4 sm:px-6 py-4 text-xs text-muted">© {new Date().getFullYear()} PostKit · Beirut</p>
             </div>
           </footer>
           </ToastProvider>

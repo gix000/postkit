@@ -18,7 +18,7 @@ const en = {
     profile: "Your profile",
     searchModels: "Search models",
   },
-  footer: "Create photos and videos with open AI models.",
+  footer: "Pro photos and videos for your business, made in seconds.",
   search: {
     compact: "Search models, datasets…",
     label: "Search models and datasets",
@@ -318,7 +318,7 @@ const ar: Dict = {
     profile: "ملفك الشخصي",
     searchModels: "ابحث في النماذج",
   },
-  footer: "أنشئ صورًا وفيديوهات بنماذج ذكاء اصطناعي مفتوحة.",
+  footer: "صور وفيديوهات احترافية لعملك، خلال ثوانٍ.",
   search: {
     compact: "ابحث عن نماذج أو بيانات…",
     label: "ابحث في النماذج والبيانات",

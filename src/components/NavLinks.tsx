@@ -11,11 +11,12 @@ function Pending() {
 /** Desktop navigation inside the floating glass bar. */
 export default function NavLinks() {
   const path = usePathname();
-  const { t } = useT();
+  const { lang, t } = useT();
   const links = [
     { href: "/create", label: t.nav.create },
-    { href: "/explore", label: t.nav.explore },
-    { href: "/#models", label: t.nav.models },
+    { href: "/templates", label: lang === "ar" ? "القوالب" : "Templates" },
+    { href: "/#models", label: t.nav.models, wide: true },
+    { href: "/explore", label: t.nav.explore, wide: true },
     { href: "/library", label: t.nav.library },
     { href: "/credits", label: t.nav.credits },
   ];
@@ -28,7 +29,7 @@ export default function NavLinks() {
             key={l.href}
             href={l.href}
             aria-current={active ? "page" : undefined}
-            className={`tap relative px-3.5 py-1.5 rounded-full ${active ? "bg-ink/10 text-ink font-semibold" : "text-muted hover:text-ink hover:bg-ink/5"}`}
+            className={`tap relative px-3.5 py-1.5 rounded-full ${l.wide ? "hidden lg:inline-block" : ""} ${active ? "bg-ink/10 text-ink font-semibold" : "text-muted hover:text-ink hover:bg-ink/5"}`}
           >
             {l.label}
             <Pending />

@@ -6,9 +6,16 @@ import { getT } from "@/lib/i18n/server";
 import { SHOWCASE, showcaseHref } from "@/lib/showcase";
 import ModelShowcase from "@/components/ModelShowcase";
 import { showcaseCards } from "@/lib/model-showcase";
+import { TrustBar, HowItWorks, Faq, FinalCta } from "@/components/HomeSections";
+import { TemplateCard } from "@/components/TemplateGrid";
+import { TEMPLATES } from "@/lib/templates";
 
 export default async function Home() {
-  const [{ t }, showcase] = await Promise.all([getT(), listPublic(undefined, 8)]);
+  const [{ lang, t }, showcase] = await Promise.all([getT(), listPublic(undefined, 8)]);
+  const ar = lang === "ar";
+  const featured = ["menu-dish", "burger-ad", "white-studio", "luxury-podium", "bright-listing", "staging", "photo-video", "event-poster"]
+    .map((id) => TEMPLATES.find((x) => x.id === id)!)
+    .filter(Boolean);
 
   const featureLinks = ["/create?mode=photo", "/create?mode=animate", "/create?mode=photo"];
 
@@ -69,6 +76,34 @@ export default async function Home() {
         </div>
       </section>
 
+      <TrustBar lang={lang} />
+
+      <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-16">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+          <div>
+            <p className="text-sm font-semibold text-cobalt tracking-wide uppercase">{ar ? "القوالب" : "Templates"}</p>
+            <h2 className="text-[32px] sm:text-[40px] font-extrabold tracking-[-0.03em] leading-[1.05] mt-1 max-w-[22ch]">
+              {ar ? "صور احترافية لعملك، بنقرة واحدة." : "Pro shots for your business, in one tap."}
+            </h2>
+            <p className="text-muted mt-2 max-w-[56ch]">
+              {ar ? "ارفع صورة من هاتفك واختر الشكل. كل نتيجة هنا صُنعت فعلًا بهذا القالب." : "Upload a phone photo and pick a look. Every result here was really made with that template."}
+            </p>
+          </div>
+          <Link href="/templates" className="tap inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold border border-rule hover:border-ink/40 shrink-0 self-start sm:self-auto">
+            {ar ? "كل القوالب ←" : "All templates →"}
+          </Link>
+        </div>
+        <ul className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {featured.map((tp, i) => (
+            <li key={tp.id}>
+              <TemplateCard t={tp} i={i} />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <HowItWorks lang={lang} />
+
       <ModelShowcase cards={showcaseCards()} />
 
       <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14">
@@ -110,6 +145,8 @@ export default async function Home() {
         </ul>
       </section>
 
+      <Faq lang={lang} />
+      <FinalCta lang={lang} />
     </div>
   );
 }

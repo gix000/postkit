@@ -15,6 +15,7 @@ export default function NavLinks() {
   const links = [
     { href: "/create", label: t.nav.create },
     { href: "/explore", label: t.nav.explore },
+    { href: "/#models", label: t.nav.models },
     { href: "/library", label: t.nav.library },
     { href: "/credits", label: t.nav.credits },
   ];

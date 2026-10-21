@@ -4,6 +4,8 @@ import Logo from "@/components/Logo";
 import { listPublic } from "@/lib/creations";
 import { getT } from "@/lib/i18n/server";
 import { SHOWCASE, showcaseHref } from "@/lib/showcase";
+import ModelShowcase from "@/components/ModelShowcase";
+import { showcaseCards } from "@/lib/model-showcase";
 
 export default async function Home() {
   const [{ t }, showcase] = await Promise.all([getT(), listPublic(undefined, 8)]);
@@ -66,6 +68,8 @@ export default async function Home() {
           </ul>
         </div>
       </section>
+
+      <ModelShowcase cards={showcaseCards()} />
 
       <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-14">
         <div className="flex items-baseline justify-between mb-3">

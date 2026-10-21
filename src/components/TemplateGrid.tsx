@@ -35,7 +35,7 @@ export function TemplateCard({ t, i = 0 }: { t: Template; i?: number }) {
         {t.before && (
           <span className="absolute top-2.5 end-2.5 flex flex-col items-center gap-0.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={t.before} alt="" className="h-14 w-[42px] rounded-lg object-cover border border-white/50 shadow-lg" />
+            <img src={t.before} alt="" loading="lazy" decoding="async" className="h-14 w-[42px] rounded-lg object-cover border border-white/50 shadow-lg" />
             <span className="rounded-full bg-black/60 px-1.5 text-[10px] font-semibold text-white">{ar ? "قبل" : "Before"}</span>
           </span>
         )}

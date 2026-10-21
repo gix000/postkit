@@ -81,7 +81,7 @@ export default function ModelShowcase({ cards }: { cards: ShowCard[] }) {
                 {c.before && (
                   <span className="absolute top-2.5 end-2.5 flex items-center gap-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={c.before} alt="" className="h-12 w-9 rounded-md object-cover border border-white/40 shadow-lg" />
+                    <img src={c.before} alt="" loading="lazy" decoding="async" className="h-12 w-9 rounded-md object-cover border border-white/40 shadow-lg" />
                     <span className="text-white text-xs font-bold drop-shadow">{ar ? "←" : "→"}</span>
                   </span>
                 )}

@@ -76,10 +76,10 @@ export default function Studio({
         <div className="glass rounded-[24px] p-3 sm:p-4 mb-6 flex items-center gap-4">
           <span className="relative shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={template.cover} alt="" className="h-20 w-16 sm:h-24 sm:w-[72px] rounded-xl object-cover" />
+            <img src={template.cover} alt="" loading="lazy" decoding="async" className="h-20 w-16 sm:h-24 sm:w-[72px] rounded-xl object-cover" />
             {template.before && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={template.before} alt="" className="absolute -bottom-1.5 -end-2 h-9 w-7 rounded-md object-cover border border-white/50 shadow-lg" />
+              <img src={template.before} alt="" loading="lazy" decoding="async" className="absolute -bottom-1.5 -end-2 h-9 w-7 rounded-md object-cover border border-white/50 shadow-lg" />
             )}
           </span>
           <span className="min-w-0 flex-1">

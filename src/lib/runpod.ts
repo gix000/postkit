@@ -104,3 +104,20 @@ export async function runUpscale(image: Blob, width?: number, height?: number): 
   const mime = bytes[0] === 0xff && bytes[1] === 0xd8 ? "image/jpeg" : "image/png";
   return new Blob([bytes], { type: mime });
 }
+
+/** Our own background-removal endpoint (BiRefNet on a rented GPU, billed per second while it works). */
+export function cutoutReady() {
+  return runpodReady() && Boolean(process.env.RUNPOD_CUTOUT_ENDPOINT);
+}
+
+/** Returns a grayscale PNG mask (base64) the same size as the photo: white = keep. */
+export async function runCutout(image: Blob): Promise<string> {
+  const b64 = Buffer.from(await image.arrayBuffer()).toString("base64");
+  const out = (await runJob(process.env.RUNPOD_CUTOUT_ENDPOINT!, { input_data: { image: b64 } }, 150_000)) as
+    | { mask?: string; output?: { mask?: string } }
+    | undefined;
+  const mask = out?.mask ?? out?.output?.mask;
+  if (!mask) throw new RunpodError(`Cutout returned nothing: ${JSON.stringify(out ?? {}).slice(0, 200)}`);
+  return mask;
+}
+

@@ -20,7 +20,7 @@ import { CreditsError, refund, spend } from "@/lib/credits";
 import { saveCreation } from "@/lib/creations";
 import { toEnglishPrompt } from "@/lib/translate";
 import { cloudflareReady, runCloudflareImage } from "@/lib/cloudflare";
-import { downloadResult, runRunpod, runUpscale, runpodReady, upscalerReady } from "@/lib/runpod";
+import { cutoutReady, downloadResult, runCutout, runRunpod, runUpscale, runpodReady, upscalerReady } from "@/lib/runpod";
 import { createClient } from "@/lib/supabase/server";
 import { CREATIONS_BUCKET } from "@/lib/creations";
 
@@ -222,6 +222,10 @@ export async function POST(req: NextRequest) {
         provider: "auto",
         parameters: { prompt: styled || "natural, subtle motion, cinematic", aspect_ratio: dims.ratio } as Record<string, unknown>,
       });
+    } else if (cutoutReady()) {
+      // Our BiRefNet GPU sends a mask; the browser combines it with the photo into a transparent PNG.
+      const mask = await runCutout(image!);
+      return NextResponse.json({ mask: `data:image/png;base64,${mask}`, credits: creditsLeft, cost });
     } else {
       const segments = await client.imageSegmentation({ model: CUTOUT_MODEL, inputs: image!, provider: "auto" });
       const b64 = segments?.[0]?.mask;
@@ -253,7 +257,7 @@ export async function POST(req: NextRequest) {
         { detail: msg.slice(0, 300), refunded: cost, code: "daily_limit" },
       );
     }
-    if (!hasHF && ((tool === "upscale" && !upscalerReady()) || tool === "cutout")) {
+    if (!hasHF && ((tool === "upscale" && !upscalerReady()) || (tool === "cutout" && !cutoutReady()))) {
       return fail("This tool is coming soon. Your credits were returned.", 503, { refunded: cost });
     }
     const notServed = /not supported|no provider|not found|404|model .* is not|unknown model/i.test(msg);

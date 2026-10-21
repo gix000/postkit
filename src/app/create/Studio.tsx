@@ -670,6 +670,9 @@ function ResultCard({
           </a>
           {!isVideo && (
             <>
+              <Link href={`/captions?about=${encodeURIComponent(item.prompt.slice(0, 300))}`} className={`${action} inline-flex items-center`}>
+                {ar ? "تعليق" : "Caption"}
+              </Link>
               <button type="button" onClick={onText} className={action}>
                 {ar ? "+ نص" : "+ Text"}
               </button>

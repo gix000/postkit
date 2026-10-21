@@ -44,6 +44,8 @@ type Body = {
   /** Original photo size, so edits keep its shape. */
   imageWidth?: unknown;
   imageHeight?: unknown;
+  /** Post Pack: force a feed (4:5) or story (9:16) shape for edits. */
+  shape?: unknown;
 };
 
 /** Output size for an edit: the photo's shape, about 1 megapixel, in steps of 16. */
@@ -146,7 +148,7 @@ export async function POST(req: NextRequest) {
       tempPath = up.path;
       tempUrl = up.url;
     }
-    const input = runpodInput(slug, { prompt: styled || "natural, subtle motion, cinematic", size, imageUrl: tempUrl, ...dims_ });
+    const input = runpodInput(slug, { prompt: styled || "natural, subtle motion, cinematic", size, imageUrl: tempUrl, shape: body.shape === "feed" || body.shape === "story" ? body.shape : undefined, ...dims_ });
     const result = await runRunpod(slug, input);
     return downloadResult(result.url, kind === "video" ? "video/mp4" : "image/jpeg");
   };
@@ -303,7 +305,7 @@ function fitSize(w: number | undefined, h: number | undefined, long: number) {
 /** Each Runpod model's own input format. */
 function runpodInput(
   slug: string,
-  c: { prompt: string; size: SizeId; imageUrl?: string; w?: number; h?: number },
+  c: { prompt: string; size: SizeId; imageUrl?: string; w?: number; h?: number; shape?: "feed" | "story" },
 ): Record<string, unknown> {
   const tall = (c.w ?? 1) < (c.h ?? 1);
   switch (slug) {
@@ -321,10 +323,11 @@ function runpodInput(
       return { prompt: c.prompt, size: { square: "2048*2048", portrait: "1632*2048", story: "1152*2048", wide: "2048*1152" }[c.size] };
     case "qwen-image-edit-2511": {
       const r = (c.w ?? 1) / (c.h ?? 1);
-      return { prompt: c.prompt, images: [c.imageUrl], size: r > 1.15 ? "1280*1024" : r < 0.87 ? "1024*1280" : "1024*1024", output_format: "jpeg" };
+      const qsize = c.shape === "feed" || c.shape === "story" ? "1024*1280" : r > 1.15 ? "1280*1024" : r < 0.87 ? "1024*1280" : "1024*1024";
+      return { prompt: c.prompt, images: [c.imageUrl], size: qsize, output_format: "jpeg" };
     }
     case "p-image-edit":
-      return { prompt: c.prompt, images: [c.imageUrl], aspect_ratio: "match_input_image" };
+      return { prompt: c.prompt, images: [c.imageUrl], aspect_ratio: c.shape === "story" ? "9:16" : c.shape === "feed" ? "3:4" : "match_input_image" };
     case "seedream-v4-edit":
       return { prompt: c.prompt, images: [c.imageUrl], size: fitSize(c.w, c.h, 2048) };
     case "p-video":

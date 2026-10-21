@@ -7,16 +7,15 @@ import { SHOWCASE, showcaseHref } from "@/lib/showcase";
 import ModelShowcase from "@/components/ModelShowcase";
 import LazyVideo from "@/components/LazyVideo";
 import { showcaseCards } from "@/lib/model-showcase";
-import { TrustBar, HowItWorks, Faq, FinalCta } from "@/components/HomeSections";
+import { TrustBar, HowItWorks, Faq, FinalCta, SocialStrip } from "@/components/HomeSections";
 import { TemplateCard } from "@/components/TemplateGrid";
-import { TEMPLATES } from "@/lib/templates";
+import { TEMPLATES, upcomingOccasions } from "@/lib/templates";
 
 export default async function Home() {
   const [{ lang, t }, showcase] = await Promise.all([getT(), listPublic(undefined, 8)]);
   const ar = lang === "ar";
-  const featured = ["menu-dish", "burger-ad", "white-studio", "luxury-podium", "bright-listing", "staging", "photo-video", "event-poster"]
-    .map((id) => TEMPLATES.find((x) => x.id === id)!)
-    .filter(Boolean);
+  // The next occasion leads, then the everyday favourites.
+  const featured = [upcomingOccasions()[0], ...["menu-dish", "burger-ad", "white-studio", "luxury-podium", "bright-listing", "staging", "photo-video"].map((id) => TEMPLATES.find((x) => x.id === id)!)].filter(Boolean);
 
   const featureLinks = ["/create?mode=photo", "/create?mode=animate", "/create?mode=photo"];
 
@@ -102,6 +101,8 @@ export default async function Home() {
           ))}
         </ul>
       </section>
+
+      <div className="cv"><SocialStrip lang={lang} /></div>
 
       <div className="cv"><HowItWorks lang={lang} /></div>
 

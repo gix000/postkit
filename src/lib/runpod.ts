@@ -121,3 +121,26 @@ export async function runCutout(image: Blob): Promise<string> {
   return mask;
 }
 
+
+/** Starts a job without waiting (for work that can outlast one server request). Returns the job id. */
+export async function startJob(slug: string, input: Record<string, unknown>): Promise<string> {
+  if (!runpodReady()) throw new RunpodError("Runpod not configured");
+  const res = await fetch(`${BASE}/${slug}/run`, { method: "POST", headers: headers(), body: JSON.stringify({ input }), signal: AbortSignal.timeout(30_000) });
+  const job = await res.json().catch(() => null);
+  if (!res.ok || !job?.id) throw new RunpodError(`Runpod ${res.status}: ${JSON.stringify(job ?? {}).slice(0, 200)}`);
+  return job.id as string;
+}
+
+/** One status check: "running", or the finished file URL, or an error. */
+export async function jobStatus(slug: string, id: string): Promise<{ state: "running" } | { state: "done"; url: string } | { state: "failed"; error: string }> {
+  const res = await fetch(`${BASE}/${slug}/status/${id}`, { headers: headers(), signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  const s = await res.json().catch(() => null);
+  if (!s) return { state: "running" };
+  if (s.status === "COMPLETED") {
+    const out: Output | undefined = Array.isArray(s.output) ? s.output[0] : s.output;
+    const url = out?.result ?? out?.video_url ?? out?.image_url;
+    return url ? { state: "done", url } : { state: "failed", error: "no file" };
+  }
+  if (s.status === "FAILED" || s.status === "CANCELLED" || s.status === "TIMED_OUT") return { state: "failed", error: String(s.error ?? s.status).slice(0, 200) };
+  return { state: "running" };
+}

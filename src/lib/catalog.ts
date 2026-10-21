@@ -306,3 +306,6 @@ export function isPack(v: unknown): v is PackId {
 }
 
 export const WELCOME_CREDITS = 10;
+
+/** Credits for one talking video (voice ≈ $0.005 + lip-sync video $0.25 at 480p, about 7 s). */
+export const TALK_COST = 20;

@@ -166,3 +166,49 @@ export function FinalCta({ lang }: { lang: Lang }) {
     </section>
   );
 }
+
+const SOCIAL: { href: string; icon: string; t: T; b: T }[] = [
+  { href: "/pack", icon: "▦", t: { en: "Post Pack", ar: "باقة المنشور" }, b: { en: "Feed + story + reel + caption from one photo", ar: "منشور وستوري وريل وتعليق من صورة واحدة" } },
+  { href: "/talk", icon: "◉", t: { en: "Talking product", ar: "منتج يتكلّم" }, b: { en: "Your photo says your line, in Arabic or English", ar: "صورتك تقول جملتك بالعربي أو الإنجليزي" } },
+  { href: "/captions", icon: "✎", t: { en: "Lebanese captions", ar: "تعليقات لبنانية" }, b: { en: "Arabizi, Arabic or the Beirut mix", ar: "عربيزي، عربي، أو مزيج بيروتي" } },
+  { href: "/menu", icon: "☰", t: { en: "Menu maker", ar: "صانع القوائم" }, b: { en: "Bilingual menus for print and Instagram", ar: "قوائم بلغتين للطباعة وإنستغرام" } },
+];
+
+/** Promo for the Social studio tools. */
+export function SocialStrip({ lang }: { lang: Lang }) {
+  const ar = lang === "ar";
+  return (
+    <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-20">
+      <div className="relative overflow-hidden rounded-[32px] glass p-6 sm:p-10">
+        <div className="neon-field opacity-60" aria-hidden="true" />
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-8 items-center">
+          <div>
+            <p className="text-sm font-semibold text-cobalt tracking-wide uppercase">{ar ? "جديد · استوديو السوشيال" : "New · Social studio"}</p>
+            <h2 className="text-[32px] sm:text-[44px] font-extrabold tracking-[-0.03em] leading-[1.03] mt-1">
+              {ar ? "أدوات لن تجدها في أي موقع آخر." : "Tools you won't find anywhere else."}
+            </h2>
+            <p className="text-muted mt-2 max-w-[44ch]">
+              {ar ? "صُمّمت لصفحات المحلات والمطاعم في لبنان: من الصورة إلى المنشور الجاهز." : "Built for shop and restaurant pages in Lebanon: from photo to ready-to-post."}
+            </p>
+            <Link href="/social" className="tap btn-neon mt-5 inline-flex h-12 items-center rounded-full px-6 text-[15px] font-semibold">
+              {ar ? "افتح استوديو السوشيال" : "Open Social studio"}
+            </Link>
+          </div>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {SOCIAL.map((s) => (
+              <li key={s.href}>
+                <Link href={s.href} className="tap flex items-start gap-3 rounded-[22px] bg-paper/50 border border-rule p-4 h-full hover:border-cobalt/50">
+                  <span className="grid place-items-center h-10 w-10 rounded-xl bg-cobalt/15 text-cobalt font-bold shrink-0">{s.icon}</span>
+                  <span>
+                    <span className="block font-bold">{tx(s.t, lang)}</span>
+                    <span className="block text-sm text-muted">{tx(s.b, lang)}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}

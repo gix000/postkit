@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useT } from "./I18n";
 import LazyVideo from "./LazyVideo";
 import { costFor, type Tool } from "@/lib/catalog";
-import { CATEGORIES, templateHref, type Template, type TemplateCategory } from "@/lib/templates";
+import { CATEGORIES, daysUntil, templateHref, type Template, type TemplateCategory } from "@/lib/templates";
 
 function toolFor(t: Template): Tool {
   if (t.mode === "video") return t.needs === "photo" ? "animate" : "video";
@@ -15,6 +15,10 @@ export function TemplateCard({ t, i = 0 }: { t: Template; i?: number }) {
   const { lang } = useT();
   const ar = lang === "ar";
   const credits = costFor(toolFor(t), t.model);
+  const soon = daysUntil(t);
+  const when = soon
+    ? `${soon.days === 0 ? (ar ? "اليوم" : "Today") : ar ? `بعد ${soon.days} يومًا` : `In ${soon.days} days`} · ${soon.approx ? "≈ " : ""}${soon.date.toLocaleDateString(ar ? "ar-LB" : "en-GB", { day: "numeric", month: "short" })}`
+    : null;
   return (
     <Link
       href={templateHref(t)}
@@ -29,9 +33,13 @@ export function TemplateCard({ t, i = 0 }: { t: Template; i?: number }) {
           <img src={t.cover} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]" />
         )}
         <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/5 to-transparent" aria-hidden="true" />
-        <span className="hidden sm:block absolute top-2.5 start-2.5 rounded-full bg-black/55 backdrop-blur px-2.5 py-1 text-[11px] font-semibold text-white border border-white/15">
-          {t.needs === "photo" ? (ar ? "ارفع صورتك" : "Upload your photo") : ar ? "غيّر الكلمات" : "Edit the words"}
-        </span>
+        {when ? (
+          <span className="absolute top-2.5 start-2.5 rounded-full bg-cobalt text-cobalt-ink px-2.5 py-1 text-[11px] font-bold">{when}</span>
+        ) : (
+          <span className="hidden sm:block absolute top-2.5 start-2.5 rounded-full bg-black/55 backdrop-blur px-2.5 py-1 text-[11px] font-semibold text-white border border-white/15">
+            {t.needs === "photo" ? (ar ? "ارفع صورتك" : "Upload your photo") : ar ? "غيّر الكلمات" : "Edit the words"}
+          </span>
+        )}
         {t.before && (
           <span className="absolute top-2.5 end-2.5 flex flex-col items-center gap-0.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -58,10 +66,14 @@ export function TemplateCard({ t, i = 0 }: { t: Template; i?: number }) {
 }
 
 /** All templates with category chips. */
-export default function TemplateGrid({ templates }: { templates: Template[] }) {
+export default function TemplateGrid({ templates, initialCat = "all" }: { templates: Template[]; initialCat?: TemplateCategory | "all" }) {
   const { lang } = useT();
-  const [cat, setCat] = useState<TemplateCategory | "all">("all");
-  const shown = cat === "all" ? templates : templates.filter((t) => t.category === cat);
+  const [cat, setCat] = useState<TemplateCategory | "all">(initialCat);
+  const byDate = (list: Template[]) => [...list].sort((a, b) => (daysUntil(a)?.days ?? 0) - (daysUntil(b)?.days ?? 0));
+  const regular = templates.filter((t) => t.category !== "occasions");
+  const occasions = byDate(templates.filter((t) => t.category === "occasions"));
+  // "All": everyday templates first, then occasions in date order.
+  const shown = cat === "all" ? [...regular, ...occasions] : cat === "occasions" ? occasions : templates.filter((t) => t.category === cat);
   const chips: { id: TemplateCategory | "all"; label: string }[] = [
     { id: "all", label: lang === "ar" ? "الكل" : "All" },
     ...CATEGORIES.map((c) => ({ id: c.id, label: c.name[lang] })),

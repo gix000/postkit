@@ -5,6 +5,7 @@ import { useT } from "@/components/I18n";
 import TextEditor from "@/components/TextEditor";
 import ReelMaker from "@/components/ReelMaker";
 import { prepareUpload } from "@/lib/image-client";
+import { TALK_COST } from "@/lib/catalog";
 
 type Tool = {
   id: string;
@@ -26,7 +27,7 @@ export const TOOLS: Tool[] = [
   { id: "feed", href: "/feed", icon: "⊞", title: { en: "Feed preview", ar: "معاينة الصفحة" }, body: { en: "See your posts as an Instagram grid and rearrange them before posting.", ar: "شاهد منشوراتك كشبكة إنستغرام ورتّبها قبل النشر." }, cost: FREE },
   { id: "menu", href: "/menu", icon: "☰", title: { en: "Menu maker", ar: "صانع القوائم" }, body: { en: "Dishes, prices and photos into a designed bilingual menu for print or Instagram.", ar: "أطباق وأسعار وصور في قائمة مصمّمة بلغتين للطباعة أو إنستغرام." }, cost: FREE },
   { id: "occasions", href: "/templates?cat=occasions", icon: "✦", title: { en: "Occasion campaigns", ar: "حملات المناسبات" }, body: { en: "Your product themed for Ramadan, Eid, Christmas, Mother's Day and more.", ar: "منتجك بأجواء رمضان والعيد والميلاد وعيد الأم وغيرها." }, cost: { en: "3 credits", ar: "3 رصيد" } },
-  { id: "talk", href: "/talk", icon: "◉", title: { en: "Talking product", ar: "منتج يتكلّم" }, body: { en: "A photo of a person, mascot or product says your line out loud.", ar: "صورة شخص أو شخصية أو منتج تقول جملتك بصوت." }, badge: { en: "New", ar: "جديد" }, cost: { en: "20 credits", ar: "20 رصيد" } },
+  { id: "talk", href: "/talk", icon: "◉", title: { en: "Talking product", ar: "منتج يتكلّم" }, body: { en: "A photo of a person, mascot or product says your line out loud.", ar: "صورة شخص أو شخصية أو منتج تقول جملتك بصوت." }, badge: { en: "New", ar: "جديد" }, cost: { en: `${TALK_COST} credits`, ar: `${TALK_COST} رصيد` } },
 ];
 
 /** Grid of social tools. Text and Before/After open right here from photos on the phone. */

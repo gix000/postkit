@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import TemplateGrid from "@/components/TemplateGrid";
-import { TEMPLATES } from "@/lib/templates";
+import { CATEGORIES, TEMPLATES } from "@/lib/templates";
+import { first } from "@/lib/format";
 import { getT } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -11,8 +12,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function TemplatesPage() {
-  const { lang } = await getT();
+export default async function TemplatesPage({ searchParams }: PageProps<"/templates">) {
+  const [{ lang }, sp] = await Promise.all([getT(), searchParams]);
+  const cat = CATEGORIES.find((c) => c.id === first(sp.cat))?.id ?? "all";
   const ar = lang === "ar";
   return (
     <div>
@@ -31,7 +33,7 @@ export default async function TemplatesPage() {
         </div>
       </section>
       <section className="mx-auto max-w-[1240px] px-4 sm:px-6 pt-8 pb-6">
-        <TemplateGrid templates={TEMPLATES} />
+        <TemplateGrid templates={TEMPLATES} initialCat={cat} />
       </section>
     </div>
   );

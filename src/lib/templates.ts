@@ -1,6 +1,6 @@
 import type { SizeId, Text } from "./catalog";
 
-export type TemplateCategory = "food" | "products" | "realestate" | "social";
+export type TemplateCategory = "occasions" | "food" | "products" | "realestate" | "social";
 
 export type Template = {
   id: string;
@@ -18,9 +18,12 @@ export type Template = {
   cover: string;
   before?: string;
   video?: string;
+  /** Occasion templates: which date to count down to (see OCCASION_DATES). */
+  occasion?: string;
 };
 
 export const CATEGORIES: { id: TemplateCategory; name: Text }[] = [
+  { id: "occasions", name: { en: "Occasions", ar: "مناسبات" } },
   { id: "food", name: { en: "Food & menus", ar: "طعام وقوائم" } },
   { id: "products", name: { en: "Products", ar: "منتجات" } },
   { id: "realestate", name: { en: "Real estate", ar: "عقارات" } },
@@ -32,6 +35,69 @@ const KEEP: Text = { en: "Upload a clear photo of your item. PostKit keeps it th
 
 /** Covers were made with these templates on phone-style sample photos (Oct 2026). */
 export const TEMPLATES: Template[] = [
+  {
+    id: "occ-ramadan", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Ramadan", ar: "رمضان" },
+    blurb: { en: "Lanterns, dates and golden candlelight.", ar: "فوانيس وتمر وضوء ذهبي دافئ." },
+    prompt: "Place this product on a table with glowing Ramadan lanterns, a bowl of dates and a small crescent moon ornament, warm golden candlelight against a deep navy evening backdrop, festive and elegant advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-ramadan.webp", before: "/templates/white-studio-before.webp", occasion: "ramadan",
+  },
+  {
+    id: "occ-eid", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Eid", ar: "العيد" },
+    blurb: { en: "Gifts, ma'amoul and gold confetti.", ar: "هدايا ومعمول وقصاصات ذهبية." },
+    prompt: "Place this product among elegant Eid gifts: pastel gift boxes with gold ribbons, ma'amoul cookies on a brass tray, scattered gold confetti, soft warm light, joyful and refined advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-eid.webp", before: "/templates/white-studio-before.webp", occasion: "eid",
+  },
+  {
+    id: "occ-christmas", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Christmas", ar: "الميلاد" },
+    blurb: { en: "Pine, ornaments and warm fairy lights.", ar: "صنوبر وزينة وأضواء دافئة." },
+    prompt: "Place this product in a cozy Christmas scene: pine branches, red and gold ornaments, warm fairy-light bokeh, a soft dusting of snow, festive and warm advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-christmas.webp", before: "/templates/white-studio-before.webp", occasion: "christmas",
+  },
+  {
+    id: "occ-new-year", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "New Year", ar: "رأس السنة" },
+    blurb: { en: "Confetti, champagne and sparkle.", ar: "قصاصات وشمبانيا ولمعان." },
+    prompt: "Place this product in a New Year's Eve celebration: gold and silver confetti, two champagne glasses, sparkling bokeh lights on a midnight-blue backdrop, glamorous advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-new-year.webp", before: "/templates/white-studio-before.webp", occasion: "new-year",
+  },
+  {
+    id: "occ-valentine", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Valentine's", ar: "عيد الحب" },
+    blurb: { en: "Red roses, petals and soft pink light.", ar: "ورود حمراء وبتلات وضوء وردي." },
+    prompt: "Place this product on soft pink silk surrounded by red roses and scattered rose petals, romantic pink light with heart-shaped bokeh, Valentine's Day advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-valentine.webp", before: "/templates/white-studio-before.webp", occasion: "valentine",
+  },
+  {
+    id: "occ-mothers-day", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Mother's Day", ar: "عيد الأم" },
+    blurb: { en: "Spring tulips and gentle morning light.", ar: "توليب ربيعي وضوء صباحي ناعم." },
+    prompt: "Place this product among fresh pastel tulips and baby's breath flowers on a white linen table by a bright window, soft spring morning light, gentle and loving mood, clean advertising photo. Absolutely no words, letters, signs or cards anywhere. Keep the product exactly the same.",
+    tip: KEEP, cover: "/templates/occ-mothers-day.webp", before: "/templates/white-studio-before.webp", occasion: "mothers-day",
+  },
+  {
+    id: "occ-independence", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Independence Day", ar: "عيد الاستقلال" },
+    blurb: { en: "Red and white with a cedar branch.", ar: "أحمر وأبيض مع غصن أرز." },
+    prompt: "Place this product on a white marble surface beside a small green cedar branch, with red and white ribbons and soft red-and-white bokeh lights, elegant Lebanese Independence Day advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-independence.webp", before: "/templates/white-studio-before.webp", occasion: "independence",
+  },
+  {
+    id: "occ-black-friday", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Black Friday", ar: "الجمعة السوداء" },
+    blurb: { en: "Black, neon lime and shopping bags.", ar: "أسود ونيون أخضر وأكياس تسوّق." },
+    prompt: "Place this product on a matte black surface with bold neon lime-green light strips behind it and plain black shopping bags without any print, dramatic high-contrast sale-season advertising photo. Absolutely no words, letters, numbers or logos anywhere. Keep the product exactly the same.",
+    tip: KEEP, cover: "/templates/occ-black-friday.webp", before: "/templates/white-studio-before.webp", occasion: "black-friday",
+  },
+  {
+    id: "occ-summer", category: "occasions", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "portrait",
+    name: { en: "Summer", ar: "الصيف" },
+    blurb: { en: "Sunlit sand and turquoise water.", ar: "رمل مشمس ومياه فيروزية." },
+    prompt: "Place this product on sunlit sand at a Mediterranean beach with turquoise water behind, palm leaf shadows and a pair of sunglasses, bright summer advertising photo. Keep the product exactly the same. No text.",
+    tip: KEEP, cover: "/templates/occ-summer.webp", before: "/templates/white-studio-before.webp", occasion: "summer",
+  },
   {
     id: "menu-dish", category: "food", needs: "photo", mode: "photo", model: QWEN_EDIT, size: "square",
     name: { en: "Menu photo", ar: "صورة للقائمة" },
@@ -129,6 +195,62 @@ export const TEMPLATES: Template[] = [
     cover: "/templates/sale-post.webp",
   },
 ];
+
+
+/** Next date a fixed-date occasion happens (month is 0-based). */
+function yearly(month: number, day: number) {
+  const now = new Date();
+  const d = new Date(now.getFullYear(), month, day);
+  if (d.getTime() < now.getTime() - 86_400_000) d.setFullYear(d.getFullYear() + 1);
+  return { date: d };
+}
+/** Black Friday: the day after the fourth Thursday of November. */
+function blackFriday() {
+  const make = (y: number) => {
+    const first = new Date(y, 10, 1);
+    const thursday = 1 + ((4 - first.getDay() + 7) % 7) + 21;
+    return new Date(y, 10, thursday + 1);
+  };
+  const now = new Date();
+  let d = make(now.getFullYear());
+  if (d.getTime() < now.getTime() - 86_400_000) d = make(now.getFullYear() + 1);
+  return { date: d };
+}
+/** Approximate start dates (they depend on the moon sighting). */
+const ISLAMIC: Record<"ramadan" | "eid", string[]> = {
+  ramadan: ["2026-02-18", "2027-02-08", "2028-01-28", "2029-01-16", "2030-01-06"],
+  eid: ["2026-03-20", "2027-03-10", "2028-02-27", "2029-02-15", "2030-02-05"],
+};
+function islamic(k: "ramadan" | "eid") {
+  const now = Date.now() - 86_400_000;
+  const d = ISLAMIC[k].map((s) => new Date(`${s}T00:00:00`)).find((x) => x.getTime() >= now) ?? new Date(ISLAMIC[k].at(-1)!);
+  return { date: d, approx: true };
+}
+
+const OCCASION_DATES: Record<string, () => { date: Date; approx?: boolean }> = {
+  "ramadan": () => islamic('ramadan'),
+  "eid": () => islamic('eid'),
+  "christmas": () => yearly(11, 25),
+  "new-year": () => yearly(11, 31),
+  "valentine": () => yearly(1, 14),
+  "mothers-day": () => yearly(2, 21),
+  "independence": () => yearly(10, 22),
+  "black-friday": () => blackFriday(),
+  "summer": () => yearly(5, 21),
+};
+
+/** Days until an occasion, or null for regular templates. */
+export function daysUntil(t: Template) {
+  const next = t.occasion ? OCCASION_DATES[t.occasion] : undefined;
+  if (!next) return null;
+  const { date, approx } = next();
+  return { days: Math.max(0, Math.ceil((date.getTime() - Date.now()) / 86_400_000)), date, approx };
+}
+
+/** Occasions sorted by which one is coming up first. */
+export function upcomingOccasions() {
+  return TEMPLATES.filter((t) => t.occasion).sort((a, b) => daysUntil(a)!.days - daysUntil(b)!.days);
+}
 
 export function getTemplate(id?: string | null) {
   return id ? TEMPLATES.find((t) => t.id === id) : undefined;

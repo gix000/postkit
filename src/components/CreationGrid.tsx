@@ -6,6 +6,8 @@ import { deleteCreation, setShared } from "@/app/creation-actions";
 import Viewer, { type ViewItem } from "./Viewer";
 import { useToast } from "./Toast";
 import LazyVideo from "./LazyVideo";
+import TextEditor from "./TextEditor";
+import { shareUrl } from "@/lib/share";
 
 export type GridItem = {
   id: string;
@@ -28,8 +30,10 @@ function createHref(it: GridItem, mode?: string) {
 
 /** Masonry-style wall of photos and videos. "mine" adds share and delete controls. */
 export default function CreationGrid({ items, mine = false }: { items: GridItem[]; mine?: boolean }) {
-  const { t } = useT();
+  const { lang, t } = useT();
+  const ar = lang === "ar";
   const [list, setList] = useState(items);
+  const [texting, setTexting] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const [viewing, setViewing] = useState<ViewItem | null>(null);
   const toast = useToast();
@@ -79,6 +83,23 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
                 <Link href={createHref(it)} className={`${btn} inline-flex items-center ${!mine ? "btn-neon border-transparent" : ""}`}>
                   {mine ? t.library.usePrompt : t.explore.usePrompt}
                 </Link>
+              )}
+              {mine && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const ok = await shareUrl(it.url, `postkit.${it.kind === "video" ? "mp4" : "png"}`);
+                    if (!ok) window.open(it.url, "_blank");
+                  }}
+                  className={`${btn} btn-neon border-transparent`}
+                >
+                  {ar ? "انشر" : "Post"}
+                </button>
+              )}
+              {mine && it.kind === "photo" && (
+                <button type="button" onClick={() => setTexting(it.url)} className={btn}>
+                  {ar ? "+ نص" : "+ Text"}
+                </button>
               )}
               {mine && it.kind === "photo" && (
                 <Link href={`/create?mode=animate&from=${encodeURIComponent(it.url)}`} className={`${btn} inline-flex items-center`}>
@@ -131,6 +152,13 @@ export default function CreationGrid({ items, mine = false }: { items: GridItem[
       ))}
     </ul>
     <Viewer item={viewing} onClose={() => setViewing(null)} />
+    {texting && (
+      <TextEditor
+        src={texting}
+        onClose={() => setTexting(null)}
+        onSaved={(r) => r.id && setList((l) => [{ id: r.id!, kind: "photo", tool: "text", url: r.url, prompt: null, model: null, is_public: false }, ...l])}
+      />
+    )}
     </>
   );
 }

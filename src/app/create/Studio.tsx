@@ -21,12 +21,15 @@ import {
   type Tool,
 } from "@/lib/catalog";
 import { applyMask, prepareUpload, smallCopy, urlToUpload } from "@/lib/image-client";
-import { createClient as browserSupabase } from "@/lib/supabase/browser";
+import { saveFromBrowser } from "@/lib/save-client";
+import { shareUrl } from "@/lib/share";
+import TextEditor from "@/components/TextEditor";
+import ReelMaker from "@/components/ReelMaker";
 import { setShared } from "@/app/creation-actions";
 
 export type Tab = "photo" | "video" | "chat";
 type Msg = { role: "user" | "assistant"; content: string };
-type Result = { id?: string; url: string; kind: "photo" | "video"; prompt: string; tool: Tool; shared: boolean };
+type Result = { id?: string; url: string; kind: "photo" | "video"; prompt: string; tool: Tool; shared: boolean; before?: string };
 
 export default function Studio({
   initialTab,
@@ -179,6 +182,8 @@ function MediaGen({
   const fileInput = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const [viewing, setViewing] = useState<ViewItem | null>(null);
+  const [texting, setTexting] = useState<string | null>(null);
+  const [reel, setReel] = useState<{ before: string; after: string } | null>(null);
   const [started, setStarted] = useState<number | null>(null);
   const [now, setNow] = useState(0);
 
@@ -283,14 +288,14 @@ function MediaGen({
       router.refresh();
       if (data.mask && image) {
         const png = await applyMask(image, data.mask);
-        const saved = await saveCutoutFromBrowser(png);
+        const saved = await saveFromBrowser(png, { kind: "photo", tool: "cutout" });
         setItems((prev) => [
           { id: saved?.id, url: saved?.url ?? URL.createObjectURL(png), kind: "photo", prompt: "", tool: "cutout", shared: false },
           ...prev,
         ]);
       } else if (data.creation) {
         setItems((prev) => [
-          { id: data.creation.id, url: data.creation.url, kind: data.creation.kind, prompt, tool: runTool, shared: false },
+          { id: data.creation.id, url: data.creation.url, kind: data.creation.kind, prompt, tool: runTool, shared: false, before: runTool === "edit" && image ? image : undefined },
           ...prev,
         ]);
       }
@@ -516,6 +521,8 @@ function MediaGen({
                     setItems((prev) => prev.map((x) => (x.url === it.url ? { ...x, shared } : x)));
                     toast(shared ? t.create.sharedToast : t.create.unsharedToast);
                   }}
+                  onText={() => setTexting(it.url)}
+                  onReel={it.before ? () => setReel({ before: it.before!, after: it.url }) : undefined}
                   onEdit={() => {
                     setImage(null);
                     setSource("photo");
@@ -535,6 +542,14 @@ function MediaGen({
         )}
       </div>
       <Viewer item={viewing} onClose={() => setViewing(null)} />
+      {texting && (
+        <TextEditor
+          src={texting}
+          onClose={() => setTexting(null)}
+          onSaved={(r) => setItems((prev) => [{ id: r.id, url: r.url, kind: "photo", prompt: "", tool: "edit", shared: false }, ...prev])}
+        />
+      )}
+      {reel && <ReelMaker before={reel.before} after={reel.after} onClose={() => setReel(null)} />}
     </div>
   );
 }
@@ -605,6 +620,8 @@ function ResultCard({
   onShared,
   onEdit,
   onAnimate,
+  onText,
+  onReel,
 }: {
   item: Result;
   index: number;
@@ -612,8 +629,11 @@ function ResultCard({
   onShared: (shared: boolean) => void;
   onEdit: () => void;
   onAnimate: () => void;
+  onText: () => void;
+  onReel?: () => void;
 }) {
-  const { t } = useT();
+  const { lang, t } = useT();
+  const ar = lang === "ar";
   const [pending, start] = useTransition();
   const isVideo = item.kind === "video";
   const action = "tap h-9 px-3 rounded-full text-[13px] font-medium border border-rule hover:border-ink/40";
@@ -634,11 +654,30 @@ function ResultCard({
       <div className="p-3 space-y-2">
         {item.prompt && <p className="text-sm text-muted line-clamp-2" dir="auto">{item.prompt}</p>}
         <div className="flex flex-wrap gap-1.5">
+          <button
+            type="button"
+            onClick={async () => {
+              const name = `postkit-${index + 1}.${isVideo ? "mp4" : "png"}`;
+              const ok = await shareUrl(item.url, name);
+              if (!ok) window.open(item.url, "_blank");
+            }}
+            className={`${action} btn-neon border-transparent`}
+          >
+            {ar ? "انشر" : "Post"}
+          </button>
           <a href={item.url} download={`postkit-${index + 1}.${isVideo ? "mp4" : "png"}`} className={`${action} inline-flex items-center`}>
             {t.create.download}
           </a>
           {!isVideo && (
             <>
+              <button type="button" onClick={onText} className={action}>
+                {ar ? "+ نص" : "+ Text"}
+              </button>
+              {onReel && (
+                <button type="button" onClick={onReel} className={action}>
+                  {ar ? "ريل قبل/بعد" : "Before/After reel"}
+                </button>
+              )}
               <button type="button" onClick={onEdit} className={action}>
                 {t.create.edit}
               </button>
@@ -669,22 +708,6 @@ function ResultCard({
   );
 }
 
-/** Stores a cutout that was finished in the browser in the visitor's gallery. */
-async function saveCutoutFromBrowser(png: Blob): Promise<{ id: string; url: string } | null> {
-  const sb = browserSupabase();
-  if (!sb) return null;
-  const {
-    data: { user },
-  } = await sb.auth.getUser();
-  if (!user) return null;
-  const id = crypto.randomUUID();
-  const path = `${user.id}/${id}.png`;
-  const up = await sb.storage.from("creations").upload(path, png, { contentType: "image/png" });
-  if (up.error) return null;
-  const url = sb.storage.from("creations").getPublicUrl(path).data.publicUrl;
-  const { error } = await sb.from("creations").insert({ id, user_id: user.id, kind: "photo", tool: "cutout", path, url });
-  return error ? null : { id, url };
-}
 
 /* ── Chat ────────────────────────────────────────────────── */
 

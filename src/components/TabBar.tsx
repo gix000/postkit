@@ -32,9 +32,9 @@ const Stack = (
     <path d="m8 12 2.5-3 2 2.2L14 9.5l2 2.5" />
   </svg>
 );
-const BoltIcon = (
+const Heart = (
   <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" {...stroke}>
-    <path d="M13.2 3 5 13.5h6l-1 7.5 8-10.5h-6z" />
+    <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" />
   </svg>
 );
 const Person = (
@@ -57,8 +57,8 @@ export default function TabBar({ signedIn }: { signedIn: boolean }) {
     { href: "/", label: t.nav.home, icon: Home },
     { href: "/templates", label: lang === "ar" ? "القوالب" : "Templates", icon: Grid },
     { href: "/create", label: t.nav.create, icon: Spark, primary: true },
-    { href: "/library", label: t.nav.library, icon: Stack },
-    signedIn ? { href: "/credits", label: t.nav.credits, icon: BoltIcon } : { href: "/login", label: t.nav.signIn, icon: Person },
+    { href: "/social", label: lang === "ar" ? "سوشيال" : "Social", icon: Heart },
+    signedIn ? { href: "/library", label: t.nav.library, icon: Stack } : { href: "/login", label: t.nav.signIn, icon: Person },
   ];
   return (
     <nav

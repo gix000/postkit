@@ -15,6 +15,7 @@ export default function NavLinks() {
   const links = [
     { href: "/create", label: t.nav.create },
     { href: "/templates", label: lang === "ar" ? "القوالب" : "Templates" },
+    { href: "/social", label: lang === "ar" ? "سوشيال" : "Social" },
     { href: "/#models", label: t.nav.models, wide: true },
     { href: "/explore", label: t.nav.explore, wide: true },
     { href: "/library", label: t.nav.library },

@@ -1,5 +1,6 @@
 "use client";
 import type { Template } from "@/lib/templates";
+import PromptLibrary from "@/components/PromptLibrary";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -155,6 +156,10 @@ function MediaGen({
   const [image, setImage] = useState<string | null>(remoteStart ? null : (initialImage ?? null));
   const [loadingImage, setLoadingImage] = useState(remoteStart);
   const [prompt, setPrompt] = useState(initialPrompt ?? "");
+  const [polishing, setPolishing] = useState(false);
+  const [beforePolish, setBeforePolish] = useState<string | null>(null);
+
+
   const [size, setSize] = useState<SizeId>(initialSize ?? (isVideo ? "story" : "square"));
   const [preset, setPreset] = useState<PresetId>("none");
   const usesPhoto = source === "photo";
@@ -202,6 +207,28 @@ function MediaGen({
       setSource("photo");
     } finally {
       setLoadingImage(false);
+    }
+  }
+
+  async function polish() {
+    if (polishing || prompt.trim().length < 2) return;
+    setPolishing(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/enhance", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ prompt, kind: pickerKind }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.prompt) throw new Error(data.error || "Error");
+      setBeforePolish(prompt);
+      setPrompt(data.prompt);
+      haptic(8);
+    } catch (e) {
+      setError({ text: (e as Error).message });
+    } finally {
+      setPolishing(false);
     }
   }
 
@@ -357,40 +384,58 @@ function MediaGen({
         )}
 
         <div>
-          <label htmlFor={`${kind}-prompt`} className="text-sm font-medium">
-            {promptLabel}
-          </label>
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={`${kind}-prompt`} className="text-sm font-medium">
+              {promptLabel}
+            </label>
+            <button
+              type="button"
+              onClick={polish}
+              disabled={polishing || prompt.trim().length < 2}
+              title={lang === "ar" ? "يحوّل فكرتك القصيرة إلى وصف احترافي مجانًا" : "Turns a short idea into a pro prompt, free"}
+              className="tap inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-semibold border border-cobalt/40 text-cobalt hover:bg-cobalt/10 disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={polishing ? "animate-spin" : ""}>
+                <path d="M12 2.5c.7 4.6 3.4 7.6 9 9.5-5.6 1.9-8.3 4.9-9 9.5-.7-4.6-3.4-7.6-9-9.5 5.6-1.9 8.3-4.9 9-9.5Z" />
+              </svg>
+              {polishing ? (lang === "ar" ? "نحسّن…" : "Polishing…") : lang === "ar" ? "حسّن الوصف" : "Polish"}
+            </button>
+          </div>
           <textarea
             id={`${kind}-prompt`}
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={(e) => {
+              setPrompt(e.target.value);
+              setBeforePolish(null);
+            }}
             rows={4}
             dir="auto"
             placeholder={placeholder}
             className="mt-1 w-full rounded-2xl border border-rule bg-surface px-3 py-2.5 text-[15px] focus:outline-none focus:border-cobalt"
           />
-          <p className="text-xs text-muted mt-1">{t.create.arabicOk}</p>
-          {!prompt.trim() && (
-            <div className="mt-3">
-              <p className="text-xs text-muted mb-1.5">{t.create.ideas}</p>
-              <div className="flex gap-1.5 overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 lg:flex-wrap pb-1">
-                {t.create.ideaList[pickerKind as "photo" | "edit" | "video" | "animate"].map((idea) => (
-                  <button
-                    key={idea}
-                    type="button"
-                    dir="auto"
-                    onClick={() => {
-                      setPrompt(idea);
-                      haptic(6);
-                    }}
-                    className="glass shrink-0 max-w-[260px] truncate rounded-full px-3.5 py-2 text-[13px] text-muted hover:text-ink"
-                  >
-                    {idea}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="flex items-center justify-between gap-2 mt-1">
+            <p className="text-xs text-muted">{t.create.arabicOk}</p>
+            {beforePolish !== null && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPrompt(beforePolish);
+                  setBeforePolish(null);
+                }}
+                className="text-xs font-semibold text-muted hover:text-ink underline underline-offset-2 shrink-0"
+              >
+                {lang === "ar" ? "تراجع" : "Undo polish"}
+              </button>
+            )}
+          </div>
+          <PromptLibrary
+            kind={pickerKind as "photo" | "edit" | "video" | "animate"}
+            onPick={(text) => {
+              setPrompt(text);
+              setBeforePolish(null);
+              haptic(6);
+            }}
+          />
         </div>
 
         {showSize && (

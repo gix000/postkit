@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Link from "next/link";
 import Header from "@/components/Header";
+import ScrollLock from "@/components/ScrollLock";
 import Logo from "@/components/Logo";
 import { I18nProvider, LangSwitch } from "@/components/I18n";
 import { ToastProvider } from "@/components/Toast";
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           >
             {t.skip}
           </a>
+          <ScrollLock />
           <Header />
           <main id="main" className="flex-1 pb-28 sm:pb-0">
             {children}

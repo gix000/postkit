@@ -78,7 +78,7 @@ export default function PromptLibrary({ kind, onPick }: { kind: PromptKind; onPi
               </div>
             )}
           </div>
-          <ul className="overflow-y-auto p-3 space-y-2">
+          <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 space-y-2">
             {shown.map((x) => (
               <li key={x.title.en}>
                 <button

@@ -414,6 +414,7 @@ button:not(:disabled):active, .tap:active {
 
 /* ── Bottom sheet (model picker) and viewer ─────────────── */
 dialog.sheet {
+  overscroll-behavior: contain;
   margin: auto auto 0;
   max-width: 100%;
   border: 1px solid rgba(239, 248, 255, 0.13);
@@ -474,3 +475,7 @@ dialog.viewer[open] {
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+/* Scrolling inside a sheet never chains to the page behind it. */
+dialog.sheet *,
+dialog.viewer { overscroll-behavior: contain; }

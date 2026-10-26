@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -28,9 +29,11 @@ const jbmono = localFont({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { lang } = await getT();
+  const [{ lang }, h] = await Promise.all([getT(), headers()]);
+  const path = h.get("x-pk-path") ?? "/";
   const shared: Metadata = {
     metadataBase: new URL("https://www.postkitlb.com"),
+    alternates: { canonical: path },
     applicationName: "PostKit",
     openGraph: { siteName: "PostKit", type: "website", images: [{ url: "/templates/burger-ad.webp" }] },
     twitter: { card: "summary_large_image" },

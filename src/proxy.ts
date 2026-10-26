@@ -11,6 +11,8 @@ export async function proxy(request: NextRequest) {
   // Search-engine landing pages have a fixed language: /use/… English, /ar/use/… Arabic.
   const path = request.nextUrl.pathname;
   request.headers.delete("x-pk-lang");
+  // Lets the layout give every page a canonical URL without its ?query (no duplicate pages in Google).
+  request.headers.set("x-pk-path", path);
   if (path === "/ar/use" || path.startsWith("/ar/use/")) request.headers.set("x-pk-lang", "ar");
   else if (path === "/use" || path.startsWith("/use/")) request.headers.set("x-pk-lang", "en");
   const newDevice = request.cookies.has(DEVICE_COOKIE) ? null : crypto.randomUUID();

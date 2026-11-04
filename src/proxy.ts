@@ -5,8 +5,8 @@ const DEVICE_COOKIE = "pk_device";
 
 // Crawlers and scrapers. They were crawling the old Hugging Face mirror pages
 // (/models/…, /datasets/…): millions of possible pages, each rendered on the
-// server, which used up the free plan's server time. They now get a tiny
-// "gone" answer for those pages without rendering anything.
+// server, which used up the free plan's server time. Those pages are gone;
+// old links are answered here without rendering anything.
 const BOT = /bot|crawl|spider|slurp|scrap|fetch|preview|python|curl|wget|httpx|axios|go-http|java\/|okhttp|headless|lighthouse|bytespider|petalbot|ahrefs|semrush|mj12|dotbot|gptbot|claudebot|ccbot|perplexity|amazonbot|meta-externalagent|facebookexternalhit/i;
 const OLD_HUB = /^\/(models|datasets)(\/|$)/;
 
@@ -17,8 +17,12 @@ export async function proxy(request: NextRequest) {
   // A long-lived device id, so the free welcome credits go to one account per phone or laptop.
   // Search-engine landing pages have a fixed language: /use/… English, /ar/use/… Arabic.
   const path = request.nextUrl.pathname;
-  if (OLD_HUB.test(path) && BOT.test(request.headers.get("user-agent") || "")) {
-    return new NextResponse("Gone", { status: 410, headers: { "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "public, max-age=86400" } });
+  // The old Hugging Face pages were removed: bots get "gone", people go home.
+  if (OLD_HUB.test(path)) {
+    if (BOT.test(request.headers.get("user-agent") || "")) {
+      return new NextResponse("Gone", { status: 410, headers: { "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "public, max-age=86400" } });
+    }
+    return NextResponse.redirect(new URL("/", request.url), 308);
   }
   request.headers.delete("x-pk-lang");
   // Lets the layout give every page a canonical URL without its ?query (no duplicate pages in Google).
@@ -50,5 +54,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/search|api/models|api/health|showcase|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2|mp4)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/models|api/health|showcase|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2|mp4)$).*)"],
 };

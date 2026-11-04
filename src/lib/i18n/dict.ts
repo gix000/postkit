@@ -293,7 +293,7 @@ const en = {
   notFound: {
     title: "Not found",
     body: "This page doesn't exist, is private, or was renamed.",
-    models: "Browse models",
+    models: "Explore creations",
     create: "Start creating",
   },
 };
@@ -593,7 +593,7 @@ const ar: Dict = {
   notFound: {
     title: "غير موجود",
     body: "هذه الصفحة غير موجودة أو خاصة أو تغيّر اسمها.",
-    models: "تصفّح النماذج",
+    models: "استكشف الإبداعات",
     create: "ابدأ الإنشاء",
   },
 };

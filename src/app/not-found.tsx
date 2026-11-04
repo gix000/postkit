@@ -11,7 +11,7 @@ export default async function NotFound() {
         <Link href="/create" className="tap btn-neon inline-flex h-11 items-center rounded-full px-5 text-sm font-semibold">
           {t.notFound.create}
         </Link>
-        <Link href="/models" className="tap inline-flex h-11 items-center rounded-full border border-rule bg-surface px-5 text-sm font-medium">
+        <Link href="/explore" className="tap inline-flex h-11 items-center rounded-full border border-rule bg-surface px-5 text-sm font-medium">
           {t.notFound.models}
         </Link>
       </div>

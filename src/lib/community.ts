@@ -116,10 +116,8 @@ export async function saveCount(ref: string): Promise<number> {
 
 /** Where a saved ref lives in the app. */
 export function saveHref(s: Pick<Save, "ref" | "kind" | "label">): string {
-  if (s.ref.startsWith("hf:")) {
-    const id = s.ref.split(":").slice(2).join(":");
-    return s.kind === "model" ? `/models/${id}` : `/datasets/${id}`;
-  }
+  // The old Hugging Face model/dataset pages were removed.
+  if (s.ref.startsWith("hf:")) return "/explore";
   // community label is stored as "username/slug"
   const [user, slug] = s.label.split("/");
   return `/c/${user}/${s.kind}s/${slug}`;

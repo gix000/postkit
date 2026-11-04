@@ -3,6 +3,13 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const DEVICE_COOKIE = "pk_device";
 
+// Crawlers and scrapers. They were crawling the old Hugging Face mirror pages
+// (/models/…, /datasets/…): millions of possible pages, each rendered on the
+// server, which used up the free plan's server time. They now get a tiny
+// "gone" answer for those pages without rendering anything.
+const BOT = /bot|crawl|spider|slurp|scrap|fetch|preview|python|curl|wget|httpx|axios|go-http|java\/|okhttp|headless|lighthouse|bytespider|petalbot|ahrefs|semrush|mj12|dotbot|gptbot|claudebot|ccbot|perplexity|amazonbot|meta-externalagent|facebookexternalhit/i;
+const OLD_HUB = /^\/(models|datasets)(\/|$)/;
+
 /** Keeps the Supabase session cookie fresh on every navigation. */
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_HUB_SUPABASE_URL;
@@ -10,6 +17,9 @@ export async function proxy(request: NextRequest) {
   // A long-lived device id, so the free welcome credits go to one account per phone or laptop.
   // Search-engine landing pages have a fixed language: /use/… English, /ar/use/… Arabic.
   const path = request.nextUrl.pathname;
+  if (OLD_HUB.test(path) && BOT.test(request.headers.get("user-agent") || "")) {
+    return new NextResponse("Gone", { status: 410, headers: { "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "public, max-age=86400" } });
+  }
   request.headers.delete("x-pk-lang");
   // Lets the layout give every page a canonical URL without its ?query (no duplicate pages in Google).
   request.headers.set("x-pk-path", path);
